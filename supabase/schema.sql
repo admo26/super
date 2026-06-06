@@ -38,10 +38,21 @@ create table if not exists public.weekly_plan_items (
   "group" text not null
 );
 
+create table if not exists public.recipes (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  source text not null,
+  cook_frequency text not null,
+  serving_pattern text not null,
+  rotation_notes text not null,
+  ingredients_to_map text[] not null default '{}'
+);
+
 alter table public.weekly_plans enable row level security;
 alter table public.weekly_plan_meals enable row level security;
 alter table public.weekly_plan_cadence_items enable row level security;
 alter table public.weekly_plan_items enable row level security;
+alter table public.recipes enable row level security;
 
 drop policy if exists "Public can read weekly plans" on public.weekly_plans;
 create policy "Public can read weekly plans"
@@ -67,6 +78,13 @@ using (true);
 drop policy if exists "Public can read weekly plan items" on public.weekly_plan_items;
 create policy "Public can read weekly plan items"
 on public.weekly_plan_items
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Public can read recipes" on public.recipes;
+create policy "Public can read recipes"
+on public.recipes
 for select
 to anon, authenticated
 using (true);

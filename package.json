@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "seed:weekly-plan": "node scripts/seed_weekly_plan.mjs"
+    "seed:weekly-plan": "node scripts/seed_weekly_plan.mjs",
+    "seed:recipes": "node scripts/seed_recipes.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
