@@ -20,7 +20,7 @@ export default function CallbackClient({ code, nextPath }: CallbackClientProps) 
 
     async function completeAuth() {
       if (!code) {
-        router.replace("/login");
+        setMessage("Google did not return a sign-in code. Check the Supabase redirect URL configuration.");
         return;
       }
 
@@ -30,8 +30,7 @@ export default function CallbackClient({ code, nextPath }: CallbackClientProps) 
       if (cancelled) return;
 
       if (error) {
-        setMessage("Sign-in failed. Redirecting back to login...");
-        router.replace("/login");
+        setMessage(`Sign-in failed: ${error.message}`);
         return;
       }
 
