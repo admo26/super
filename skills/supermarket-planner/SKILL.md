@@ -50,7 +50,9 @@ Produce:
 
 If the task is to generate the next weekly order for this repo, also:
 - write the dated output files under `data/`
+- update `data/current_weekly_plan.json` to match the latest active weekly plan
 - keep `docs/index.html` aligned with the latest weekly view
+- sync the current weekly plan to Supabase when the project environment is configured for it
 - stage, commit, and push the repo changes unless the user explicitly asks not to publish yet
 
 Use the template in:

@@ -29,7 +29,8 @@ Always provide:
 
 ## Repo Update Rule
 - When generating a new weekly order, update the repository outputs as part of the task.
-- Write the new plan to the dated files in `data/` and keep `docs/index.html` aligned with the latest published weekly view.
+- Write the new plan to the dated files in `data/`, keep `data/current_weekly_plan.json` aligned with the latest active week, and keep `docs/index.html` aligned with the latest published weekly view.
+- If Supabase is configured, sync `data/current_weekly_plan.json` into the database as part of the weekly-order publish flow.
 - Stage, commit, and push the changes before handing the result back unless the user explicitly asks not to publish the repo update yet.
 
 ## Safety and Automation Guardrails
