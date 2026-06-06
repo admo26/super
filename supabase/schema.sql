@@ -48,11 +48,25 @@ create table if not exists public.recipes (
   ingredients_to_map text[] not null default '{}'
 );
 
+create table if not exists public.order_history_items (
+  id uuid primary key default gen_random_uuid(),
+  imported_at timestamptz not null default now(),
+  order_date date,
+  item_name text not null,
+  quantity text,
+  unit text,
+  category text,
+  notes text,
+  source_type text not null default 'manual_import',
+  source_name text
+);
+
 alter table public.weekly_plans enable row level security;
 alter table public.weekly_plan_meals enable row level security;
 alter table public.weekly_plan_cadence_items enable row level security;
 alter table public.weekly_plan_items enable row level security;
 alter table public.recipes enable row level security;
+alter table public.order_history_items enable row level security;
 
 drop policy if exists "Public can read weekly plans" on public.weekly_plans;
 create policy "Public can read weekly plans"
@@ -85,6 +99,13 @@ using (true);
 drop policy if exists "Public can read recipes" on public.recipes;
 create policy "Public can read recipes"
 on public.recipes
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Public can read order history items" on public.order_history_items;
+create policy "Public can read order history items"
+on public.order_history_items
 for select
 to anon, authenticated
 using (true);

@@ -1,0 +1,138 @@
+import { NextResponse } from "next/server";
+
+import type { ParsedOrderHistoryPayload } from "@/lib/order-import";
+
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+
+function getMimeType(file: File) {
+  if (file.type) return file.type;
+  if (file.name.toLowerCase().endsWith(".pdf")) return "application/pdf";
+  if (file.name.toLowerCase().endsWith(".png")) return "image/png";
+  if (file.name.toLowerCase().endsWith(".jpg") || file.name.toLowerCase().endsWith(".jpeg")) return "image/jpeg";
+  return "application/octet-stream";
+}
+
+function buildSchema() {
+  return {
+    type: "json_schema",
+    name: "order_history_import",
+    strict: true,
+    schema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["source_name", "summary", "confidence_notes", "items"],
+      properties: {
+        source_name: { type: "string" },
+        summary: { type: "string" },
+        confidence_notes: {
+          type: "array",
+          items: { type: "string" }
+        },
+        items: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["order_date", "item_name", "quantity", "unit", "category", "notes"],
+            properties: {
+              order_date: {
+                anyOf: [{ type: "string" }, { type: "null" }]
+              },
+              item_name: { type: "string" },
+              quantity: {
+                anyOf: [{ type: "string" }, { type: "null" }]
+              },
+              unit: {
+                anyOf: [{ type: "string" }, { type: "null" }]
+              },
+              category: {
+                anyOf: [{ type: "string" }, { type: "null" }]
+              },
+              notes: {
+                anyOf: [{ type: "string" }, { type: "null" }]
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+}
+
+export async function POST(request: Request) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ error: "OPENAI_API_KEY is not configured." }, { status: 500 });
+  }
+
+  const formData = await request.formData();
+  const file = formData.get("file");
+
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: "Missing upload file." }, { status: 400 });
+  }
+
+  if (file.size > MAX_FILE_BYTES) {
+    return NextResponse.json({ error: "File too large. Keep uploads below 10 MB." }, { status: 400 });
+  }
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const base64 = buffer.toString("base64");
+  const mimeType = getMimeType(file);
+
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      input: [
+        {
+          role: "system",
+          content: [
+            {
+              type: "input_text",
+              text:
+                "Extract supermarket order history from the uploaded file. Return normalized JSON only. Use ISO dates when the order date is visible. Keep quantity and unit exactly as best inferred from the document. If uncertain, put the uncertainty into notes or confidence_notes rather than inventing values."
+            }
+          ]
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_text",
+              text:
+                "Parse this supermarket order PDF or screenshot into structured order history rows for a family grocery planner."
+            },
+            {
+              type: "input_file",
+              filename: file.name,
+              file_data: `data:${mimeType};base64,${base64}`
+            }
+          ]
+        }
+      ],
+      text: {
+        format: buildSchema()
+      }
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    return NextResponse.json({ error: `OpenAI parse failed: ${errorText}` }, { status: 500 });
+  }
+
+  const payload = await response.json();
+  const outputText = payload.output_text;
+
+  if (!outputText) {
+    return NextResponse.json({ error: "Model returned no structured output." }, { status: 500 });
+  }
+
+  const parsed = JSON.parse(outputText) as ParsedOrderHistoryPayload;
+  return NextResponse.json(parsed);
+}

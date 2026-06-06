@@ -321,6 +321,71 @@ p {
   gap: 14px;
 }
 
+.import-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.ghost-button {
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.helper-text,
+.error-text,
+.success-text {
+  margin-top: 12px;
+}
+
+.helper-text {
+  color: var(--muted);
+}
+
+.error-text {
+  color: #9b2c2c;
+}
+
+.success-text {
+  color: var(--green);
+}
+
+.import-table {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.import-table__head,
+.import-table__row {
+  display: grid;
+  grid-template-columns: 0.9fr 1.7fr 0.7fr 0.8fr 1fr 1.6fr;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.import-table__head {
+  background: rgba(255,255,255,0.75);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.import-table__row {
+  background: rgba(255,255,255,0.62);
+  border-top: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
 .recipe-card {
   padding: 18px;
   border-radius: 20px;
@@ -430,6 +495,11 @@ p {
   .content-grid,
   .cadence-grid,
   .hero-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .import-table__head,
+  .import-table__row {
     grid-template-columns: 1fr;
   }
 }
