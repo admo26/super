@@ -386,6 +386,53 @@ p {
   font-size: 0.95rem;
 }
 
+.history-list {
+  display: grid;
+  gap: 18px;
+}
+
+.history-card {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.72);
+  overflow: hidden;
+}
+
+.history-card__header {
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+}
+
+.history-table {
+  display: grid;
+}
+
+.history-table__head,
+.history-table__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(90px, 0.8fr) minmax(120px, 0.9fr) minmax(140px, 1.1fr);
+  gap: 12px;
+  padding: 12px 18px;
+}
+
+.history-table__head {
+  background: rgba(255,255,255,0.75);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.history-table__row {
+  background: rgba(255,255,255,0.62);
+  border-top: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
 .recipe-card {
   padding: 18px;
   border-radius: 20px;
@@ -499,7 +546,9 @@ p {
   }
 
   .import-table__head,
-  .import-table__row {
+  .import-table__row,
+  .history-table__head,
+  .history-table__row {
     grid-template-columns: 1fr;
   }
 }
