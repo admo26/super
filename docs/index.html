@@ -153,6 +153,18 @@
       font-size: 0.88rem;
     }
 
+    .pill a,
+    .recipe-link {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+    }
+
+    .pill a:hover,
+    .recipe-link:hover {
+      opacity: 0.82;
+    }
+
     .hero-note {
       margin: 0;
       color: rgba(255,247,239,0.74);
@@ -602,9 +614,9 @@
         { name: "Roast Chicken Dinner", type: "Weekly anchor", note: "Main roast night with potatoes, kumara and gravy." },
         { name: "Weekly Fajitas", type: "Weekly anchor", note: "Uses your regular wraps, capsicum, greens and chicken thighs." },
         { name: "Simple Sausages", type: "Easy dinner", note: "Low-effort sausage meal with potatoes, broccoli, carrots and cucumber." },
-        { name: "Quick Coconut Chicken Curry", type: "Rotation meal", note: "Mild curry using coconut milk and pantry spices." },
+        { name: "Quick Coconut Chicken Curry", type: "Rotation meal", note: "Mild curry using coconut milk and pantry spices.", url: "https://simplehomeedit.com/recipe/quick-coconut-chicken-curry/" },
         { name: "Simple Chicken Katsu", type: "Rotation meal", note: "Crumbed chicken with bagged slaw and pantry sauces." },
-        { name: "Bolognese freezer batch", type: "Batch cook", note: "Separate freezer top-up, not counted as one of the five dinners." }
+        { name: "Bolognese freezer batch", type: "Batch cook", note: "Separate freezer top-up, not counted as one of the five dinners.", url: "https://www.langbein.com/recipes/bolognese-sauce" }
       ],
       cadence: {
         weekly: [
@@ -694,7 +706,7 @@
 
     function renderHero() {
       document.getElementById("heroMeals").innerHTML = plan.meals
-        .map((meal) => `<span class="pill">${meal.name}</span>`)
+        .map((meal) => `<span class="pill">${meal.url ? `<a href="${meal.url}" target="_blank" rel="noreferrer">${meal.name}</a>` : meal.name}</span>`)
         .join("");
 
       const stats = [
@@ -738,7 +750,7 @@
       document.getElementById("mealPlan").innerHTML = plan.meals.map((meal) => `
         <article class="meal-card">
           <div>
-            <div class="item-strong">${meal.name}</div>
+            <div class="item-strong">${meal.url ? `<a class="recipe-link" href="${meal.url}" target="_blank" rel="noreferrer">${meal.name}</a>` : meal.name}</div>
             <div class="meal-meta">${meal.note}</div>
           </div>
           <span class="meal-type">${meal.type}</span>
