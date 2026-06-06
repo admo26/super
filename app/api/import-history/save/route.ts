@@ -35,6 +35,16 @@ export async function POST(request: Request) {
   );
 
   if (result.error) {
+    if (result.error.message.includes("Could not find the table 'public.order_history_items'")) {
+      return NextResponse.json(
+        {
+          error:
+            "Supabase is missing the order_history_items table. Run the latest order history SQL from supabase/schema.sql in the Supabase SQL Editor, then try saving again."
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ error: result.error.message }, { status: 500 });
   }
 

@@ -6,9 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "seed:order-history": "node scripts/seed_order_history.mjs",
     "seed:weekly-plan": "node scripts/seed_weekly_plan.mjs",
     "seed:recipes": "node scripts/seed_recipes.mjs",
-    "seed:all": "npm run seed:weekly-plan && npm run seed:recipes"
+    "seed:all": "npm run seed:order-history && npm run seed:weekly-plan && npm run seed:recipes"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
