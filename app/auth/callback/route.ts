@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
 
 import { isAllowedAuthEmail } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+
+type CookieValue = {
+  name: string;
+  value: string;
+  options?: any;
+};
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -12,23 +19,56 @@ export async function GET(request: Request) {
     next = "/";
   }
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (!code) {
+    return NextResponse.redirect(`${origin}/login`);
+  }
 
-    if (!error) {
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
+  const cookieMap = new Map<string, string>();
+  const pendingCookies: CookieValue[] = [];
+  const cookieStore = await cookies();
+  cookieStore.getAll().forEach(({ name, value }) => {
+    cookieMap.set(name, value);
+  });
 
-      if (isAllowedAuthEmail(user?.email)) {
-        return NextResponse.redirect(`${origin}${next}`);
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return [...cookieMap.entries()].map(([name, value]) => ({ name, value }));
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieMap.set(name, value);
+            pendingCookies.push({ name, value, options });
+          });
+        }
       }
+    }
+  );
 
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  let destination = "/login";
+
+  if (!error) {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (isAllowedAuthEmail(user?.email)) {
+      destination = next;
+    } else {
       await supabase.auth.signOut();
-      return NextResponse.redirect(`${origin}/unauthorized`);
+      destination = "/unauthorized";
     }
   }
 
-  return NextResponse.redirect(`${origin}/login`);
+  const response = NextResponse.redirect(`${origin}${destination}`);
+  pendingCookies.forEach(({ name, value, options }) => {
+    response.cookies.set(name, value, options);
+  });
+
+  return response;
 }
