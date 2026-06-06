@@ -98,6 +98,9 @@ export default function ImportPage() {
             <p className="hero-note">
               This is the bridge from messy order documents into structured history that the weekly planner can actually use.
             </p>
+            <p className="hero-note">
+              Parsing runs through your Vercel AI setup so usage stays visible in one place.
+            </p>
           </aside>
         </div>
       </section>

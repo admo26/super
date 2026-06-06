@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import type { ParsedOrderHistoryPayload } from "@/lib/order-import";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const AI_GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
+const AI_GATEWAY_MODEL = "openai/gpt-4o-mini";
 
 function getMimeType(file: File) {
   if (file.type) return file.type;
@@ -60,9 +62,9 @@ function buildSchema() {
 }
 
 export async function POST(request: Request) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.AI_GATEWAY_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: "OPENAI_API_KEY is not configured." }, { status: 500 });
+    return NextResponse.json({ error: "AI_GATEWAY_API_KEY is not configured." }, { status: 500 });
   }
 
   const formData = await request.formData();
@@ -80,14 +82,14 @@ export async function POST(request: Request) {
   const base64 = buffer.toString("base64");
   const mimeType = getMimeType(file);
 
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const response = await fetch(`${AI_GATEWAY_BASE_URL}/responses`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: AI_GATEWAY_MODEL,
       input: [
         {
           role: "system",
@@ -123,7 +125,7 @@ export async function POST(request: Request) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    return NextResponse.json({ error: `OpenAI parse failed: ${errorText}` }, { status: 500 });
+    return NextResponse.json({ error: `AI Gateway parse failed: ${errorText}` }, { status: 500 });
   }
 
   const payload = await response.json();
