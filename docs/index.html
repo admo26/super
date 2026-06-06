@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weekly Grocery Plan</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: rgba(255, 252, 246, 0.88);
+      --panel-strong: #fffaf2;
+      --ink: #241b14;
+      --muted: #6f6258;
+      --line: rgba(103, 83, 63, 0.16);
+      --accent: #b85c2d;
+      --accent-deep: #8f3f16;
+      --accent-soft: #f6ddcd;
+      --green: #3d6a3d;
+      --green-soft: #e4f0e4;
+      --shadow: 0 24px 60px rgba(53, 38, 22, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, #fff6ea 0, transparent 28%),
+        radial-gradient(circle at top right, #f1dcc7 0, transparent 24%),
+        linear-gradient(180deg, #f8f1e8 0%, var(--bg) 48%, #efe5d8 100%);
+    }
+
+    .shell {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 28px 18px 36px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,248,237,0.92)),
+        linear-gradient(120deg, #f4dac8, #f8f1e8);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184,92,45,0.16), rgba(184,92,45,0));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: 10ch;
+    }
+
+    .hero-copy {
+      margin: 14px 0 0;
+      max-width: 62ch;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .hero-grid {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.62);
+      border: 1px solid rgba(255,255,255,0.74);
+      backdrop-filter: blur(8px);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.76rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-side {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(36,27,20,0.88);
+      color: #fff7ef;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .hero-side h2 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+    }
+
+    .meal-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 0.88rem;
+    }
+
+    .hero-note {
+      margin: 0;
+      color: rgba(255,247,239,0.74);
+      line-height: 1.5;
+      font-size: 0.92rem;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.75);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card-sub {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .cadence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .cadence {
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .cadence h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+
+    .cadence ul,
+    .meal-list,
+    .notes,
+    .checklist {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .cadence li,
+    .notes li,
+    .checklist li {
+      margin: 0 0 10px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .cadence li:last-child,
+    .notes li:last-child,
+    .checklist li:last-child {
+      margin-bottom: 0;
+    }
+
+    .item-strong {
+      display: block;
+      color: var(--ink);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .meal-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .meal-card {
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffdf9 0%, #fbf5eb 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .meal-meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .meal-type {
+      white-space: nowrap;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0 14px;
+    }
+
+    input[type="search"], select {
+      min-width: 170px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      background: var(--accent);
+      color: white;
+      padding: 11px 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(184,92,45,0.24);
+    }
+
+    button.ghost {
+      background: white;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .shopping-list {
+      display: grid;
+      gap: 10px;
+      max-height: 760px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .shopping-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.76);
+    }
+
+    .shopping-item.done {
+      opacity: 0.62;
+      background: rgba(241, 233, 224, 0.8);
+    }
+
+    .shopping-item.done .shopping-name {
+      text-decoration: line-through;
+    }
+
+    .shopping-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .shopping-meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    .reason-tag {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #f3ede5;
+      color: #5d5145;
+      font-size: 0.77rem;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 18px;
+      align-self: start;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .summary-chip {
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .summary-chip strong {
+      display: block;
+      font-size: 1.4rem;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+
+    .group-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .group {
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 14px;
+    }
+
+    .group h3 {
+      margin: 0 0 10px;
+      font-size: 0.96rem;
+    }
+
+    .group ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .group li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .group li strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 280px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+      color: var(--ink);
+    }
+
+    .notes {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .notes li {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .checklist li {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: var(--green-soft);
+      color: #315431;
+      border: 1px solid rgba(61,106,61,0.14);
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid,
+      .main-grid,
+      .cadence-grid,
+      .stats,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <p class="eyebrow">Weekly Planner</p>
+      <h1>This Week's Grocery Run</h1>
+      <p class="hero-copy">
+        Five family dinners, one freezer bolognese batch, and a shopping list tuned to the staples your household actually repeats.
+      </p>
+
+      <div class="hero-grid">
+        <div class="stats" id="heroStats"></div>
+        <div class="hero-side">
+          <h2>Meal Line-Up</h2>
+          <div class="meal-pills" id="heroMeals"></div>
+          <p class="hero-note">
+            Pantry assumptions are built in for sauces and basic spices, so the list stays focused on what likely needs to be bought this week.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="main-grid">
+      <div class="stack">
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Cadence Snapshot</h2>
+              <p class="card-sub">What is showing up because of history, and what is due because of this week's meals.</p>
+            </div>
+          </div>
+          <div class="cadence-grid" id="cadenceGrid"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Meal Plan</h2>
+              <p class="card-sub">The five dinners for the week, plus the freezer batch cook.</p>
+            </div>
+          </div>
+          <div class="meal-list" id="mealPlan"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Shopping List</h2>
+              <p class="card-sub">Untick anything already covered in the pantry or fridge. The export updates live.</p>
+            </div>
+          </div>
+
+          <div class="controls">
+            <input id="search" type="search" placeholder="Search items or meals" />
+            <select id="reasonFilter">
+              <option value="all">All reasons</option>
+              <option value="planned meal">Planned meal</option>
+              <option value="weekly staple">Weekly staple</option>
+              <option value="fortnightly staple">Fortnightly staple</option>
+              <option value="freezer batch">Freezer batch</option>
+              <option value="pantry check">Pantry check</option>
+            </select>
+            <button id="checkAll">Keep All</button>
+            <button id="clearAll" class="ghost">Clear All</button>
+          </div>
+
+          <div class="shopping-list" id="shoppingList"></div>
+        </section>
+      </div>
+
+      <aside class="sidebar">
+        <section class="card">
+          <h2>Order Summary</h2>
+          <p class="card-sub">Quick view of what remains after your edits.</p>
+          <div class="summary-grid" id="summaryGrid"></div>
+        </section>
+
+        <section class="card">
+          <h2>Grouped For Shopping</h2>
+          <p class="card-sub">Collapsed into the main buckets you will likely think in while ordering.</p>
+          <div class="group-list" id="groupList"></div>
+        </section>
+
+        <section class="card">
+          <h2>Copyable Final List</h2>
+          <p class="card-sub">Ready to paste into a notes app, supermarket search, or message.</p>
+          <div class="controls" style="margin-top:16px;">
+            <button id="copyBtn">Copy List</button>
+            <button id="downloadBtn" class="ghost">Download TXT</button>
+          </div>
+          <textarea id="output" readonly></textarea>
+        </section>
+
+        <section class="card">
+          <h2>Assumptions</h2>
+          <ul class="notes" id="assumptions"></ul>
+        </section>
+
+        <section class="card">
+          <h2>Quick Adjustments</h2>
+          <ul class="checklist" id="adjustments"></ul>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const plan = {
+      orderDate: "2026-06-04",
+      analysisWindow: "12 orders from 2026-01-30 to 2026-05-22",
+      meals: [
+        { name: "Roast Chicken Dinner", type: "Weekly anchor", note: "Main roast night with potatoes, kumara and gravy." },
+        { name: "Weekly Fajitas", type: "Weekly anchor", note: "Uses your regular wraps, capsicum, greens and chicken thighs." },
+        { name: "Simple Sausages", type: "Easy dinner", note: "Low-effort sausage meal with potatoes, broccoli, carrots and cucumber." },
+        { name: "Quick Coconut Chicken Curry", type: "Rotation meal", note: "Mild curry using coconut milk and pantry spices." },
+        { name: "Simple Chicken Katsu", type: "Rotation meal", note: "Crumbed chicken with bagged slaw and pantry sauces." },
+        { name: "Bolognese freezer batch", type: "Batch cook", note: "Separate freezer top-up, not counted as one of the five dinners." }
+      ],
+      cadence: {
+        weekly: [
+          { name: "Bananas", qty: "8 each", note: "12/12 weeks" },
+          { name: "Bread", qty: "2 pack", note: "12/12 weeks" },
+          { name: "Red onions", qty: "1 kg", note: "12/12 weeks" },
+          { name: "Cherry tomatoes", qty: "2 pack", note: "12/12 weeks" },
+          { name: "Milk", qty: "1 pack", note: "12/12 weeks" },
+          { name: "Cucumber", qty: "1 each", note: "12/12 weeks" }
+        ],
+        fortnightly: [
+          { name: "Sausages", qty: "1 pack", note: "7/12 weeks" },
+          { name: "Potatoes", qty: "1 pack", note: "6/12 weeks" },
+          { name: "Tortillas", qty: "1 pack", note: "5/12 weeks" },
+          { name: "Coconut milk", qty: "1 pack", note: "5/12 weeks" },
+          { name: "Avocado", qty: "3 each", note: "4/12 weeks" }
+        ],
+        monthly: [
+          { name: "Beef mince", qty: "1 pack", note: "3/12 weeks" },
+          { name: "Red kumara", qty: "1 pack", note: "3/12 weeks" },
+          { name: "Rice", qty: "1 pack", note: "2/12 weeks" },
+          { name: "Lettuce", qty: "1 pack", note: "2/12 weeks" },
+          { name: "Peanut butter", qty: "1 pack", note: "2/12 weeks" }
+        ]
+      },
+      assumptions: [
+        "BBQ sauce, Kewpie mayo, oil, salt, pepper and core pantry sauces are already on hand.",
+        "Four packs of chicken thighs should comfortably cover fajitas, curry and katsu.",
+        "The bolognese cook is for freezer replenishment rather than one of this week's five dinners."
+      ],
+      adjustments: [
+        "Skip curry spices and tomato paste if the pantry is already stocked.",
+        "Drop avocado this week if fajitas are already covered from an earlier shop.",
+        "Double beef mince and tomatoes if you want a larger bolognese freezer batch."
+      ],
+      items: [
+        { name: "Tegel Free Range Oven Ready Sage & Onion Roast Fresh Chicken", qty: "1 pack", reason: "planned meal", meal: "Roast Chicken Dinner", group: "Protein" },
+        { name: "Pams Brushed Agria Potatoes", qty: "1 pack", reason: "planned meal", meal: "Roast Chicken Dinner + Simple Sausages", group: "Vegetables" },
+        { name: "Value Fresh Carrots", qty: "1 pack", reason: "planned meal", meal: "Roast Chicken Dinner + Simple Sausages", group: "Vegetables" },
+        { name: "Red Kumara", qty: "1 pack", reason: "planned meal", meal: "Roast Chicken Dinner", group: "Vegetables" },
+        { name: "Maggi Roast Chicken Flavoured Gravy Mix", qty: "1 pack", reason: "planned meal", meal: "Roast Chicken Dinner", group: "Pantry" },
+        { name: "Pams Free Range Boneless Skinless Chicken Thighs", qty: "4 pack", reason: "planned meal", meal: "Fajitas + Curry + Katsu", group: "Protein" },
+        { name: "Pams Flour Tortillas", qty: "1 pack", reason: "planned meal", meal: "Weekly Fajitas", group: "Bread & wraps" },
+        { name: "Red Capsicum", qty: "2 each", reason: "planned meal", meal: "Weekly Fajitas", group: "Vegetables" },
+        { name: "Loose Red Onions", qty: "1 kg", reason: "weekly staple", meal: "Fajitas + Curry + Bolognese", group: "Vegetables" },
+        { name: "Pams Baby Spinach", qty: "1 pack", reason: "weekly staple", meal: "Weekly Fajitas", group: "Vegetables" },
+        { name: "Pams Iceberg Lettuce", qty: "1 pack", reason: "planned meal", meal: "Weekly Fajitas", group: "Vegetables" },
+        { name: "Pams Fresh Cherry Tomatoes", qty: "2 pack", reason: "weekly staple", meal: "Weekly Fajitas + household staple", group: "Vegetables" },
+        { name: "Salsa", qty: "1 jar", reason: "planned meal", meal: "Weekly Fajitas", group: "Pantry" },
+        { name: "Pams Mild Cheese", qty: "1 pack", reason: "planned meal", meal: "Weekly Fajitas", group: "Dairy" },
+        { name: "Hellers Craft Angus Beef Sausages", qty: "1 pack", reason: "fortnightly staple", meal: "Simple Sausages", group: "Protein" },
+        { name: "Broccoli", qty: "2 each", reason: "weekly staple", meal: "Simple Sausages + curry side", group: "Vegetables" },
+        { name: "Telegraph Cucumber", qty: "2 each", reason: "weekly staple", meal: "Simple Sausages + Katsu side", group: "Vegetables" },
+        { name: "Trident Premium Coconut Milk", qty: "1 pack", reason: "fortnightly staple", meal: "Quick Coconut Chicken Curry", group: "Pantry" },
+        { name: "Tomato Paste", qty: "1 tube", reason: "planned meal", meal: "Curry + Bolognese", group: "Pantry" },
+        { name: "Ginger", qty: "1 knob", reason: "planned meal", meal: "Quick Coconut Chicken Curry", group: "Vegetables" },
+        { name: "Garlic", qty: "2 bulbs", reason: "planned meal", meal: "Curry + Bolognese", group: "Vegetables" },
+        { name: "Curry Powder", qty: "1 pack", reason: "pantry check", meal: "Quick Coconut Chicken Curry", group: "Pantry" },
+        { name: "Ground Turmeric", qty: "1 pack", reason: "pantry check", meal: "Quick Coconut Chicken Curry", group: "Pantry" },
+        { name: "Ground Cumin", qty: "1 pack", reason: "pantry check", meal: "Quick Coconut Chicken Curry", group: "Pantry" },
+        { name: "Basmati or Jasmine Rice", qty: "1 pack", reason: "monthly staple", meal: "Quick Coconut Chicken Curry", group: "Pantry" },
+        { name: "Panko Breadcrumbs", qty: "1 pack", reason: "planned meal", meal: "Simple Chicken Katsu", group: "Pantry" },
+        { name: "Asian Slaw Mix", qty: "1 bag", reason: "planned meal", meal: "Simple Chicken Katsu", group: "Vegetables" },
+        { name: "Woodland Free Range Grade 8 Eggs", qty: "1 pack", reason: "weekly staple", meal: "Simple Chicken Katsu + household staple", group: "Dairy" },
+        { name: "Affco Premium Beef Mince", qty: "1 pack", reason: "freezer batch", meal: "Bolognese freezer batch", group: "Protein" },
+        { name: "Pams Italian Diced Tomatoes or Passata", qty: "2 to 4 pack", reason: "freezer batch", meal: "Bolognese freezer batch", group: "Pantry" },
+        { name: "Spaghetti or Fettuccine", qty: "1 pack", reason: "freezer batch", meal: "Bolognese night or top-up", group: "Pantry" },
+        { name: "Bananas", qty: "8 each", reason: "weekly staple", meal: "Household staple", group: "Fruit" },
+        { name: "Freya's Swiss Soya Linseed Bread", qty: "2 pack", reason: "weekly staple", meal: "Household staple", group: "Bread & wraps" },
+        { name: "Pams Value Standard Milk", qty: "1 pack", reason: "weekly staple", meal: "Household staple", group: "Dairy" },
+        { name: "Boring No Added Sugar Oat Milk", qty: "2 pack", reason: "weekly staple", meal: "Household staple", group: "Dairy" },
+        { name: "Avocado", qty: "3 each", reason: "fortnightly staple", meal: "Useful for fajitas or lunches", group: "Fruit" },
+        { name: "The Berry Fix Snap Frozen Mixed Berries", qty: "1 pack", reason: "fortnightly staple", meal: "Household staple", group: "Frozen" }
+      ]
+    };
+
+    const state = {
+      items: plan.items.map((item, index) => ({ ...item, id: index + 1, keep: true }))
+    };
+
+    const shoppingList = document.getElementById("shoppingList");
+    const search = document.getElementById("search");
+    const reasonFilter = document.getElementById("reasonFilter");
+    const output = document.getElementById("output");
+    const summaryGrid = document.getElementById("summaryGrid");
+    const groupList = document.getElementById("groupList");
+
+    function renderHero() {
+      document.getElementById("heroMeals").innerHTML = plan.meals
+        .map((meal) => `<span class="pill">${meal.name}</span>`)
+        .join("");
+
+      const stats = [
+        ["Order date", plan.orderDate],
+        ["Meals", "5 + freezer batch"],
+        ["Items on list", String(plan.items.length)],
+        ["History window", "12 orders"]
+      ];
+
+      document.getElementById("heroStats").innerHTML = stats.map(([label, value]) => `
+        <div class="stat">
+          <span class="stat-label">${label}</span>
+          <span class="stat-value">${value}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderCadence() {
+      const sections = [
+        ["Weekly", plan.cadence.weekly],
+        ["Fortnightly", plan.cadence.fortnightly],
+        ["Monthly", plan.cadence.monthly]
+      ];
+
+      document.getElementById("cadenceGrid").innerHTML = sections.map(([title, items]) => `
+        <section class="cadence">
+          <h3>${title}</h3>
+          <ul>
+            ${items.map((item) => `
+              <li>
+                <span class="item-strong">${item.name} · ${item.qty}</span>
+                <span>${item.note}</span>
+              </li>
+            `).join("")}
+          </ul>
+        </section>
+      `).join("");
+    }
+
+    function renderMeals() {
+      document.getElementById("mealPlan").innerHTML = plan.meals.map((meal) => `
+        <article class="meal-card">
+          <div>
+            <div class="item-strong">${meal.name}</div>
+            <div class="meal-meta">${meal.note}</div>
+          </div>
+          <span class="meal-type">${meal.type}</span>
+        </article>
+      `).join("");
+
+      document.getElementById("assumptions").innerHTML = plan.assumptions
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+
+      document.getElementById("adjustments").innerHTML = plan.adjustments
+        .map((item) => `<li>${item}</li>`)
+        .join("");
+    }
+
+    function renderShopping() {
+      const q = search.value.trim().toLowerCase();
+      const rf = reasonFilter.value;
+
+      const filtered = state.items.filter((item) => {
+        const haystack = `${item.name} ${item.meal}`.toLowerCase();
+        const matchesSearch = !q || haystack.includes(q);
+        const matchesReason = rf === "all" || item.reason === rf;
+        return matchesSearch && matchesReason;
+      });
+
+      shoppingList.innerHTML = filtered.map((item) => `
+        <label class="shopping-item ${item.keep ? "" : "done"}">
+          <input type="checkbox" data-id="${item.id}" ${item.keep ? "checked" : ""} />
+          <div>
+            <div class="shopping-name">${item.name}</div>
+            <div class="shopping-meta">Qty: ${item.qty}</div>
+            <div class="shopping-meta">${item.meal}</div>
+          </div>
+          <div class="reason-tag">${item.reason}</div>
+        </label>
+      `).join("");
+
+      renderSummary();
+      renderGrouped();
+      renderOutput();
+    }
+
+    function renderSummary() {
+      const kept = state.items.filter((item) => item.keep);
+      const planned = kept.filter((item) => item.reason === "planned meal").length;
+      const staples = kept.filter((item) => item.reason.includes("staple")).length;
+
+      const cards = [
+        ["Items kept", String(kept.length)],
+        ["Items removed", String(state.items.length - kept.length)],
+        ["Meal-driven", String(planned)],
+        ["Staple-driven", String(staples)]
+      ];
+
+      summaryGrid.innerHTML = cards.map(([label, value]) => `
+        <div class="summary-chip">
+          <strong>${value}</strong>
+          <span>${label}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderGrouped() {
+      const kept = state.items.filter((item) => item.keep);
+      const groups = kept.reduce((acc, item) => {
+        (acc[item.group] ||= []).push(item);
+        return acc;
+      }, {});
+
+      groupList.innerHTML = Object.entries(groups).map(([group, items]) => `
+        <section class="group">
+          <h3>${group}</h3>
+          <ul>
+            ${items.map((item) => `
+              <li>
+                <strong>${item.name}</strong>
+                <span>${item.qty}</span>
+              </li>
+            `).join("")}
+          </ul>
+        </section>
+      `).join("");
+    }
+
+    function renderOutput() {
+      const kept = state.items.filter((item) => item.keep);
+      const meals = plan.meals.map((meal) => `- ${meal.name}`).join("\n");
+      const list = kept.map((item) => `- ${item.name}: ${item.qty}`).join("\n");
+      output.value = `Planned meals:\n${meals}\n\nFinal shopping list:\n${list}`;
+    }
+
+    shoppingList.addEventListener("change", (event) => {
+      if (!event.target.matches("input[type='checkbox']")) return;
+      const id = Number(event.target.dataset.id);
+      const item = state.items.find((entry) => entry.id === id);
+      if (!item) return;
+      item.keep = event.target.checked;
+      renderShopping();
+    });
+
+    search.addEventListener("input", renderShopping);
+    reasonFilter.addEventListener("change", renderShopping);
+
+    document.getElementById("checkAll").addEventListener("click", () => {
+      state.items.forEach((item) => {
+        item.keep = true;
+      });
+      renderShopping();
+    });
+
+    document.getElementById("clearAll").addEventListener("click", () => {
+      state.items.forEach((item) => {
+        item.keep = false;
+      });
+      renderShopping();
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(output.value);
+        alert("Copied final list to clipboard.");
+      } catch {
+        alert("Copy failed. You can still select and copy from the text area.");
+      }
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const blob = new Blob([output.value], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "weekly-grocery-plan.txt";
+      anchor.click();
+      URL.revokeObjectURL(url);
+    });
+
+    renderHero();
+    renderCadence();
+    renderMeals();
+    renderShopping();
+  </script>
+</body>
+</html>
