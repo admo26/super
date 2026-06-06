@@ -61,6 +61,34 @@ function buildSchema() {
   };
 }
 
+function extractStructuredText(payload: any): string | null {
+  if (typeof payload?.output_text === "string" && payload.output_text.trim()) {
+    return payload.output_text.trim();
+  }
+
+  if (Array.isArray(payload?.output)) {
+    for (const item of payload.output) {
+      if (!Array.isArray(item?.content)) continue;
+
+      for (const content of item.content) {
+        if (typeof content?.text === "string" && content.text.trim()) {
+          return content.text.trim();
+        }
+
+        if (typeof content?.json === "string" && content.json.trim()) {
+          return content.json.trim();
+        }
+
+        if (content?.json && typeof content.json === "object") {
+          return JSON.stringify(content.json);
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
 export async function POST(request: Request) {
   const apiKey = process.env.AI_GATEWAY_API_KEY;
   if (!apiKey) {
@@ -129,10 +157,19 @@ export async function POST(request: Request) {
   }
 
   const payload = await response.json();
-  const outputText = payload.output_text;
+  const outputText = extractStructuredText(payload);
 
   if (!outputText) {
-    return NextResponse.json({ error: "Model returned no structured output." }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Model returned no structured output.",
+        response_shape: {
+          has_output_text: typeof payload?.output_text === "string",
+          output_items: Array.isArray(payload?.output) ? payload.output.length : 0
+        }
+      },
+      { status: 500 }
+    );
   }
 
   const parsed = JSON.parse(outputText) as ParsedOrderHistoryPayload;
