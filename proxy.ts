@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { isAllowedAuthEmail } from "@/lib/auth";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const PUBLIC_PATHS = new Set(["/login", "/auth/callback"]);
+const PUBLIC_PATHS = new Set(["/login", "/auth/callback", "/unauthorized"]);
 
 function hasSupabaseConfig() {
   return Boolean(
@@ -23,10 +24,15 @@ export async function proxy(request: NextRequest) {
   }
 
   const { response, user } = await updateSession(request);
+  const email = user?.email ?? null;
+  const isAllowed = isAllowedAuthEmail(email);
 
   if (PUBLIC_PATHS.has(pathname)) {
-    if (user) {
+    if (user && isAllowed) {
       return NextResponse.redirect(new URL("/", request.url));
+    }
+    if (user && !isAllowed && pathname !== "/unauthorized") {
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
     return response;
   }
@@ -41,6 +47,14 @@ export async function proxy(request: NextRequest) {
       loginUrl.searchParams.set("next", pathname);
     }
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (!isAllowed) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "This account is not authorized." }, { status: 403 });
+    }
+
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
   return response;
