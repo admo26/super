@@ -5,7 +5,7 @@ function isUrl(value: string) {
 }
 
 export default async function RecipesPage() {
-  const { recipes, sourceLabel } = await getRecipes();
+  const { recipes } = await getRecipes();
 
   return (
     <main className="page-shell">
@@ -23,10 +23,6 @@ export default async function RecipesPage() {
             <article className="stat-card">
               <span className="stat-label">Recipes</span>
               <strong>{recipes.length}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Source</span>
-              <strong>{sourceLabel}</strong>
             </article>
             <article className="stat-card">
               <span className="stat-label">Linked</span>

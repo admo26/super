@@ -16,9 +16,6 @@ export default async function HomePage() {
         <div>
           <p className="eyebrow">Weekly Planner</p>
           <h1>This Week&apos;s Grocery Run</h1>
-          <p className="hero-copy">
-            Database-ready weekly planning on Vercel, with a safe fallback to the latest in-repo order while Supabase gets wired in.
-          </p>
         </div>
 
         <div className="hero-grid">
@@ -34,10 +31,6 @@ export default async function HomePage() {
             <article className="stat-card">
               <span className="stat-label">Items</span>
               <strong>{plan.items.length}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Source</span>
-              <strong>{plan.sourceLabel}</strong>
             </article>
           </div>
 
