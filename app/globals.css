@@ -68,6 +68,22 @@ body {
   flex-wrap: wrap;
 }
 
+.site-auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.site-user {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .site-links a {
   color: var(--muted);
   font-weight: 600;
@@ -337,6 +353,65 @@ p {
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.ghost-button--small {
+  padding: 8px 12px;
+  font-size: 0.92rem;
+}
+
+.auth-shell {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 90px);
+}
+
+.auth-card {
+  width: min(100%, 560px);
+  padding: 28px;
+  border-radius: 28px;
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: var(--shadow);
+}
+
+.auth-form {
+  margin-top: 22px;
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.auth-form input,
+.auth-form button {
+  border-radius: 14px;
+  padding: 13px 14px;
+  font: inherit;
+}
+
+.auth-form input {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.85);
+  color: var(--ink);
+}
+
+.auth-form button {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-form button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
 }
 
 .helper-text,

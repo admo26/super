@@ -2,8 +2,18 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 import type { ParsedOrderHistoryPayload } from "@/lib/order-import";
+import { createClient as createAuthClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
+  const authSupabase = await createAuthClient();
+  const {
+    data: { user }
+  } = await authSupabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseSecret = process.env.SUPABASE_SECRET_KEY;
 

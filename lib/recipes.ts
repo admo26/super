@@ -1,6 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-
 import recipeFallback from "@/data/recipes.json";
+import { createClient } from "@/lib/supabase/server";
 
 export type Recipe = {
   name: string;
@@ -27,14 +26,6 @@ function hasSupabaseConfig() {
   );
 }
 
-function createSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { persistSession: false } }
-  );
-}
-
 function mapRecipeRow(row: RecipeRow): Recipe {
   return {
     name: row.name,
@@ -55,7 +46,7 @@ export async function getRecipes(): Promise<{ sourceLabel: string; recipes: Reci
   }
 
   try {
-    const supabase = createSupabase();
+    const supabase = await createClient();
     const result = await supabase
       .from("recipes")
       .select("name, source, cook_frequency, serving_pattern, rotation_notes, ingredients_to_map")

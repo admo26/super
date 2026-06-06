@@ -1,6 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-
 import { defaultPlan } from "@/lib/default-plan";
+import { createClient } from "@/lib/supabase/server";
 import type { CadenceItem, CadenceKey, Meal, ShoppingItem, WeeklyPlan } from "@/lib/types";
 
 type PlanRow = {
@@ -29,14 +28,6 @@ function hasSupabaseConfig() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-  );
-}
-
-function createSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { persistSession: false } }
   );
 }
 
@@ -69,7 +60,7 @@ export async function getWeeklyPlan(): Promise<WeeklyPlan> {
   }
 
   try {
-    const supabase = createSupabase();
+    const supabase = await createClient();
     const planResult = await supabase
       .from("weekly_plans")
       .select("id, order_date, analysis_window")

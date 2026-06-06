@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import type { ParsedOrderHistoryPayload } from "@/lib/order-import";
+import { createClient } from "@/lib/supabase/server";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const AI_GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
@@ -90,6 +91,15 @@ function extractStructuredText(payload: any): string | null {
 }
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
   const apiKey = process.env.AI_GATEWAY_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "AI_GATEWAY_API_KEY is not configured." }, { status: 500 });

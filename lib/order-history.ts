@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 
 type OrderHistoryRow = {
   order_date: string | null;
@@ -42,14 +42,6 @@ function hasSupabaseConfig() {
   );
 }
 
-function createSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { persistSession: false } }
-  );
-}
-
 function normalizeOrderDate(value: string | null) {
   return value ?? "Unknown date";
 }
@@ -77,7 +69,7 @@ export async function getOrderHistory(): Promise<OrderHistorySummary> {
   }
 
   try {
-    const supabase = createSupabase();
+    const supabase = await createClient();
     const result = await supabase
       .from("order_history_items")
       .select("order_date, item_name, quantity, unit, category, notes, source_type, source_name")
