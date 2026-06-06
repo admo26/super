@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-type OrderHistoryRow = {
+export type OrderHistoryRow = {
   order_date: string | null;
   item_name: string;
   quantity: string | null;
@@ -56,6 +56,35 @@ function mapItem(row: OrderHistoryRow): OrderHistoryItem {
   };
 }
 
+export async function getOrderHistoryRows(limit?: number): Promise<OrderHistoryRow[]> {
+  if (!hasSupabaseConfig()) {
+    return [];
+  }
+
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from("order_history_items")
+      .select("order_date, item_name, quantity, unit, category, notes, source_type, source_name")
+      .order("order_date", { ascending: false })
+      .order("item_name", { ascending: true });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const result = await query;
+
+    if (result.error) {
+      return [];
+    }
+
+    return (result.data ?? []) as OrderHistoryRow[];
+  } catch {
+    return [];
+  }
+}
+
 export async function getOrderHistory(): Promise<OrderHistorySummary> {
   if (!hasSupabaseConfig()) {
     return {
@@ -69,14 +98,9 @@ export async function getOrderHistory(): Promise<OrderHistorySummary> {
   }
 
   try {
-    const supabase = await createClient();
-    const result = await supabase
-      .from("order_history_items")
-      .select("order_date, item_name, quantity, unit, category, notes, source_type, source_name")
-      .order("order_date", { ascending: false })
-      .order("item_name", { ascending: true });
+    const rows = await getOrderHistoryRows();
 
-    if (result.error || !result.data?.length) {
+    if (!rows.length) {
       return {
         totalRows: 0,
         totalOrders: 0,
@@ -87,7 +111,6 @@ export async function getOrderHistory(): Promise<OrderHistorySummary> {
       };
     }
 
-    const rows = result.data as OrderHistoryRow[];
     const grouped = new Map<string, OrderHistoryGroup>();
 
     for (const row of rows) {

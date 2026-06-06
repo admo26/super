@@ -1,7 +1,18 @@
+import { generateNextWeeklyPlan } from "@/app/plan/actions";
 import { getWeeklyPlan } from "@/lib/weekly-plan";
 
-export default async function HomePage() {
+type HomePageProps = {
+  searchParams?: Promise<{
+    generated?: string;
+    error?: string;
+  }>;
+};
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const resolvedSearchParams = (await searchParams) ?? {};
   const plan = await getWeeklyPlan();
+  const generated = resolvedSearchParams.generated === "1";
+  const error = resolvedSearchParams.error ?? null;
 
   const groupedItems = plan.items.reduce<Record<string, typeof plan.items>>((acc, item) => {
     const current = acc[item.group] ?? [];
@@ -12,6 +23,12 @@ export default async function HomePage() {
 
   return (
     <main className="page-shell">
+      {generated ? (
+        <section className="notice-banner">
+          New weekly plan generated from Supabase history and recipes.
+        </section>
+      ) : null}
+      {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="hero">
         <div>
           <p className="eyebrow">Weekly Planner</p>
@@ -50,6 +67,12 @@ export default async function HomePage() {
               ))}
             </div>
             <p className="hero-note">{plan.analysisWindow}</p>
+            <form action={generateNextWeeklyPlan} className="hero-actions">
+              <button className="action-button" type="submit">
+                Generate next week
+              </button>
+              <p className="action-note">Builds a new draft from imported history and the recipe list.</p>
+            </form>
           </aside>
         </div>
       </section>
