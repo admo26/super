@@ -48,14 +48,12 @@ export async function GET(request: Request) {
     }
   );
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
   let destination = "/login";
 
   if (!error) {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
+    const user = data.session?.user ?? data.user ?? null;
 
     if (isAllowedAuthEmail(user?.email)) {
       destination = next;
