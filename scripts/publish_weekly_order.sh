@@ -5,7 +5,7 @@ repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
 today="$(date +%F)"
-message="${1:-Update weekly order for ${today}}"
+message="${1:-Publish weekly order for ${today}}"
 
 git add docs/index.html data/weekly_plan_*.md data/next_order_draft_*.md data/recipes.md
 

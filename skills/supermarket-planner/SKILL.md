@@ -48,6 +48,11 @@ Produce:
 - Assumptions and confidence notes.
 - Suggested user edits.
 
+If the task is to generate the next weekly order for this repo, also:
+- write the dated output files under `data/`
+- keep `docs/index.html` aligned with the latest weekly view
+- stage, commit, and push the repo changes unless the user explicitly asks not to publish yet
+
 Use the template in:
 - `templates/weekly_output_template.md`
 

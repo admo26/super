@@ -27,6 +27,11 @@ Always provide:
 3. Assumptions and confidence notes.
 4. Quick adjustments user can make (e.g., "skip this week", "double for guests").
 
+## Repo Update Rule
+- When generating a new weekly order, update the repository outputs as part of the task.
+- Write the new plan to the dated files in `data/` and keep `docs/index.html` aligned with the latest published weekly view.
+- Stage, commit, and push the changes before handing the result back unless the user explicitly asks not to publish the repo update yet.
+
 ## Safety and Automation Guardrails
 - Never place, submit, or confirm a real supermarket order without explicit user approval.
 - For browser/computer-use automation, run in dry-run mode first:
