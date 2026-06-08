@@ -75,11 +75,55 @@ for select
 to anon, authenticated
 using (true);
 
+drop policy if exists "Authenticated can manage weekly plans" on public.weekly_plans;
+create policy "Authenticated can manage weekly plans"
+on public.weekly_plans
+for insert
+to authenticated
+with check (true);
+
+drop policy if exists "Authenticated can update weekly plans" on public.weekly_plans;
+create policy "Authenticated can update weekly plans"
+on public.weekly_plans
+for update
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated can delete weekly plans" on public.weekly_plans;
+create policy "Authenticated can delete weekly plans"
+on public.weekly_plans
+for delete
+to authenticated
+using (true);
+
 drop policy if exists "Public can read weekly plan meals" on public.weekly_plan_meals;
 create policy "Public can read weekly plan meals"
 on public.weekly_plan_meals
 for select
 to anon, authenticated
+using (true);
+
+drop policy if exists "Authenticated can manage weekly plan meals" on public.weekly_plan_meals;
+create policy "Authenticated can manage weekly plan meals"
+on public.weekly_plan_meals
+for insert
+to authenticated
+with check (true);
+
+drop policy if exists "Authenticated can update weekly plan meals" on public.weekly_plan_meals;
+create policy "Authenticated can update weekly plan meals"
+on public.weekly_plan_meals
+for update
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated can delete weekly plan meals" on public.weekly_plan_meals;
+create policy "Authenticated can delete weekly plan meals"
+on public.weekly_plan_meals
+for delete
+to authenticated
 using (true);
 
 drop policy if exists "Public can read weekly cadence items" on public.weekly_plan_cadence_items;
@@ -89,11 +133,55 @@ for select
 to anon, authenticated
 using (true);
 
+drop policy if exists "Authenticated can manage weekly cadence items" on public.weekly_plan_cadence_items;
+create policy "Authenticated can manage weekly cadence items"
+on public.weekly_plan_cadence_items
+for insert
+to authenticated
+with check (true);
+
+drop policy if exists "Authenticated can update weekly cadence items" on public.weekly_plan_cadence_items;
+create policy "Authenticated can update weekly cadence items"
+on public.weekly_plan_cadence_items
+for update
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated can delete weekly cadence items" on public.weekly_plan_cadence_items;
+create policy "Authenticated can delete weekly cadence items"
+on public.weekly_plan_cadence_items
+for delete
+to authenticated
+using (true);
+
 drop policy if exists "Public can read weekly plan items" on public.weekly_plan_items;
 create policy "Public can read weekly plan items"
 on public.weekly_plan_items
 for select
 to anon, authenticated
+using (true);
+
+drop policy if exists "Authenticated can manage weekly plan items" on public.weekly_plan_items;
+create policy "Authenticated can manage weekly plan items"
+on public.weekly_plan_items
+for insert
+to authenticated
+with check (true);
+
+drop policy if exists "Authenticated can update weekly plan items" on public.weekly_plan_items;
+create policy "Authenticated can update weekly plan items"
+on public.weekly_plan_items
+for update
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated can delete weekly plan items" on public.weekly_plan_items;
+create policy "Authenticated can delete weekly plan items"
+on public.weekly_plan_items
+for delete
+to authenticated
 using (true);
 
 drop policy if exists "Public can read recipes" on public.recipes;
