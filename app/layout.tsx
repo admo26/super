@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
+import { getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
 import "./globals.css";
 
@@ -19,10 +20,27 @@ function hasSupabaseConfig() {
   );
 }
 
+function getTodayInPacificAuckland() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Pacific/Auckland",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
+
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const supabase = hasSupabaseConfig() ? await createClient() : null;
   const userResult = supabase ? await supabase.auth.getUser() : null;
   const user = userResult?.data.user ?? null;
+  const planSummaries = hasSupabaseConfig() ? await getWeeklyPlanSummaries() : [];
+  const today = getTodayInPacificAuckland();
+  const currentPlanDate = planSummaries
+    .filter((plan) => plan.orderDate <= today)
+    .at(-1)?.orderDate ?? null;
+  const nextPlan = currentPlanDate
+    ? planSummaries.find((plan) => plan.orderDate > currentPlanDate) ?? null
+    : planSummaries.at(-1) ?? null;
 
   return (
     <html lang="en">
@@ -34,6 +52,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </Link>
             <nav className="site-links">
               <Link href="/">Current Week</Link>
+              {nextPlan ? <Link href={`/?week=${nextPlan.orderDate}`}>Next Week</Link> : null}
               <Link href="/recipes">Recipes</Link>
               <Link href="/history">Order History</Link>
               <Link href="/import">Order Import</Link>

@@ -5,14 +5,17 @@ type HomePageProps = {
   searchParams?: Promise<{
     generated?: string;
     error?: string;
+    week?: string;
   }>;
 };
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const plan = await getWeeklyPlan();
   const generated = resolvedSearchParams.generated === "1";
   const error = resolvedSearchParams.error ?? null;
+  const selectedWeek = resolvedSearchParams.week ?? null;
+  const plan = await getWeeklyPlan(selectedWeek ?? undefined);
+  const selectedLabel = selectedWeek ? "Next Week Preview" : "Current Week";
 
   const groupedItems = plan.items.reduce<Record<string, typeof plan.items>>((acc, item) => {
     const current = acc[item.group] ?? [];
@@ -28,11 +31,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           New weekly plan generated from Supabase history and recipes.
         </section>
       ) : null}
+      {selectedWeek ? (
+        <section className="notice-banner">
+          Previewing the generated plan for {selectedWeek}. Use Current Week to jump back.
+        </section>
+      ) : null}
       {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="hero">
         <div>
           <p className="eyebrow">Weekly Planner</p>
           <h1>This Week&apos;s Grocery Run</h1>
+          <p className="hero-copy">{selectedLabel}</p>
         </div>
 
         <div className="hero-grid">
