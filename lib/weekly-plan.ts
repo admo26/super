@@ -14,6 +14,13 @@ export type WeeklyPlanSummary = {
   analysisWindow: string | null;
 };
 
+export type EditableWeeklyPlan = {
+  id: string;
+  orderDate: string;
+  analysisWindow: string | null;
+  cadence: Record<CadenceKey, CadenceItem[]>;
+};
+
 type MealRow = {
   name: string;
   type: string;
@@ -118,6 +125,40 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
   };
 }
 
+async function fetchEditableWeeklyPlanByDate(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  orderDate: string
+): Promise<EditableWeeklyPlan | null> {
+  const planResult = await supabase
+    .from("weekly_plans")
+    .select("id, order_date, analysis_window")
+    .eq("order_date", orderDate)
+    .maybeSingle();
+
+  if (planResult.error || !planResult.data) {
+    return null;
+  }
+
+  const planRow = planResult.data as PlanRow;
+  const cadenceResult = await supabase
+    .from("weekly_plan_cadence_items")
+    .select("cadence, name, qty, note")
+    .eq("weekly_plan_id", planRow.id)
+    .order("position", { ascending: true })
+    .returns<CadenceRow[]>();
+
+  if (cadenceResult.error) {
+    return null;
+  }
+
+  return {
+    id: planRow.id,
+    orderDate: planRow.order_date,
+    analysisWindow: planRow.analysis_window,
+    cadence: rowsToCadence(cadenceResult.data ?? [])
+  };
+}
+
 export async function getWeeklyPlan(targetOrderDate?: string): Promise<WeeklyPlan> {
   if (!hasSupabaseConfig()) {
     return defaultPlan;
@@ -178,5 +219,40 @@ export async function getWeeklyPlanSummaries(): Promise<WeeklyPlanSummary[]> {
     }));
   } catch {
     return [];
+  }
+}
+
+export async function getEditableWeeklyPlan(targetOrderDate?: string): Promise<EditableWeeklyPlan | null> {
+  if (!hasSupabaseConfig()) {
+    return null;
+  }
+
+  try {
+    const supabase = await createClient();
+    const today = getTodayInPacificAuckland();
+    const selectedOrderDate = targetOrderDate
+      ? targetOrderDate
+      : (
+          await supabase
+            .from("weekly_plans")
+            .select("order_date")
+            .lte("order_date", today)
+            .order("order_date", { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        ).data?.order_date ??
+        (
+          await supabase
+            .from("weekly_plans")
+            .select("order_date")
+            .order("order_date", { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        ).data?.order_date ??
+        "";
+
+    return selectedOrderDate ? fetchEditableWeeklyPlanByDate(supabase, selectedOrderDate) : null;
+  } catch {
+    return null;
   }
 }

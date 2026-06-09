@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { generateNextWeeklyPlan } from "@/app/plan/actions";
 import { getWeeklyPlan } from "@/lib/weekly-plan";
 
@@ -94,6 +96,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <h2>Cadence Snapshot</h2>
                 <p>Weekly, fortnightly, and monthly staples from the current plan source.</p>
               </div>
+              <Link className="ghost-button" href="/cadence">
+                Edit cadence
+              </Link>
             </div>
 
             <div className="cadence-grid">

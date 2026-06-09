@@ -53,6 +53,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <nav className="site-links">
               <Link href="/">Current Week</Link>
               {nextPlan ? <Link href={`/?week=${nextPlan.orderDate}`}>Next Week</Link> : null}
+              <Link href="/cadence">Cadence</Link>
               <Link href="/recipes">Recipes</Link>
               <Link href="/history">Order History</Link>
               <Link href="/import">Order Import</Link>
