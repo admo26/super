@@ -31,6 +31,15 @@ function hasSupabaseConfig() {
   );
 }
 
+function getTodayInPacificAuckland() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Pacific/Auckland",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
+
 function rowsToCadence(rows: CadenceRow[]): Record<CadenceKey, CadenceItem[]> {
   return rows.reduce<Record<CadenceKey, CadenceItem[]>>(
     (acc, row) => {
@@ -61,12 +70,24 @@ export async function getWeeklyPlan(): Promise<WeeklyPlan> {
 
   try {
     const supabase = await createClient();
-    const planResult = await supabase
+    const today = getTodayInPacificAuckland();
+
+    const currentPlanResult = await supabase
       .from("weekly_plans")
       .select("id, order_date, analysis_window")
+      .lte("order_date", today)
       .order("order_date", { ascending: false })
       .limit(1)
       .maybeSingle();
+
+    const planResult = currentPlanResult.data
+      ? currentPlanResult
+      : await supabase
+          .from("weekly_plans")
+          .select("id, order_date, analysis_window")
+          .order("order_date", { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
     if (planResult.error || !planResult.data) {
       return defaultPlan;
