@@ -96,6 +96,35 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="panel">
             <div className="section-header">
               <div>
+                <h2>Meal Plan</h2>
+                <p>Meals driving this week&apos;s order.</p>
+              </div>
+            </div>
+
+            <div className="meal-list">
+              {plan.meals.map((meal) => (
+                <article className="meal-card" key={meal.name}>
+                  <div>
+                    <div className="item-strong">
+                      {meal.url ? (
+                        <a className="recipe-link" href={meal.url} target="_blank" rel="noreferrer">
+                          {meal.name}
+                        </a>
+                      ) : (
+                        meal.name
+                      )}
+                    </div>
+                    <p className="meal-note">{meal.note}</p>
+                  </div>
+                  <span className="meal-type">{meal.type}</span>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="section-header">
+              <div>
                 <h2>Shopping List</h2>
                 <p>
                   {canEditShoppingList
@@ -135,35 +164,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     </article>
                   ))}
                 </section>
-              ))}
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="section-header">
-              <div>
-                <h2>Meal Plan</h2>
-                <p>Meals driving this week&apos;s order.</p>
-              </div>
-            </div>
-
-            <div className="meal-list">
-              {plan.meals.map((meal) => (
-                <article className="meal-card" key={meal.name}>
-                  <div>
-                    <div className="item-strong">
-                      {meal.url ? (
-                        <a className="recipe-link" href={meal.url} target="_blank" rel="noreferrer">
-                          {meal.name}
-                        </a>
-                      ) : (
-                        meal.name
-                      )}
-                    </div>
-                    <p className="meal-note">{meal.note}</p>
-                  </div>
-                  <span className="meal-type">{meal.type}</span>
-                </article>
               ))}
             </div>
           </section>
