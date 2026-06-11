@@ -1,3 +1,4 @@
+import { RecipeLibrary } from "@/app/recipes/recipe-library";
 import { getRecipes } from "@/lib/recipes";
 
 function isUrl(value: string) {
@@ -9,82 +10,40 @@ export default async function RecipesPage() {
 
   return (
     <main className="page-shell">
-      <section className="hero">
+      <section className="page-header">
         <div>
-          <p className="eyebrow">Recipes</p>
+          <p className="page-kicker">Recipe Library</p>
           <h1>Family Rotation Meals</h1>
-          <p className="hero-copy">
-            One place for the family-standard meals, linked recipes, cadence notes, and shopping ingredients that drive the weekly planner.
+          <p className="page-summary">
+            The source list for meal planning and ingredient mapping.
           </p>
-        </div>
-
-        <div className="hero-grid">
-          <div className="hero-stats">
-            <article className="stat-card">
-              <span className="stat-label">Recipes</span>
-              <strong>{recipes.length}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Linked</span>
-              <strong>{recipes.filter((recipe) => isUrl(recipe.source)).length}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Custom</span>
-              <strong>{recipes.filter((recipe) => !isUrl(recipe.source)).length}</strong>
-            </article>
-          </div>
-
-          <aside className="hero-aside">
-            <h2>What This Drives</h2>
-            <p className="hero-note">
-              These recipes are the planning inputs for weekly meals, ingredient overlap, and future WhatsApp-driven additions.
-            </p>
-          </aside>
         </div>
       </section>
 
-      <section className="panel" style={{ marginTop: "18px" }}>
+      <section className="metric-strip" aria-label="Recipe summary">
+        <article className="metric-card">
+          <span className="metric-label">Recipes</span>
+          <strong>{recipes.length}</strong>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Linked</span>
+          <strong>{recipes.filter((recipe) => isUrl(recipe.source)).length}</strong>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Family standards</span>
+          <strong>{recipes.filter((recipe) => !isUrl(recipe.source)).length}</strong>
+        </article>
+      </section>
+
+      <section className="panel">
         <div className="section-header">
           <div>
-            <h2>Recipe Library</h2>
-            <p>Each card shows cadence, notes, and the ingredient mapping used by the planner.</p>
+            <h2>Library</h2>
+            <p>Search by meal, cadence, serving pattern, or ingredient.</p>
           </div>
         </div>
 
-        <div className="recipe-grid">
-          {recipes.map((recipe) => (
-            <article className="recipe-card" key={recipe.name}>
-              <div className="recipe-top">
-                <div>
-                  <h3 className="recipe-title">
-                    {isUrl(recipe.source) ? (
-                      <a className="recipe-link" href={recipe.source} target="_blank" rel="noreferrer">
-                        {recipe.name}
-                      </a>
-                    ) : (
-                      recipe.name
-                    )}
-                  </h3>
-                  <p className="recipe-meta">
-                    {recipe.cookFrequency} · {recipe.servingPattern}
-                  </p>
-                </div>
-                <span className="meal-type">{isUrl(recipe.source) ? "Linked recipe" : "Family standard"}</span>
-              </div>
-
-              <p className="meal-note">{recipe.rotationNotes}</p>
-
-              <div className="ingredients-block">
-                <strong>Ingredients to map</strong>
-                <ul>
-                  {recipe.ingredientsToMap.map((item) => (
-                    <li key={`${recipe.name}-${item}`}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </article>
-          ))}
-        </div>
+        <RecipeLibrary recipes={recipes} />
       </section>
     </main>
   );

@@ -154,8 +154,8 @@ export function MealPlanEditor({
     <section className="panel cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
-          <h2>Meal Plan Editor</h2>
-          <p>Swap meals to another recipe or remove them from the visible week. Saving here updates both the meal line-up and the shopping list.</p>
+          <h2>Meal Lineup</h2>
+          <p>{orderDate} · saving meals refreshes the shopping list.</p>
         </div>
         <div className="cadence-editor__actions">
           <button className="ghost-button" type="button" onClick={resetMeals}>
@@ -168,10 +168,7 @@ export function MealPlanEditor({
       </div>
 
       <div className="cadence-editor__meta">
-        <span className="helper-text">
-          Plan date: {orderDate}
-          {analysisWindow ? ` · ${analysisWindow}` : ""}
-        </span>
+        {analysisWindow ? <span className="status-tag status-tag--muted">{analysisWindow}</span> : null}
         {saveMessage ? <span className="success-text">{saveMessage}</span> : null}
         {error ? <span className="error-text">{error}</span> : null}
       </div>
@@ -238,7 +235,7 @@ export function MealPlanEditor({
       </div>
 
       <div className="import-footer">
-        <p className="helper-text">Recipe-backed meals will refresh the shopping list automatically. Custom meal names without a matching recipe will not add new shopping items.</p>
+        <p className="helper-text">Recipe-backed meals add mapped ingredients automatically.</p>
         <button className="ghost-button" type="button" onClick={addMeal}>
           Add meal slot
         </button>

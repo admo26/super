@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
 import { signOut } from "@/app/auth/actions";
+import { NavLinks } from "@/app/nav-links";
 import { createClient } from "@/lib/supabase/server";
 import { getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
@@ -50,14 +52,23 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <Link href="/" className="site-brand">
               Super
             </Link>
-            <nav className="site-links">
-              <Link href="/">Current Week</Link>
-              {nextPlan ? <Link href={`/?week=${nextPlan.orderDate}`}>Next Week</Link> : null}
-              <Link href="/cadence">Cadence</Link>
-              <Link href="/recipes">Recipes</Link>
-              <Link href="/history">Order History</Link>
-              <Link href="/import">Order Import</Link>
-            </nav>
+            <Suspense
+              fallback={
+                <nav className="site-links" aria-label="Main navigation">
+                  <Link className="site-link" href="/">
+                    Current
+                  </Link>
+                  <Link className="site-link" href="/cadence">
+                    Planner
+                  </Link>
+                  <Link className="site-link" href="/recipes">
+                    Recipes
+                  </Link>
+                </nav>
+              }
+            >
+              <NavLinks nextPlanDate={nextPlan?.orderDate ?? null} />
+            </Suspense>
             <div className="site-auth">
               {user ? (
                 <>

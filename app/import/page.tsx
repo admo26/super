@@ -121,50 +121,40 @@ export default function ImportPage() {
     setDraftItems((current) => current.filter((_, currentIndex) => currentIndex !== index));
   }
 
+  const reviewedRows = draftItems.filter((item) => item.item_name.trim().length > 0).length;
+
   return (
     <main className="page-shell">
-      <section className="hero">
+      <section className="page-header">
         <div>
-          <p className="eyebrow">Order Import</p>
-          <h1>Bring In PDFs And Screenshots</h1>
-          <p className="hero-copy">
-            Upload a supermarket PDF or screenshot, let AI turn it into order rows, review the result, and save it to Supabase.
+          <p className="page-kicker">Order Import</p>
+          <h1>Upload, Review, Save</h1>
+          <p className="page-summary">
+            Turn supermarket PDFs or screenshots into structured history for future plans.
           </p>
-        </div>
-
-        <div className="hero-grid">
-          <div className="hero-stats">
-            <article className="stat-card">
-              <span className="stat-label">Accepted files</span>
-              <strong>PDF, PNG, JPG</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Flow</span>
-              <strong>Parse then review</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Save target</span>
-              <strong>Supabase</strong>
-            </article>
-          </div>
-
-          <aside className="hero-aside">
-            <h2>Why This Exists</h2>
-            <p className="hero-note">
-              This is the bridge from messy order documents into structured history that the weekly planner can actually use.
-            </p>
-            <p className="hero-note">
-              Parsing runs through your Vercel AI setup so usage stays visible in one place.
-            </p>
-          </aside>
         </div>
       </section>
 
-      <section className="panel" style={{ marginTop: "18px" }}>
+      <section className="step-strip" aria-label="Import progress">
+        <article className="step-card">
+          <strong>1. Upload</strong>
+          <span>{file ? file.name : "PDF, PNG, or JPG"}</span>
+        </article>
+        <article className="step-card">
+          <strong>2. Review</strong>
+          <span>{parsed ? `${draftItems.length} extracted rows` : "Waiting for parse"}</span>
+        </article>
+        <article className="step-card">
+          <strong>3. Save</strong>
+          <span>{saveMessage ? "Saved" : `${reviewedRows} ready rows`}</span>
+        </article>
+      </section>
+
+      <section className="panel">
         <div className="section-header">
           <div>
-            <h2>Upload</h2>
-            <p>Start with one order document so we can sanity-check extraction quality before scaling up.</p>
+            <h2>Upload Document</h2>
+            <p>Parse one order at a time, then review before saving.</p>
           </div>
         </div>
 
@@ -191,7 +181,7 @@ export default function ImportPage() {
 
       {parsed ? (
         <>
-          <section className="panel" style={{ marginTop: "18px" }}>
+          <section className="panel">
             <div className="section-header">
               <div>
                 <h2>Parse Summary</h2>
@@ -206,11 +196,11 @@ export default function ImportPage() {
             </ul>
           </section>
 
-          <section className="panel" style={{ marginTop: "18px" }}>
+          <section className="panel">
             <div className="section-header">
               <div>
-                <h2>Preview Rows</h2>
-                <p>Edit, add, or remove rows before saving them to order history.</p>
+                <h2>Review Rows</h2>
+                <p>Edit extraction details before saving to history.</p>
               </div>
               <button className="ghost-button" onClick={addRow} type="button">
                 Add line

@@ -120,8 +120,8 @@ export function CadenceEditor({
     <section className="panel cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
-          <h2>Cadence Lists</h2>
-          <p>Edit the recurring items for the {orderDate} plan. Changes save back to Supabase.</p>
+          <h2>Recurring Staples</h2>
+          <p>{orderDate} · weekly, fortnightly, and monthly defaults.</p>
         </div>
         <div className="cadence-editor__actions">
           <button className="ghost-button" type="button" onClick={resetCadence}>
@@ -150,10 +150,7 @@ export function CadenceEditor({
       </div>
 
       <div className="cadence-editor__meta">
-        <span className="helper-text">
-          Plan date: {orderDate}
-          {analysisWindow ? ` · ${analysisWindow}` : ""}
-        </span>
+        {analysisWindow ? <span className="status-tag status-tag--muted">{analysisWindow}</span> : null}
         {saveMessage ? <span className="success-text">{saveMessage}</span> : null}
         {error ? <span className="error-text">{error}</span> : null}
       </div>
@@ -203,7 +200,7 @@ export function CadenceEditor({
       </div>
 
       <div className="import-footer">
-        <p className="helper-text">Editing {selectedCadence} items only. Use the tabs to switch cadence buckets.</p>
+        <p className="helper-text">Editing {selectedCadence} staples.</p>
         <button className="ghost-button" type="button" onClick={addItem}>
           Add line
         </button>

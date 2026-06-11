@@ -11,49 +11,36 @@ export default async function OrderHistoryPage() {
 
   return (
     <main className="page-shell">
-      <section className="hero">
+      <section className="page-header">
         <div>
-          <p className="eyebrow">Order History</p>
-          <h1>See What We Already Know</h1>
-          <p className="hero-copy">
-            Browse the imported grocery history that will drive cadence detection and future weekly order generation.
+          <p className="page-kicker">Order History</p>
+          <h1>Imported Grocery Data</h1>
+          <p className="page-summary">
+            Review the order rows used for cadence detection and weekly plan generation.
           </p>
-        </div>
-
-        <div className="hero-grid">
-          <div className="hero-stats">
-            <article className="stat-card">
-              <span className="stat-label">Orders</span>
-              <strong>{history.totalOrders}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Rows</span>
-              <strong>{history.totalRows}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">First order</span>
-              <strong>{history.earliestOrderDate ?? "—"}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Latest order</span>
-              <strong>{history.latestOrderDate ?? "—"}</strong>
-            </article>
-          </div>
-
-          <aside className="hero-aside">
-            <h2>What This Unlocks</h2>
-            <p className="hero-note">
-              Once this history looks right, we can generate weekly orders from actual household buying patterns instead of only static seed data.
-            </p>
-          </aside>
         </div>
       </section>
 
-      <section className="panel" style={{ marginTop: "18px" }}>
+      <section className="metric-strip" aria-label="Order history summary">
+        <article className="metric-card">
+          <span className="metric-label">Orders</span>
+          <strong>{history.totalOrders}</strong>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Rows</span>
+          <strong>{history.totalRows}</strong>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Window</span>
+          <strong>{history.earliestOrderDate ?? "—"} to {history.latestOrderDate ?? "—"}</strong>
+        </article>
+      </section>
+
+      <section className="panel">
         <div className="section-header">
           <div>
-            <h2>Imported Orders</h2>
-            <p>Each card shows one saved order batch grouped by date and import source.</p>
+            <h2>Saved Orders</h2>
+            <p>Grouped by order date and import source.</p>
           </div>
         </div>
 
@@ -95,9 +82,7 @@ export default async function OrderHistoryPage() {
             ))}
           </div>
         ) : (
-          <p className="helper-text">
-            No order history rows are available yet. Import a PDF/image or run the repo CSV seed to populate this page.
-          </p>
+          <div className="empty-state">No order history rows are available yet.</div>
         )}
       </section>
     </main>

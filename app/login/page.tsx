@@ -15,10 +15,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className="page-shell auth-shell">
       <section className="auth-card">
-        <p className="eyebrow">Household Access</p>
-        <h1>Sign In To Super</h1>
-        <p className="hero-copy">
-          Sign in with Google so the grocery planner and the AI-powered import tools stay behind one household account.
+        <p className="page-kicker">Household Access</p>
+        <h1>Sign in to Super</h1>
+        <p className="page-summary">
+          Secure access for the weekly grocery planner and order import tools.
         </p>
 
         <form className="auth-form" action={signInWithGoogle}>

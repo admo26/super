@@ -34,49 +34,40 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
 
   return (
     <main className="page-shell">
-      <section className="hero">
+      <section className="page-header">
         <div>
-          <p className="eyebrow">Cadence Editor</p>
-          <h1>View And Edit Recurring Items</h1>
-          <p className="hero-copy">
-            Keep the weekly, fortnightly, and monthly lists tidy in one place, then save the changes back to the weekly plan.
+          <p className="page-kicker">Planning Settings</p>
+          <h1>Meals And Recurring Items</h1>
+          <p className="page-summary">
+            Tune the selected week, recurring staples, and meal lineup that generate the order.
           </p>
         </div>
-
-        <div className="hero-grid">
-          <div className="hero-stats">
-            <article className="stat-card">
-              <span className="stat-label">Plans</span>
-              <strong>{summaries.length}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Current view</span>
-              <strong>{selectedWeek ?? "None"}</strong>
-            </article>
-            <article className="stat-card">
-              <span className="stat-label">Status</span>
-              <strong>{plan ? "Editable" : "Empty"}</strong>
-            </article>
-          </div>
-
-          <aside className="hero-aside">
-            <h2>Navigation</h2>
-            <p className="hero-note">
-              Switch between available weekly plans, then edit each cadence bucket with the tabbed editor below.
-            </p>
-          </aside>
-        </div>
+        <Link className="ghost-button" href="/">
+          Back to current week
+        </Link>
       </section>
 
-      <section className="panel" style={{ marginTop: "18px" }}>
+      <section className="metric-strip" aria-label="Planner summary">
+        <article className="metric-card">
+          <span className="metric-label">Plans</span>
+          <strong>{summaries.length}</strong>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Selected week</span>
+          <strong>{selectedWeek ?? "None"}</strong>
+        </article>
+        <article className="metric-card">
+          <span className="metric-label">Status</span>
+          <strong>{plan ? "Editable" : "Empty"}</strong>
+        </article>
+      </section>
+
+      <section className="panel">
         <div className="section-header cadence-page__header">
           <div>
-            <h2>Available Plans</h2>
-            <p>Pick the week you want to inspect or edit.</p>
+            <h2>Week Switcher</h2>
+            <p>Pick the saved plan to inspect or edit.</p>
           </div>
-          <Link className="ghost-button" href="/">
-            Back to dashboard
-          </Link>
         </div>
 
         <div className="cadence-plan-pills">
@@ -97,25 +88,23 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
       </section>
 
       {plan ? (
-        <div style={{ marginTop: "18px" }}>
+        <div className="stack">
           <CadenceEditor
             weeklyPlanId={plan.id}
             orderDate={plan.orderDate}
             analysisWindow={plan.analysisWindow}
             initialCadence={plan.cadence}
           />
-          <div style={{ marginTop: "18px" }}>
-            <MealPlanEditor
-              weeklyPlanId={plan.id}
-              orderDate={plan.orderDate}
-              analysisWindow={plan.analysisWindow}
-              initialMeals={plan.meals}
-              recipes={recipes}
-            />
-          </div>
+          <MealPlanEditor
+            weeklyPlanId={plan.id}
+            orderDate={plan.orderDate}
+            analysisWindow={plan.analysisWindow}
+            initialMeals={plan.meals}
+            recipes={recipes}
+          />
         </div>
       ) : (
-        <section className="panel" style={{ marginTop: "18px" }}>
+        <section className="panel">
           <p className="helper-text">There is no cadence plan selected yet.</p>
         </section>
       )}
