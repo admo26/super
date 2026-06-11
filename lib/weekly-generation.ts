@@ -134,6 +134,12 @@ function inferGroup(name: string) {
   return "Pantry";
 }
 
+function cadenceReason(cadence: CadenceKey) {
+  if (cadence === "weekly") return "weekly staple";
+  if (cadence === "fortnightly") return "fortnightly staple";
+  return "monthly staple";
+}
+
 function makeMealType(frequency: string) {
   if (frequency === "weekly") return "Weekly anchor";
   if (frequency === "fortnightly") return "Fortnightly rotation";
@@ -289,22 +295,26 @@ function buildMealPlan(recipes: Recipe[], historyCounts: Map<string, number>) {
   return { meals, dinnerRecipes, batchRecipe };
 }
 
-function buildShoppingItems(
+export function buildShoppingItems(
   meals: Array<Meal & { recipe?: Recipe }>,
   cadenceItems: Record<CadenceKey, { name: string; qty: string; note: string }[]>
 ) {
   const items: ShoppingItem[] = [];
   const seen = new Map<string, string>();
 
-  const seedNames = [
-    ...cadenceItems.weekly,
-    ...cadenceItems.fortnightly,
-    ...cadenceItems.monthly
-  ].map((item) => canonicalName(item.name));
+  for (const cadence of ["weekly", "fortnightly", "monthly"] as const) {
+    for (const item of cadenceItems[cadence]) {
+      const canonical = canonicalName(item.name);
+      if (!canonical || seen.has(canonical)) continue;
 
-  for (const name of seedNames) {
-    if (name) {
-      seen.set(name, name);
+      seen.set(canonical, canonical);
+      items.push({
+        name: titleCase(item.name),
+        qty: item.qty,
+        reason: cadenceReason(cadence),
+        meal: "Household staple",
+        group: inferGroup(item.name)
+      });
     }
   }
 

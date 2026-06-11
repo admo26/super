@@ -146,7 +146,7 @@ export function MealPlanEditor({
         return;
       }
 
-      setSaveMessage(`Saved ${payload.saved} meal rows to Supabase.`);
+      setSaveMessage(`Saved ${payload.saved} meal rows and refreshed ${payload.itemsSaved} shopping list rows.`);
     });
   }
 
@@ -155,7 +155,7 @@ export function MealPlanEditor({
       <div className="section-header cadence-editor__header">
         <div>
           <h2>Meal Plan Editor</h2>
-          <p>Swap meals to another recipe or remove them from the visible week. Saving here updates the meal line-up only.</p>
+          <p>Swap meals to another recipe or remove them from the visible week. Saving here updates both the meal line-up and the shopping list.</p>
         </div>
         <div className="cadence-editor__actions">
           <button className="ghost-button" type="button" onClick={resetMeals}>
@@ -238,7 +238,7 @@ export function MealPlanEditor({
       </div>
 
       <div className="import-footer">
-        <p className="helper-text">This does not regenerate the shopping list yet, so use it for manual presentation changes to the weekly meal line-up.</p>
+        <p className="helper-text">Recipe-backed meals will refresh the shopping list automatically. Custom meal names without a matching recipe will not add new shopping items.</p>
         <button className="ghost-button" type="button" onClick={addMeal}>
           Add meal slot
         </button>
