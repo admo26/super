@@ -8,7 +8,6 @@ today="$(date +%F)"
 message="${1:-Publish weekly order for ${today}}"
 
 if [[ -n "${NEXT_PUBLIC_SUPABASE_URL:-}" && -n "${SUPABASE_SECRET_KEY:-}" ]]; then
-  npm run seed:recipes
   npm run seed:weekly-plan
 else
   echo "Skipping Supabase sync because NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY is not set."

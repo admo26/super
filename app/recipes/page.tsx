@@ -1,48 +1,14 @@
-import Link from "next/link";
-
-import { syncRecipesToSupabase } from "@/app/recipes/actions";
-import { isAllowedAuthEmail } from "@/lib/auth";
 import { getRecipes } from "@/lib/recipes";
-import { createClient } from "@/lib/supabase/server";
-
-export const dynamic = "force-dynamic";
-
-type RecipesPageProps = {
-  searchParams?: Promise<{
-    synced?: string;
-    error?: string;
-  }>;
-};
 
 function isUrl(value: string) {
   return value.startsWith("http://") || value.startsWith("https://");
 }
 
-function hasSupabaseConfig() {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-  );
-}
-
-export default async function RecipesPage({ searchParams }: RecipesPageProps) {
-  const resolvedSearchParams = (await searchParams) ?? {};
-  const synced = resolvedSearchParams.synced === "1";
-  const error = resolvedSearchParams.error ?? null;
-  const supabase = hasSupabaseConfig() ? await createClient() : null;
-  const userResult = supabase ? await supabase.auth.getUser() : null;
-  const user = userResult?.data.user ?? null;
-  const canSyncRecipes = isAllowedAuthEmail(user?.email);
+export default async function RecipesPage() {
   const { recipes } = await getRecipes();
 
   return (
     <main className="page-shell">
-      {synced ? (
-        <section className="notice-banner">
-          Recipes synced to Supabase. Refresh complete.
-        </section>
-      ) : null}
-      {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="hero">
         <div>
           <p className="eyebrow">Recipes</p>
@@ -73,18 +39,6 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
             <p className="hero-note">
               These recipes are the planning inputs for weekly meals, ingredient overlap, and future WhatsApp-driven additions.
             </p>
-            {canSyncRecipes ? (
-              <form action={syncRecipesToSupabase} className="hero-actions">
-                <button className="action-button" type="submit">
-                  Sync recipes to Supabase
-                </button>
-                <p className="action-note">Push the repo recipe seed data into the hosted app database.</p>
-              </form>
-            ) : hasSupabaseConfig() ? (
-              <p className="hero-note" style={{ marginTop: "14px" }}>
-                <Link href="/login">Sign in</Link> with a household account to sync recipe changes to Supabase.
-              </p>
-            ) : null}
           </aside>
         </div>
       </section>
