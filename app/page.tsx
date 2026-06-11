@@ -55,31 +55,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <strong>{plan.items.length}</strong>
             </article>
           </div>
-
-          <aside className="hero-aside">
-            <h2>Meal Line-up</h2>
-            <div className="hero-pills">
-              {plan.meals.map((meal) => (
-                <span className="pill" key={meal.name}>
-                  {meal.url ? (
-                    <a href={meal.url} target="_blank" rel="noreferrer">
-                      {meal.name}
-                    </a>
-                  ) : (
-                    meal.name
-                  )}
-                </span>
-              ))}
-            </div>
-            <p className="hero-note">{plan.analysisWindow}</p>
-            <form action={generateNextWeeklyPlan} className="hero-actions">
-              <button className="action-button" type="submit">
-                Generate next week
-              </button>
-              <p className="action-note">Builds a new draft from imported history and the recipe list.</p>
-            </form>
-          </aside>
         </div>
+
+        <form action={generateNextWeeklyPlan} className="hero-actions hero-actions--inline">
+          <button className="action-button" type="submit">
+            Generate next week
+          </button>
+          <p className="hero-note">{plan.analysisWindow}</p>
+        </form>
       </section>
 
       <div className="content-grid">
@@ -153,9 +136,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </div>
           </section>
         </div>
-
-        <aside className="side-stack">
-        </aside>
       </div>
     </main>
   );
