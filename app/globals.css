@@ -458,6 +458,16 @@ p {
   background: rgba(255, 255, 255, 0.7);
 }
 
+.cadence-editor__head--meals,
+.cadence-editor__row--meals {
+  grid-template-columns: 1.4fr 0.7fr 1.3fr 0.8fr;
+}
+
+.meal-editor__recipe-picker {
+  display: grid;
+  gap: 10px;
+}
+
 .cadence-editor__empty {
   padding: 18px;
   border: 1px dashed var(--line);

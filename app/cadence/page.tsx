@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { CadenceEditor } from "@/app/cadence/cadence-editor";
+import { MealPlanEditor } from "@/app/cadence/meal-plan-editor";
+import { getRecipes } from "@/lib/recipes";
 import { getEditableWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
 type CadencePageProps = {
@@ -22,6 +24,7 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const today = getTodayInPacificAuckland();
   const summaries = await getWeeklyPlanSummaries();
+  const { recipes } = await getRecipes();
   const selectedWeek =
     resolvedSearchParams.week ??
     summaries.filter((plan) => plan.orderDate <= today).at(-1)?.orderDate ??
@@ -101,6 +104,15 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
             analysisWindow={plan.analysisWindow}
             initialCadence={plan.cadence}
           />
+          <div style={{ marginTop: "18px" }}>
+            <MealPlanEditor
+              weeklyPlanId={plan.id}
+              orderDate={plan.orderDate}
+              analysisWindow={plan.analysisWindow}
+              initialMeals={plan.meals}
+              recipes={recipes}
+            />
+          </div>
         </div>
       ) : (
         <section className="panel" style={{ marginTop: "18px" }}>

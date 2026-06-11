@@ -18,6 +18,7 @@ export type EditableWeeklyPlan = {
   id: string;
   orderDate: string;
   analysisWindow: string | null;
+  meals: Meal[];
   cadence: Record<CadenceKey, CadenceItem[]>;
 };
 
@@ -140,14 +141,22 @@ async function fetchEditableWeeklyPlanByDate(
   }
 
   const planRow = planResult.data as PlanRow;
-  const cadenceResult = await supabase
-    .from("weekly_plan_cadence_items")
-    .select("cadence, name, qty, note")
-    .eq("weekly_plan_id", planRow.id)
-    .order("position", { ascending: true })
-    .returns<CadenceRow[]>();
+  const [mealsResult, cadenceResult] = await Promise.all([
+    supabase
+      .from("weekly_plan_meals")
+      .select("name, type, note, recipe_url")
+      .eq("weekly_plan_id", planRow.id)
+      .order("position", { ascending: true })
+      .returns<MealRow[]>(),
+    supabase
+      .from("weekly_plan_cadence_items")
+      .select("cadence, name, qty, note")
+      .eq("weekly_plan_id", planRow.id)
+      .order("position", { ascending: true })
+      .returns<CadenceRow[]>()
+  ]);
 
-  if (cadenceResult.error) {
+  if (mealsResult.error || cadenceResult.error) {
     return null;
   }
 
@@ -155,6 +164,7 @@ async function fetchEditableWeeklyPlanByDate(
     id: planRow.id,
     orderDate: planRow.order_date,
     analysisWindow: planRow.analysis_window,
+    meals: rowsToMeals(mealsResult.data ?? []),
     cadence: rowsToCadence(cadenceResult.data ?? [])
   };
 }

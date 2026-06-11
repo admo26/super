@@ -126,6 +126,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <h2>Meal Plan</h2>
                 <p>Recipe links appear when a meal has a source URL.</p>
               </div>
+              <Link className="ghost-button" href={selectedWeek ? `/cadence?week=${selectedWeek}` : "/cadence"}>
+                Edit meals
+              </Link>
             </div>
 
             <div className="meal-list">
