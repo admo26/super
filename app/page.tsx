@@ -93,36 +93,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="panel">
             <div className="section-header">
               <div>
-                <h2>Cadence Snapshot</h2>
-                <p>Weekly, fortnightly, and monthly staples from the current plan source.</p>
-              </div>
-              <Link className="ghost-button" href="/cadence">
-                Edit cadence
-              </Link>
-            </div>
-
-            <div className="cadence-grid">
-              {(["weekly", "fortnightly", "monthly"] as const).map((cadence) => (
-                <article className="cadence-card" key={cadence}>
-                  <h3>{cadence[0].toUpperCase() + cadence.slice(1)}</h3>
-                  <ul>
-                    {plan.cadence[cadence].map((item) => (
-                      <li key={`${cadence}-${item.name}`}>
-                        <span className="item-strong">
-                          {item.name} · {item.qty}
-                        </span>
-                        <span>{item.note}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="section-header">
-              <div>
                 <h2>Meal Plan</h2>
                 <p>Recipe links appear when a meal has a source URL.</p>
               </div>
