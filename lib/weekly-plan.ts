@@ -29,7 +29,14 @@ type MealRow = {
   recipe_url: string | null;
 };
 
-type ItemRow = ShoppingItem;
+type ItemRow = {
+  id: string;
+  name: string;
+  qty: string;
+  reason: string;
+  meal: string;
+  group: string;
+};
 
 type CadenceRow = {
   cadence: CadenceKey;
@@ -98,7 +105,7 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
       .returns<MealRow[]>(),
     supabase
       .from("weekly_plan_items")
-      .select("name, qty, reason, meal, \"group\"")
+      .select("id, name, qty, reason, meal, \"group\"")
       .eq("weekly_plan_id", planRow.id)
       .order("position", { ascending: true })
       .returns<ItemRow[]>(),
@@ -115,6 +122,7 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
   }
 
   return {
+    id: planRow.id,
     orderDate: planRow.order_date,
     analysisWindow: planRow.analysis_window ?? defaultPlan.analysisWindow,
     sourceLabel: "Supabase",

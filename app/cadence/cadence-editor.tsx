@@ -168,7 +168,7 @@ export function CadenceEditor({
 
         {visibleItems.length ? (
           visibleItems.map((item, index) => (
-            <div className="cadence-editor__row" key={`${selectedCadence}-${item.name}-${index}`}>
+            <div className="cadence-editor__row" key={`${selectedCadence}-${index}`}>
               <input
                 className="import-input"
                 type="text"

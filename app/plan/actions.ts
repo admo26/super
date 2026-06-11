@@ -148,3 +148,45 @@ export async function generateNextWeeklyPlan() {
   revalidatePath("/history");
   redirect(`/?generated=1`);
 }
+
+export async function deleteShoppingListItem(formData: FormData) {
+  if (!hasSupabaseConfig()) {
+    redirectWithError("Supabase is not configured.");
+  }
+
+  const itemId = formData.get("itemId");
+  const week = formData.get("week");
+
+  if (typeof itemId !== "string" || itemId.length === 0) {
+    redirectWithError("Missing shopping list item id.");
+  }
+
+  const selectedWeek = typeof week === "string" && week.length > 0 ? week : null;
+  const supabase = await createClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    const nextPath = selectedWeek ? `/?week=${encodeURIComponent(selectedWeek)}` : "/";
+    redirect(`/login?error=${encodeError("Please sign in first.")}&next=${encodeURIComponent(nextPath)}`);
+  }
+
+  if (!isAllowedAuthEmail(user.email)) {
+    redirect("/unauthorized");
+  }
+
+  const deleteResult = await supabase.from("weekly_plan_items").delete().eq("id", itemId);
+
+  if (deleteResult.error) {
+    redirectWithError(deleteResult.error.message);
+  }
+
+  revalidatePath("/");
+
+  if (selectedWeek) {
+    redirect(`/?week=${encodeURIComponent(selectedWeek)}`);
+  }
+
+  redirect("/");
+}

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { generateNextWeeklyPlan } from "@/app/plan/actions";
+import { deleteShoppingListItem, generateNextWeeklyPlan } from "@/app/plan/actions";
 import { getWeeklyPlan } from "@/lib/weekly-plan";
 
 type HomePageProps = {
@@ -18,13 +18,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const selectedWeek = resolvedSearchParams.week ?? null;
   const plan = await getWeeklyPlan(selectedWeek ?? undefined);
   const selectedLabel = selectedWeek ? "Next Week Preview" : "Current Week";
-
-  const groupedItems = plan.items.reduce<Record<string, typeof plan.items>>((acc, item) => {
-    const current = acc[item.group] ?? [];
-    current.push(item);
-    acc[item.group] = current;
-    return acc;
-  }, {});
+  const canEditShoppingList = Boolean(plan.id);
 
   return (
     <main className="page-shell">
@@ -126,19 +120,34 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <div className="section-header">
               <div>
                 <h2>Shopping List</h2>
-                <p>This first Vercel version is read-only; editing can come once the database flow is live.</p>
+                <p>
+                  {canEditShoppingList
+                    ? "Remove anything you do not need for this week."
+                    : "Shopping list editing is available for saved Supabase-backed plans."}
+                </p>
               </div>
             </div>
 
             <div className="shopping-list">
               {plan.items.map((item) => (
-                <article className="shopping-item" key={`${item.name}-${item.qty}`}>
+                <article className="shopping-item" key={item.id ?? `${item.name}-${item.qty}`}>
                   <div>
                     <div className="shopping-name">{item.name}</div>
                     <div className="shopping-meta">Qty: {item.qty}</div>
                     <div className="shopping-meta">{item.meal}</div>
                   </div>
-                  <span className="reason-tag">{item.reason}</span>
+                  <div className="shopping-item__actions">
+                    <span className="reason-tag">{item.reason}</span>
+                    {item.id ? (
+                      <form action={deleteShoppingListItem}>
+                        <input type="hidden" name="itemId" value={item.id} />
+                        {selectedWeek ? <input type="hidden" name="week" value={selectedWeek} /> : null}
+                        <button className="ghost-button ghost-button--small" type="submit">
+                          Delete
+                        </button>
+                      </form>
+                    ) : null}
+                  </div>
                 </article>
               ))}
             </div>
@@ -146,42 +155,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
 
         <aside className="side-stack">
-          <section className="panel">
-            <h2>Grouped For Shopping</h2>
-            <div className="group-list">
-              {Object.entries(groupedItems).map(([group, items]) => (
-                <section className="group-card" key={group}>
-                  <h3>{group}</h3>
-                  <ul>
-                    {items.map((item) => (
-                      <li key={`${group}-${item.name}`}>
-                        <strong>{item.name}</strong>
-                        <span>{item.qty}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-            </div>
-          </section>
-
-          <section className="panel">
-            <h2>Assumptions</h2>
-            <ul className="note-list">
-              {plan.assumptions.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="panel">
-            <h2>Quick Adjustments</h2>
-            <ul className="check-list">
-              {plan.adjustments.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
         </aside>
       </div>
     </main>

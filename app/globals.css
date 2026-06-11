@@ -494,6 +494,12 @@ p {
   background: rgba(255,255,255,0.96);
 }
 
+.shopping-item__actions {
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+
 .recipe-grid {
   display: grid;
   gap: 14px;
@@ -833,5 +839,9 @@ p {
   .cadence-page__header,
   .cadence-editor__header {
     flex-direction: column;
+  }
+
+  .shopping-item__actions {
+    justify-items: start;
   }
 }

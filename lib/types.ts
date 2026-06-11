@@ -14,6 +14,7 @@ export type CadenceItem = {
 };
 
 export type ShoppingItem = {
+  id?: string;
   name: string;
   qty: string;
   reason: string;
@@ -22,6 +23,7 @@ export type ShoppingItem = {
 };
 
 export type WeeklyPlan = {
+  id?: string;
   orderDate: string;
   analysisWindow: string;
   sourceLabel: string;
