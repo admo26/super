@@ -247,3 +247,76 @@ ingredients_to_map:
 - egg
 - bbq sauce (pantry likely)
 - Kewpie mayo (pantry likely)
+
+## Creamy Chicken and Leek Pot Pie (Simple Home Edit)
+source: https://simplehomeedit.com/recipe/creamy-chicken-and-leek-pot-pie/
+cook_frequency: fortnightly
+serving_pattern: same_week_meal
+rotation_notes: Fortnightly family dinner rotation. Added as a cosy chicken option with some extra prep and strong overlap with chicken, onion and freezer staples.
+
+ingredients_to_map:
+- chicken thighs
+- brown onion
+- leeks
+- garlic
+- butter
+- plain flour
+- chicken stock
+- cream
+- Dijon mustard
+- thyme
+- frozen peas (optional)
+- parmesan
+- frozen puff pastry
+- egg yolk
+- mashed potatoes (optional side)
+- steamed greens (optional side)
+
+## Speedy Beef Teriyaki (Simple Home Edit)
+source: https://simplehomeedit.com/recipe/speedy-beef-teriyaki/
+cook_frequency: fortnightly
+serving_pattern: same_week_meal
+rotation_notes: Fortnightly family dinner rotation. Added as a fast mince dinner with good overlap across rice, onion, garlic and lunchbox-friendly veg.
+
+ingredients_to_map:
+- beef mince
+- olive oil
+- onion
+- garlic
+- teriyaki sauce
+- cornflour
+- mirin (optional if using homemade sauce)
+- cooking sake (optional if using homemade sauce)
+- soy sauce or tamari
+- brown sugar
+- rice
+- carrot
+- edamame beans
+- red cabbage
+- sesame seeds
+- spring onion
+- Kewpie mayo (optional)
+
+## Chicken Quesadillas (Simple Home Edit)
+source: https://simplehomeedit.com/recipe/chicken-quesadillas/
+cook_frequency: fortnightly
+serving_pattern: same_week_meal
+rotation_notes: Fortnightly family dinner rotation. Added as a quick chicken-and-wrap option with high overlap with fajita staples.
+
+ingredients_to_map:
+- chicken thighs
+- olive oil
+- sweet paprika
+- garlic powder
+- onion powder
+- ground cumin
+- dried oregano
+- red onion
+- garlic
+- flour tortillas
+- cheese
+- sour cream (optional)
+- pico de gallo (optional)
+- guacamole (optional)
+- coriander (optional)
+- lime

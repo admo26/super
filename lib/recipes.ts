@@ -1,4 +1,3 @@
-import recipeFallback from "@/data/recipes.json";
 import { createClient } from "@/lib/supabase/server";
 
 export type Recipe = {
@@ -40,8 +39,8 @@ function mapRecipeRow(row: RecipeRow): Recipe {
 export async function getRecipes(): Promise<{ sourceLabel: string; recipes: Recipe[] }> {
   if (!hasSupabaseConfig()) {
     return {
-      sourceLabel: "Repo fallback",
-      recipes: recipeFallback
+      sourceLabel: "Unavailable",
+      recipes: []
     };
   }
 
@@ -54,8 +53,8 @@ export async function getRecipes(): Promise<{ sourceLabel: string; recipes: Reci
 
     if (result.error || !result.data?.length) {
       return {
-        sourceLabel: "Repo fallback",
-        recipes: recipeFallback
+        sourceLabel: "Supabase",
+        recipes: []
       };
     }
 
@@ -65,8 +64,8 @@ export async function getRecipes(): Promise<{ sourceLabel: string; recipes: Reci
     };
   } catch {
     return {
-      sourceLabel: "Repo fallback",
-      recipes: recipeFallback
+      sourceLabel: "Unavailable",
+      recipes: []
     };
   }
 }
