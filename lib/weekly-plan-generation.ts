@@ -23,6 +23,20 @@ type CadenceHistoryRow = {
   position: number;
 };
 
+type ShoppingItemRow = {
+  name: string;
+  qty: string;
+  reason: string;
+  meal: string;
+  group: string;
+};
+
+type PendingAdHocRow = {
+  id: string;
+  name: string;
+  qty: string;
+};
+
 function getAdminSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseSecret = process.env.SUPABASE_SECRET_KEY;
@@ -128,11 +142,38 @@ export async function generateAndStoreNextWeeklyPlan() {
     throw new Error(existingPlan.error.message);
   }
 
+  let preservedAdHocItems: ShoppingItemRow[] = [];
+
   if (existingPlan.data?.id) {
+    const existingAdHocItems = await supabase
+      .from("weekly_plan_items")
+      .select("name, qty, reason, meal, \"group\"")
+      .eq("weekly_plan_id", existingPlan.data.id)
+      .eq("reason", "ad hoc")
+      .order("position", { ascending: true })
+      .returns<ShoppingItemRow[]>();
+
+    if (existingAdHocItems.error) {
+      throw new Error(existingAdHocItems.error.message);
+    }
+
+    preservedAdHocItems = existingAdHocItems.data ?? [];
+
     const deleted = await supabase.from("weekly_plans").delete().eq("id", existingPlan.data.id);
     if (deleted.error) {
       throw new Error(deleted.error.message);
     }
+  }
+
+  const pendingAdHocItems = await supabase
+    .from("pending_ad_hoc_items")
+    .select("id, name, qty")
+    .eq("target_order_date", draft.orderDate)
+    .order("created_at", { ascending: true })
+    .returns<PendingAdHocRow[]>();
+
+  if (pendingAdHocItems.error) {
+    throw new Error(pendingAdHocItems.error.message);
   }
 
   const insertedPlan = await supabase
@@ -174,7 +215,18 @@ export async function generateAndStoreNextWeeklyPlan() {
     }))
   );
 
-  const shoppingItems = draft.items.map((item, index) => ({
+  const adHocItems = [
+    ...preservedAdHocItems,
+    ...(pendingAdHocItems.data ?? []).map((item) => ({
+      name: item.name,
+      qty: item.qty,
+      reason: "ad hoc",
+      meal: "Added during week",
+      group: "Other"
+    }))
+  ];
+
+  const shoppingItems = [...draft.items, ...adHocItems].map((item, index) => ({
     weekly_plan_id: weeklyPlanId,
     position: index,
     name: item.name,
@@ -192,6 +244,15 @@ export async function generateAndStoreNextWeeklyPlan() {
     const result = await supabase.from(table).insert(rows as never[]);
     if (result.error) {
       throw new Error(`Failed to save ${label}: ${result.error.message}`);
+    }
+  }
+
+  if (pendingAdHocItems.data?.length) {
+    const pendingIds = pendingAdHocItems.data.map((item) => item.id);
+    const deletePending = await supabase.from("pending_ad_hoc_items").delete().in("id", pendingIds);
+
+    if (deletePending.error) {
+      throw new Error(deletePending.error.message);
     }
   }
 

@@ -1,6 +1,6 @@
 import { defaultPlan } from "@/lib/default-plan";
 import { createClient } from "@/lib/supabase/server";
-import type { CadenceItem, CadenceKey, Meal, ShoppingItem, WeeklyPlan } from "@/lib/types";
+import type { CadenceItem, CadenceKey, Meal, PendingAdHocItem, ShoppingItem, WeeklyPlan } from "@/lib/types";
 
 type PlanRow = {
   id: string;
@@ -43,6 +43,14 @@ type CadenceRow = {
   name: string;
   qty: string;
   note: string;
+};
+
+type PendingAdHocRow = {
+  id: string;
+  name: string;
+  qty: string;
+  target_order_date: string;
+  created_at: string;
 };
 
 function hasSupabaseConfig() {
@@ -272,5 +280,35 @@ export async function getEditableWeeklyPlan(targetOrderDate?: string): Promise<E
     return selectedOrderDate ? fetchEditableWeeklyPlanByDate(supabase, selectedOrderDate) : null;
   } catch {
     return null;
+  }
+}
+
+export async function getPendingAdHocItems(targetOrderDate: string): Promise<PendingAdHocItem[]> {
+  if (!hasSupabaseConfig()) {
+    return [];
+  }
+
+  try {
+    const supabase = await createClient();
+    const result = await supabase
+      .from("pending_ad_hoc_items")
+      .select("id, name, qty, target_order_date, created_at")
+      .eq("target_order_date", targetOrderDate)
+      .order("created_at", { ascending: true })
+      .returns<PendingAdHocRow[]>();
+
+    if (result.error || !result.data?.length) {
+      return [];
+    }
+
+    return result.data.map((row) => ({
+      id: row.id,
+      name: row.name,
+      qty: row.qty,
+      targetOrderDate: row.target_order_date,
+      createdAt: row.created_at
+    }));
+  } catch {
+    return [];
   }
 }

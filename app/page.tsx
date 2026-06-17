@@ -1,8 +1,9 @@
 import Link from "next/link";
 
+import { AdHocItemForm } from "@/app/order-items/ad-hoc-item-form";
 import { deleteShoppingListItem, generateNextWeeklyPlan } from "@/app/plan/actions";
-import { getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
-import type { ShoppingItem } from "@/lib/types";
+import { getPendingAdHocItems, getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
+import type { PendingAdHocItem, ShoppingItem } from "@/lib/types";
 
 type HomePageProps = {
   searchParams?: Promise<{
@@ -12,7 +13,17 @@ type HomePageProps = {
   }>;
 };
 
-const reasonOrder = ["planned meal", "weekly staple", "fortnightly staple", "monthly staple", "freezer batch", "pantry check"];
+const reasonOrder = ["planned meal", "ad hoc", "weekly staple", "fortnightly staple", "monthly staple", "freezer batch", "pantry check"];
+
+function formatDate(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function addDays(dateString: string, days: number) {
+  const date = new Date(`${dateString}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return formatDate(date);
+}
 
 function formatReason(value: string) {
   return value
@@ -35,6 +46,32 @@ function groupItemsByReason(items: ShoppingItem[]) {
   });
 }
 
+function PendingAdHocList({ items, targetWeek }: { items: PendingAdHocItem[]; targetWeek: string }) {
+  if (!items.length) return null;
+
+  return (
+    <section className="pending-ad-hoc" aria-label="Pending ad hoc items">
+      <div className="shopping-group__header">
+        <span>Pending For Next Order</span>
+        <span>{items.length}</span>
+      </div>
+      <div className="pending-ad-hoc__list">
+        {items.map((item) => (
+          <article className="shopping-item" key={item.id}>
+            <div>
+              <div className="shopping-name">{item.name}</div>
+              <div className="shopping-meta">
+                Qty: {item.qty} · saved for {targetWeek}
+              </div>
+            </div>
+            <span className="reason-tag">Pending</span>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const generated = resolvedSearchParams.generated === "1";
@@ -49,6 +86,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const nextWeekSummary = selectedWeek
     ? null
     : planSummaries.find((summary) => summary.orderDate > plan.orderDate) ?? null;
+  const adHocTargetWeek = selectedWeek ?? nextWeekSummary?.orderDate ?? addDays(plan.orderDate, 7);
+  const pendingAdHocItems = !selectedWeek && !nextWeekSummary
+    ? await getPendingAdHocItems(adHocTargetWeek)
+    : [];
   const primaryActionLabel = selectedWeek
     ? "Regenerate"
     : nextWeekSummary
@@ -156,7 +197,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     : "Shopping list editing is available for saved Supabase-backed plans."}
                 </p>
               </div>
+              <AdHocItemForm targetWeek={adHocTargetWeek} />
             </div>
+
+            <PendingAdHocList items={pendingAdHocItems} targetWeek={adHocTargetWeek} />
 
             <div className="shopping-list">
               {groupedItems.map(([reason, items]) => (

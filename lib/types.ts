@@ -22,6 +22,14 @@ export type ShoppingItem = {
   group: string;
 };
 
+export type PendingAdHocItem = {
+  id: string;
+  name: string;
+  qty: string;
+  targetOrderDate: string;
+  createdAt: string;
+};
+
 export type WeeklyPlan = {
   id?: string;
   orderDate: string;

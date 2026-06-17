@@ -38,6 +38,14 @@ create table if not exists public.weekly_plan_items (
   "group" text not null
 );
 
+create table if not exists public.pending_ad_hoc_items (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  qty text not null default '1',
+  target_order_date date not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.recipes (
   id uuid primary key default gen_random_uuid(),
   name text not null unique,
@@ -65,6 +73,7 @@ alter table public.weekly_plans enable row level security;
 alter table public.weekly_plan_meals enable row level security;
 alter table public.weekly_plan_cadence_items enable row level security;
 alter table public.weekly_plan_items enable row level security;
+alter table public.pending_ad_hoc_items enable row level security;
 alter table public.recipes enable row level security;
 alter table public.order_history_items enable row level security;
 
@@ -180,6 +189,35 @@ with check (true);
 drop policy if exists "Authenticated can delete weekly plan items" on public.weekly_plan_items;
 create policy "Authenticated can delete weekly plan items"
 on public.weekly_plan_items
+for delete
+to authenticated
+using (true);
+
+drop policy if exists "Public can read pending ad hoc items" on public.pending_ad_hoc_items;
+create policy "Public can read pending ad hoc items"
+on public.pending_ad_hoc_items
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Authenticated can manage pending ad hoc items" on public.pending_ad_hoc_items;
+create policy "Authenticated can manage pending ad hoc items"
+on public.pending_ad_hoc_items
+for insert
+to authenticated
+with check (true);
+
+drop policy if exists "Authenticated can update pending ad hoc items" on public.pending_ad_hoc_items;
+create policy "Authenticated can update pending ad hoc items"
+on public.pending_ad_hoc_items
+for update
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated can delete pending ad hoc items" on public.pending_ad_hoc_items;
+create policy "Authenticated can delete pending ad hoc items"
+on public.pending_ad_hoc_items
 for delete
 to authenticated
 using (true);

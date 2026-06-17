@@ -485,6 +485,33 @@ p {
   gap: 16px;
 }
 
+.ad-hoc-form {
+  width: min(100%, 440px);
+}
+
+.ad-hoc-form__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.ad-hoc-form .error-text,
+.ad-hoc-form .success-text {
+  margin-top: 6px;
+}
+
+.pending-ad-hoc {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pending-ad-hoc__list {
+  display: grid;
+  gap: 8px;
+}
+
 .shopping-group {
   display: grid;
   gap: 8px;
@@ -905,6 +932,10 @@ p {
     justify-content: flex-start;
   }
 
+  .ad-hoc-form {
+    width: 100%;
+  }
+
   .cadence-editor__head,
   .cadence-editor__row,
   .cadence-editor__head--meals,
@@ -940,5 +971,13 @@ p {
 
   .site-user {
     max-width: 18ch;
+  }
+
+  .ad-hoc-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .ad-hoc-form__row .action-button {
+    width: 100%;
   }
 }

@@ -20,6 +20,14 @@ type CadenceRow = {
   note: string;
 };
 
+type ShoppingItemRow = {
+  name: string;
+  qty: string;
+  reason: string;
+  meal: string;
+  group: string;
+};
+
 function hasSupabaseConfig() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -110,6 +118,18 @@ export async function POST(request: Request) {
     group: item.group
   }));
 
+  const existingAdHocResult = await supabase
+    .from("weekly_plan_items")
+    .select("name, qty, reason, meal, \"group\"")
+    .eq("weekly_plan_id", body.weeklyPlanId)
+    .eq("reason", "ad hoc")
+    .order("position", { ascending: true })
+    .returns<ShoppingItemRow[]>();
+
+  if (existingAdHocResult.error) {
+    return NextResponse.json({ error: existingAdHocResult.error.message }, { status: 500 });
+  }
+
   const deleteResult = await supabase
     .from("weekly_plan_meals")
     .delete()
@@ -136,8 +156,21 @@ export async function POST(request: Request) {
     }
   }
 
-  if (shoppingItemRows.length > 0) {
-    const insertItemsResult = await supabase.from("weekly_plan_items").insert(shoppingItemRows);
+  const mergedShoppingItemRows = [
+    ...shoppingItemRows,
+    ...(existingAdHocResult.data ?? []).map((item, index) => ({
+      weekly_plan_id: body.weeklyPlanId,
+      position: shoppingItemRows.length + index,
+      name: item.name,
+      qty: item.qty,
+      reason: item.reason,
+      meal: item.meal,
+      group: item.group
+    }))
+  ];
+
+  if (mergedShoppingItemRows.length > 0) {
+    const insertItemsResult = await supabase.from("weekly_plan_items").insert(mergedShoppingItemRows);
 
     if (insertItemsResult.error) {
       return NextResponse.json({ error: insertItemsResult.error.message }, { status: 500 });
@@ -147,5 +180,5 @@ export async function POST(request: Request) {
   revalidatePath("/");
   revalidatePath("/cadence");
 
-  return NextResponse.json({ ok: true, saved: mealRows.length, itemsSaved: shoppingItemRows.length });
+  return NextResponse.json({ ok: true, saved: mealRows.length, itemsSaved: mergedShoppingItemRows.length });
 }
