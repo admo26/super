@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 
 import type { Meal } from "@/lib/types";
-import type { Recipe } from "@/lib/recipes";
+import { isBatchCook, type Recipe, type RecipeFrequency } from "@/lib/recipes";
 
 type EditableMeal = Meal;
 
@@ -26,17 +26,16 @@ function cloneMeals(meals: EditableMeal[]) {
   return meals.map((meal) => ({ ...meal }));
 }
 
-function mealTypeFromFrequency(frequency: string) {
+function mealTypeFromFrequency(frequency: RecipeFrequency, batchCook: boolean) {
   if (frequency === "weekly") return "Weekly anchor";
-  if (frequency === "fortnightly") return "Fortnightly rotation";
-  if (frequency === "monthly_batch") return "Batch cook";
+  if (batchCook) return "Batch cook";
   return "Rotation meal";
 }
 
 function recipeToMeal(recipe: Recipe): EditableMeal {
   return {
     name: recipe.name,
-    type: mealTypeFromFrequency(recipe.cookFrequency),
+    type: mealTypeFromFrequency(recipe.cookFrequency, isBatchCook(recipe)),
     note: recipe.rotationNotes,
     url: recipe.source.startsWith("http") ? recipe.source : undefined
   };

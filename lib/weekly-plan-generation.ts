@@ -1,0 +1,168 @@
+import { createClient } from "@supabase/supabase-js";
+
+import { getRecipes } from "@/lib/recipes";
+import type { OrderHistoryRow } from "@/lib/order-history";
+import { generateWeeklyPlanDraft } from "@/lib/weekly-generation";
+
+type PlanHistoryRow = {
+  id: string;
+  order_date: string;
+};
+
+type MealHistoryRow = {
+  weekly_plan_id: string;
+  name: string;
+};
+
+function getAdminSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseSecret = process.env.SUPABASE_SECRET_KEY;
+
+  if (!supabaseUrl || !supabaseSecret) {
+    throw new Error("Supabase server credentials are not configured.");
+  }
+
+  return createClient(supabaseUrl, supabaseSecret, {
+    auth: { persistSession: false }
+  });
+}
+
+export async function generateAndStoreNextWeeklyPlan() {
+  const supabase = getAdminSupabaseClient();
+
+  const [latestPlanResult, planHistoryResult, mealHistoryResult, orderHistoryResult, recipesResult] =
+    await Promise.all([
+      supabase
+        .from("weekly_plans")
+        .select("order_date")
+        .order("order_date", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("weekly_plans")
+        .select("id, order_date")
+        .order("order_date", { ascending: false })
+        .returns<PlanHistoryRow[]>(),
+      supabase
+        .from("weekly_plan_meals")
+        .select("weekly_plan_id, name")
+        .returns<MealHistoryRow[]>(),
+      supabase
+        .from("order_history_items")
+        .select("order_date, item_name, quantity, unit, category, notes, source_type, source_name")
+        .order("order_date", { ascending: false })
+        .order("item_name", { ascending: true })
+        .limit(1000)
+        .returns<OrderHistoryRow[]>(),
+      getRecipes()
+    ]);
+
+  if (latestPlanResult.error) throw new Error(latestPlanResult.error.message);
+  if (planHistoryResult.error) throw new Error(planHistoryResult.error.message);
+  if (mealHistoryResult.error) throw new Error(mealHistoryResult.error.message);
+  if (orderHistoryResult.error) throw new Error(orderHistoryResult.error.message);
+
+  if (recipesResult.recipes.length === 0) {
+    throw new Error("No recipes are available yet.");
+  }
+
+  const orderDateByPlanId = new Map((planHistoryResult.data ?? []).map((plan) => [plan.id, plan.order_date]));
+  const recipeHistory = (mealHistoryResult.data ?? [])
+    .map((meal) => ({
+      recipeName: meal.name,
+      orderDate: orderDateByPlanId.get(meal.weekly_plan_id) ?? null
+    }))
+    .filter((meal): meal is { recipeName: string; orderDate: string } => Boolean(meal.orderDate));
+
+  const draft = generateWeeklyPlanDraft({
+    latestPlanDate: latestPlanResult.data?.order_date ?? null,
+    historyRows: orderHistoryResult.data ?? [],
+    recipes: recipesResult.recipes,
+    recipeHistory
+  });
+
+  const existingPlan = await supabase
+    .from("weekly_plans")
+    .select("id")
+    .eq("order_date", draft.orderDate)
+    .maybeSingle();
+
+  if (existingPlan.error) {
+    throw new Error(existingPlan.error.message);
+  }
+
+  if (existingPlan.data?.id) {
+    const deleted = await supabase.from("weekly_plans").delete().eq("id", existingPlan.data.id);
+    if (deleted.error) {
+      throw new Error(deleted.error.message);
+    }
+  }
+
+  const insertedPlan = await supabase
+    .from("weekly_plans")
+    .insert({
+      order_date: draft.orderDate,
+      analysis_window: draft.analysisWindow
+    })
+    .select("id")
+    .single();
+
+  if (insertedPlan.error) {
+    throw new Error(insertedPlan.error.message);
+  }
+
+  const weeklyPlanId = insertedPlan.data?.id;
+
+  if (!weeklyPlanId) {
+    throw new Error("Failed to create the weekly plan.");
+  }
+
+  const meals = draft.meals.map((meal, index) => ({
+    weekly_plan_id: weeklyPlanId,
+    position: index,
+    name: meal.name,
+    type: meal.type,
+    note: meal.note,
+    recipe_url: meal.url ?? null
+  }));
+
+  const cadenceItems = Object.entries(draft.cadence).flatMap(([cadence, items]) =>
+    items.map((item, index) => ({
+      weekly_plan_id: weeklyPlanId,
+      position: index,
+      cadence,
+      name: item.name,
+      qty: item.qty,
+      note: item.note
+    }))
+  );
+
+  const shoppingItems = draft.items.map((item, index) => ({
+    weekly_plan_id: weeklyPlanId,
+    position: index,
+    name: item.name,
+    qty: item.qty,
+    reason: item.reason,
+    meal: item.meal,
+    group: item.group
+  }));
+
+  for (const [label, rows, table] of [
+    ["meals", meals, "weekly_plan_meals"],
+    ["cadence items", cadenceItems, "weekly_plan_cadence_items"],
+    ["shopping items", shoppingItems, "weekly_plan_items"]
+  ] as const) {
+    const result = await supabase.from(table).insert(rows as never[]);
+    if (result.error) {
+      throw new Error(`Failed to save ${label}: ${result.error.message}`);
+    }
+  }
+
+  return {
+    orderDate: draft.orderDate,
+    weeklyPlanId,
+    mealsSaved: meals.length,
+    cadenceItemsSaved: cadenceItems.length,
+    shoppingItemsSaved: shoppingItems.length
+  };
+}

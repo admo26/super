@@ -23,6 +23,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname.startsWith("/api/cron/")) {
+    return NextResponse.next();
+  }
+
   const { response, user } = await updateSession(request);
   const email = user?.email ?? null;
   const isAllowed = isAllowedAuthEmail(email);

@@ -31,9 +31,9 @@ ingredients_to_map:
 
 ## Butter Chicken (RecipeTin Eats)
 source: https://www.recipetineats.com/butter-chicken/#recipe
-cook_frequency: fortnightly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Add to every-second-week dinner rotation.
+rotation_notes: Rotating dinner option.
 
 ingredients_to_map:
 - chicken thighs
@@ -48,9 +48,9 @@ ingredients_to_map:
 
 ## Loaded Potato Taco Bowl (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/loaded-potato-taco-bowl/
-cook_frequency: fortnightly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Add to every-second-week dinner rotation.
+rotation_notes: Rotating dinner option.
 
 ingredients_to_map:
 - potatoes
@@ -82,9 +82,9 @@ ingredients_to_map:
 
 ## Sticky BBQ Meatballs (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/sticky-bbq-meatballs/
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Monthly family dinner rotation.
+rotation_notes: Rotating family dinner option.
 
 ingredients_to_map:
 - beef mince
@@ -99,9 +99,9 @@ ingredients_to_map:
 
 ## Easy Sweet and Sour Pork (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/easy-sweet-and-sour-pork/
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Monthly family dinner rotation.
+rotation_notes: Rotating family dinner option.
 
 ingredients_to_map:
 - pork (stir-fry pieces)
@@ -115,9 +115,9 @@ ingredients_to_map:
 
 ## Street-Style Soy Noodles (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/street-style-soy-noodles/
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Monthly family dinner rotation.
+rotation_notes: Rotating family dinner option.
 
 ingredients_to_map:
 - noodles
@@ -131,9 +131,9 @@ ingredients_to_map:
 
 ## No-Fuss Peanut Chicken
 source: shared screenshot of mz_familyeats Instagram post
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Added from a shared recipe screenshot. Monthly is an initial assumption until household cadence is clearer.
+rotation_notes: Added from a shared recipe screenshot. Treat as a rotating meal until household cadence is clearer.
 
 ingredients_to_map:
 - chicken thighs
@@ -152,9 +152,9 @@ ingredients_to_map:
 
 ## Simple Sausages
 source: family standard meal
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Simple sausage dinner with roast-style veg and fresh cucumber. Monthly is an initial assumption until cadence is clearer.
+rotation_notes: Simple sausage dinner with roast-style veg and fresh cucumber. Treat as a rotating meal until cadence is clearer.
 
 ingredients_to_map:
 - sausages
@@ -165,9 +165,9 @@ ingredients_to_map:
 
 ## Black Pepper Beef Noodles (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/black-pepper-beef-noodles/
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Monthly family dinner rotation. Added as a beef noodle option with pantry-sauce overlap.
+rotation_notes: Rotating family dinner option with pantry-sauce overlap.
 
 ingredients_to_map:
 - beef steak or stir-fry beef
@@ -186,9 +186,9 @@ ingredients_to_map:
 
 ## Crispy Sweet Chilli Chicken (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/crispy-sweet-chilli-chicken/
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Monthly family dinner rotation. Added as a quick fakeaway-style chicken option.
+rotation_notes: Rotating family dinner option. Added as a quick fakeaway-style chicken choice.
 
 ingredients_to_map:
 - chicken breast or chicken thighs
@@ -209,9 +209,9 @@ ingredients_to_map:
 
 ## Quick Coconut Chicken Curry (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/quick-coconut-chicken-curry/
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Monthly family dinner rotation. Mild curry with strong overlap with existing chicken, rice and pantry staples.
+rotation_notes: Rotating family dinner option. Mild curry with strong overlap with existing chicken, rice and pantry staples.
 
 ingredients_to_map:
 - chicken thighs or chicken breast
@@ -236,9 +236,9 @@ ingredients_to_map:
 
 ## Simple Chicken Katsu
 source: family standard meal
-cook_frequency: monthly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Simple crumbed chicken meal with slaw and pantry sauces. Monthly is an initial assumption until cadence is clearer.
+rotation_notes: Simple crumbed chicken meal with slaw and pantry sauces. Treat as a rotating meal until cadence is clearer.
 
 ingredients_to_map:
 - chicken thighs
@@ -250,9 +250,9 @@ ingredients_to_map:
 
 ## Creamy Chicken and Leek Pot Pie (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/creamy-chicken-and-leek-pot-pie/
-cook_frequency: fortnightly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Fortnightly family dinner rotation. Added as a cosy chicken option with some extra prep and strong overlap with chicken, onion and freezer staples.
+rotation_notes: Rotating family dinner option. Added as a cosy chicken choice with strong overlap with chicken, onion and freezer staples.
 
 ingredients_to_map:
 - chicken thighs
@@ -274,9 +274,9 @@ ingredients_to_map:
 
 ## Speedy Beef Teriyaki (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/speedy-beef-teriyaki/
-cook_frequency: fortnightly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Fortnightly family dinner rotation. Added as a fast mince dinner with good overlap across rice, onion, garlic and lunchbox-friendly veg.
+rotation_notes: Rotating family dinner option. Added as a fast mince dinner with good overlap across rice, onion, garlic and lunchbox-friendly veg.
 
 ingredients_to_map:
 - beef mince
@@ -299,9 +299,9 @@ ingredients_to_map:
 
 ## Chicken Quesadillas (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/chicken-quesadillas/
-cook_frequency: fortnightly
+cook_frequency: rotating
 serving_pattern: same_week_meal
-rotation_notes: Fortnightly family dinner rotation. Added as a quick chicken-and-wrap option with high overlap with fajita staples.
+rotation_notes: Rotating family dinner option. Added as a quick chicken-and-wrap choice with high overlap with fajita staples.
 
 ingredients_to_map:
 - chicken thighs

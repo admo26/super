@@ -1,5 +1,5 @@
 import type { OrderHistoryRow } from "@/lib/order-history";
-import type { Recipe } from "@/lib/recipes";
+import { isBatchCook, type Recipe, type RecipeFrequency } from "@/lib/recipes";
 import type { CadenceKey, Meal, ShoppingItem } from "@/lib/types";
 
 type WeeklyPlanDraft = {
@@ -20,6 +20,16 @@ type HistoryOrder = {
 type IngredientEntry = {
   name: string;
   qty: string;
+};
+
+type RecipeHistoryEntry = {
+  orderDate: string;
+  recipeName: string;
+};
+
+type RecipeUsageStats = {
+  timesPlanned: number;
+  lastPlannedOrderDate: string | null;
 };
 
 function normalizeText(value: string) {
@@ -140,10 +150,9 @@ function cadenceReason(cadence: CadenceKey) {
   return "monthly staple";
 }
 
-function makeMealType(frequency: string) {
+function makeMealType(frequency: RecipeFrequency, batchCook: boolean) {
   if (frequency === "weekly") return "Weekly anchor";
-  if (frequency === "fortnightly") return "Fortnightly rotation";
-  if (frequency === "monthly_batch") return "Batch cook";
+  if (batchCook) return "Batch cook";
   return "Rotation meal";
 }
 
@@ -184,6 +193,29 @@ function scoreRecipe(recipe: Recipe, historyCounts: Map<string, number>) {
 
     return score + bestMatch;
   }, 0);
+}
+
+function buildRecipeUsageByName(entries: RecipeHistoryEntry[]) {
+  const usage = new Map<string, RecipeUsageStats>();
+
+  for (const entry of entries) {
+    const normalizedName = normalizeText(entry.recipeName);
+    if (!normalizedName) continue;
+
+    const current = usage.get(normalizedName) ?? {
+      timesPlanned: 0,
+      lastPlannedOrderDate: null
+    };
+
+    current.timesPlanned += 1;
+    if (!current.lastPlannedOrderDate || entry.orderDate > current.lastPlannedOrderDate) {
+      current.lastPlannedOrderDate = entry.orderDate;
+    }
+
+    usage.set(normalizedName, current);
+  }
+
+  return usage;
 }
 
 function isSimilarItem(left: string, right: string) {
@@ -255,17 +287,43 @@ function buildHistorySnapshot(orders: HistoryOrder[]) {
   return { cadence, historyCounts, totalOrders, scoredItems };
 }
 
-function buildMealPlan(recipes: Recipe[], historyCounts: Map<string, number>) {
-  const monthlyBatchRecipes = recipes.filter((recipe) => recipe.cookFrequency === "monthly_batch");
-  const weeklyRecipes = recipes.filter((recipe) => recipe.cookFrequency === "weekly");
-  const rotationRecipes = recipes.filter((recipe) => recipe.cookFrequency !== "weekly" && recipe.cookFrequency !== "monthly_batch");
+function buildMealPlan(
+  recipes: Recipe[],
+  historyCounts: Map<string, number>,
+  recipeHistory: RecipeHistoryEntry[]
+) {
+  const batchRecipes = recipes.filter((recipe) => isBatchCook(recipe));
+  const weeklyRecipes = recipes.filter((recipe) => recipe.cookFrequency === "weekly" && !isBatchCook(recipe));
+  const rotationRecipes = recipes.filter((recipe) => recipe.cookFrequency === "rotating" && !isBatchCook(recipe));
+  const recipeUsageByName = buildRecipeUsageByName(recipeHistory);
 
   const scoredRotation = rotationRecipes
     .map((recipe) => ({
       recipe,
-      score: scoreRecipe(recipe, historyCounts)
+      score: scoreRecipe(recipe, historyCounts),
+      usage: recipeUsageByName.get(normalizeText(recipe.name)) ?? {
+        timesPlanned: 0,
+        lastPlannedOrderDate: null
+      }
     }))
-    .sort((left, right) => right.score - left.score || left.recipe.name.localeCompare(right.recipe.name));
+    .sort((left, right) => {
+      const leftNeverUsed = left.usage.lastPlannedOrderDate === null;
+      const rightNeverUsed = right.usage.lastPlannedOrderDate === null;
+
+      if (leftNeverUsed !== rightNeverUsed) {
+        return leftNeverUsed ? -1 : 1;
+      }
+
+      if (left.usage.lastPlannedOrderDate !== right.usage.lastPlannedOrderDate) {
+        return (left.usage.lastPlannedOrderDate ?? "").localeCompare(right.usage.lastPlannedOrderDate ?? "");
+      }
+
+      if (left.usage.timesPlanned !== right.usage.timesPlanned) {
+        return left.usage.timesPlanned - right.usage.timesPlanned;
+      }
+
+      return right.score - left.score || left.recipe.name.localeCompare(right.recipe.name);
+    });
 
   const dinnerRecipes = [...weeklyRecipes];
 
@@ -274,11 +332,11 @@ function buildMealPlan(recipes: Recipe[], historyCounts: Map<string, number>) {
     dinnerRecipes.push(candidate.recipe);
   }
 
-  const batchRecipe = monthlyBatchRecipes[0] ?? null;
+  const batchRecipe = batchRecipes[0] ?? null;
 
   const meals: Meal[] = dinnerRecipes.slice(0, 5).map((recipe) => ({
     name: recipe.name,
-    type: makeMealType(recipe.cookFrequency),
+    type: makeMealType(recipe.cookFrequency, isBatchCook(recipe)),
     note: recipe.rotationNotes,
     url: recipe.source.startsWith("http") ? recipe.source : undefined
   }));
@@ -286,7 +344,7 @@ function buildMealPlan(recipes: Recipe[], historyCounts: Map<string, number>) {
   if (batchRecipe) {
     meals.push({
       name: batchRecipe.name,
-      type: makeMealType(batchRecipe.cookFrequency),
+      type: makeMealType(batchRecipe.cookFrequency, true),
       note: batchRecipe.rotationNotes,
       url: batchRecipe.source.startsWith("http") ? batchRecipe.source : undefined
     });
@@ -336,7 +394,7 @@ export function buildShoppingItems(
       items.push({
         name: parsed.name,
         qty: parsed.qty,
-        reason: recipe.cookFrequency === "monthly_batch" ? "freezer batch" : "planned meal",
+        reason: isBatchCook(recipe) ? "freezer batch" : "planned meal",
         meal: meal.name,
         group: inferGroup(parsed.name)
       });
@@ -350,10 +408,11 @@ export function generateWeeklyPlanDraft(args: {
   latestPlanDate: string | null;
   historyRows: OrderHistoryRow[];
   recipes: Recipe[];
+  recipeHistory: RecipeHistoryEntry[];
 }) {
   const orders = groupHistoryOrders(args.historyRows).slice(0, 12);
   const snapshot = buildHistorySnapshot(orders);
-  const mealPlan = buildMealPlan(args.recipes, snapshot.historyCounts);
+  const mealPlan = buildMealPlan(args.recipes, snapshot.historyCounts, args.recipeHistory);
 
   const mealsWithRecipes = mealPlan.meals.map((meal) => ({
     ...meal,
@@ -372,7 +431,8 @@ export function generateWeeklyPlanDraft(args: {
     assumptions: [
       "BBQ sauce, Kewpie mayo, oil, salt, pepper and core pantry sauces are already on hand.",
       "The freezer batch is for bolognese top-ups rather than an extra dinner.",
-      "The shopping list is driven by the most common items from the latest imported orders."
+      "The shopping list is driven by the most common items from the latest imported orders.",
+      "Rotating dinner picks prioritize recipes that have gone the longest without being scheduled."
     ],
     adjustments: [
       "Skip pantry ingredients already on hand.",

@@ -2,7 +2,7 @@
 
 import { useDeferredValue, useState } from "react";
 
-import type { Recipe } from "@/lib/recipes";
+import { recipeFrequencyLabel, type Recipe } from "@/lib/recipes";
 
 type RecipeLibraryProps = {
   recipes: Recipe[];
@@ -10,10 +10,6 @@ type RecipeLibraryProps = {
 
 function isUrl(value: string) {
   return value.startsWith("http://") || value.startsWith("https://");
-}
-
-function frequencyLabel(value: string) {
-  return value.replaceAll("_", " ");
 }
 
 export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
@@ -44,7 +40,7 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search recipes, cadence, or ingredients"
+          placeholder="Search recipes, type, or ingredients"
           aria-label="Search recipes"
         />
         <span className="status-tag status-tag--muted">{filteredRecipes.length} shown</span>
@@ -66,7 +62,7 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
                     )}
                   </h3>
                   <p className="recipe-meta">
-                    {frequencyLabel(recipe.cookFrequency)} · {recipe.servingPattern}
+                    {recipeFrequencyLabel(recipe.cookFrequency)} · {recipe.servingPattern}
                   </p>
                 </div>
                 <span className="meal-type">{isUrl(recipe.source) ? "Linked" : "Standard"}</span>
