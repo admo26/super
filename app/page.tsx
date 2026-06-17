@@ -42,6 +42,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const selectedWeek = resolvedSearchParams.week ?? null;
   const plan = await getWeeklyPlan(selectedWeek ?? undefined);
   const selectedLabel = selectedWeek ? "Next Week Preview" : "Current Week";
+  const primaryActionLabel = selectedWeek ? "Regenerate" : "Generate next week";
   const canEditShoppingList = Boolean(plan.id);
   const groupedItems = groupItemsByReason(plan.items);
 
@@ -67,7 +68,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div className="page-actions">
           <form action={generateNextWeeklyPlan}>
             <button className="action-button" type="submit">
-              Generate next week
+              {primaryActionLabel}
             </button>
           </form>
           <Link className="ghost-button" href={selectedWeek ? `/cadence?week=${selectedWeek}` : "/cadence"}>
