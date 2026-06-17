@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { deleteShoppingListItem, generateNextWeeklyPlan } from "@/app/plan/actions";
-import { getWeeklyPlan } from "@/lib/weekly-plan";
+import { getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 import type { ShoppingItem } from "@/lib/types";
 
 type HomePageProps = {
@@ -40,9 +40,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const generated = resolvedSearchParams.generated === "1";
   const error = resolvedSearchParams.error ?? null;
   const selectedWeek = resolvedSearchParams.week ?? null;
-  const plan = await getWeeklyPlan(selectedWeek ?? undefined);
+  const [plan, planSummaries] = await Promise.all([
+    getWeeklyPlan(selectedWeek ?? undefined),
+    getWeeklyPlanSummaries()
+  ]);
   const selectedLabel = selectedWeek ? "Next Week Preview" : "Current Week";
-  const primaryActionLabel = selectedWeek ? "Regenerate" : "Generate next week";
+  const pageTitle = selectedWeek ? "Next Week's Grocery Run" : "This Week's Grocery Run";
+  const nextWeekSummary = selectedWeek
+    ? null
+    : planSummaries.find((summary) => summary.orderDate > plan.orderDate) ?? null;
+  const primaryActionLabel = selectedWeek
+    ? "Regenerate"
+    : nextWeekSummary
+      ? "View next week"
+      : "Generate next week";
   const canEditShoppingList = Boolean(plan.id);
   const groupedItems = groupItemsByReason(plan.items);
 
@@ -62,15 +73,27 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <section className="page-header">
         <div>
           <p className="page-kicker">{selectedLabel}</p>
-          <h1>This Week&apos;s Grocery Run</h1>
+          <h1>{pageTitle}</h1>
           <p className="page-summary">{plan.analysisWindow}</p>
         </div>
         <div className="page-actions">
-          <form action={generateNextWeeklyPlan}>
-            <button className="action-button" type="submit">
+          {selectedWeek ? (
+            <form action={generateNextWeeklyPlan}>
+              <button className="action-button" type="submit">
+                {primaryActionLabel}
+              </button>
+            </form>
+          ) : nextWeekSummary ? (
+            <Link className="action-button" href={`/?week=${nextWeekSummary.orderDate}`}>
               {primaryActionLabel}
-            </button>
-          </form>
+            </Link>
+          ) : (
+            <form action={generateNextWeeklyPlan}>
+              <button className="action-button" type="submit">
+                {primaryActionLabel}
+              </button>
+            </form>
+          )}
           <Link className="ghost-button" href={selectedWeek ? `/cadence?week=${selectedWeek}` : "/cadence"}>
             Edit meals
           </Link>
