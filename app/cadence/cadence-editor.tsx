@@ -120,8 +120,8 @@ export function CadenceEditor({
     <section className="panel cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
-          <h2>Recurring Staples</h2>
-          <p>{orderDate} · weekly, fortnightly, and monthly defaults.</p>
+          <h2>Recurring Staples Master List</h2>
+          <p>Static household list last synced from {orderDate}.</p>
         </div>
         <div className="cadence-editor__actions">
           <button className="ghost-button" type="button" onClick={resetCadence}>
@@ -200,7 +200,7 @@ export function CadenceEditor({
       </div>
 
       <div className="import-footer">
-        <p className="helper-text">Editing {selectedCadence} staples.</p>
+        <p className="helper-text">Editing the shared {selectedCadence} staples list used for future generations.</p>
         <button className="ghost-button" type="button" onClick={addItem}>
           Add line
         </button>
