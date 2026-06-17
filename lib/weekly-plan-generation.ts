@@ -14,6 +14,15 @@ type MealHistoryRow = {
   name: string;
 };
 
+type CadenceHistoryRow = {
+  weekly_plan_id: string;
+  cadence: "weekly" | "fortnightly" | "monthly";
+  name: string;
+  qty: string;
+  note: string;
+  position: number;
+};
+
 function getAdminSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseSecret = process.env.SUPABASE_SECRET_KEY;
@@ -30,11 +39,11 @@ function getAdminSupabaseClient() {
 export async function generateAndStoreNextWeeklyPlan() {
   const supabase = getAdminSupabaseClient();
 
-  const [latestPlanResult, planHistoryResult, mealHistoryResult, orderHistoryResult, recipesResult] =
+  const [latestPlanResult, planHistoryResult, mealHistoryResult, cadenceHistoryResult, orderHistoryResult, recipesResult] =
     await Promise.all([
       supabase
         .from("weekly_plans")
-        .select("order_date")
+        .select("id, order_date")
         .order("order_date", { ascending: false })
         .limit(1)
         .maybeSingle(),
@@ -48,6 +57,11 @@ export async function generateAndStoreNextWeeklyPlan() {
         .select("weekly_plan_id, name")
         .returns<MealHistoryRow[]>(),
       supabase
+        .from("weekly_plan_cadence_items")
+        .select("weekly_plan_id, cadence, name, qty, note, position")
+        .order("position", { ascending: true })
+        .returns<CadenceHistoryRow[]>(),
+      supabase
         .from("order_history_items")
         .select("order_date, item_name, quantity, unit, category, notes, source_type, source_name")
         .order("order_date", { ascending: false })
@@ -60,6 +74,7 @@ export async function generateAndStoreNextWeeklyPlan() {
   if (latestPlanResult.error) throw new Error(latestPlanResult.error.message);
   if (planHistoryResult.error) throw new Error(planHistoryResult.error.message);
   if (mealHistoryResult.error) throw new Error(mealHistoryResult.error.message);
+  if (cadenceHistoryResult.error) throw new Error(cadenceHistoryResult.error.message);
   if (orderHistoryResult.error) throw new Error(orderHistoryResult.error.message);
 
   if (recipesResult.recipes.length === 0) {
@@ -74,11 +89,33 @@ export async function generateAndStoreNextWeeklyPlan() {
     }))
     .filter((meal): meal is { recipeName: string; orderDate: string } => Boolean(meal.orderDate));
 
+  const latestCadenceTemplate = {
+    weekly: [] as Array<{ name: string; qty: string; note: string }>,
+    fortnightly: [] as Array<{ name: string; qty: string; note: string }>,
+    monthly: [] as Array<{ name: string; qty: string; note: string }>
+  };
+
+  for (const item of cadenceHistoryResult.data ?? []) {
+    if (item.weekly_plan_id !== latestPlanResult.data?.id) continue;
+
+    latestCadenceTemplate[item.cadence].push({
+      name: item.name,
+      qty: item.qty,
+      note: item.note
+    });
+  }
+
   const draft = generateWeeklyPlanDraft({
     latestPlanDate: latestPlanResult.data?.order_date ?? null,
     historyRows: orderHistoryResult.data ?? [],
     recipes: recipesResult.recipes,
-    recipeHistory
+    recipeHistory,
+    cadenceTemplate:
+      latestCadenceTemplate.weekly.length ||
+      latestCadenceTemplate.fortnightly.length ||
+      latestCadenceTemplate.monthly.length
+        ? latestCadenceTemplate
+        : undefined
   });
 
   const existingPlan = await supabase

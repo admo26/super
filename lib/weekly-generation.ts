@@ -32,6 +32,12 @@ type RecipeUsageStats = {
   lastPlannedOrderDate: string | null;
 };
 
+type CadenceTemplateItem = {
+  name: string;
+  qty: string;
+  note: string;
+};
+
 function normalizeText(value: string) {
   return value
     .toLowerCase()
@@ -65,6 +71,14 @@ function addDays(dateString: string, days: number) {
   const date = new Date(`${dateString}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + days);
   return formatDate(date);
+}
+
+function differenceInDays(leftDate: string, rightDate: string) {
+  const left = new Date(`${leftDate}T00:00:00Z`);
+  const right = new Date(`${rightDate}T00:00:00Z`);
+  const milliseconds = left.getTime() - right.getTime();
+
+  return Math.floor(milliseconds / (1000 * 60 * 60 * 24));
 }
 
 function formatQuantity(row: OrderHistoryRow) {
@@ -251,9 +265,9 @@ function buildHistorySnapshot(orders: HistoryOrder[]) {
     }))
     .sort((left, right) => right.count - left.count || left.name.localeCompare(right.name));
 
-  const weekly = scoredItems.filter((item) => item.count / totalOrders >= 0.7).slice(0, 6);
-  const fortnightly = scoredItems.filter((item) => item.count / totalOrders >= 0.35 && item.count / totalOrders < 0.7).slice(0, 5);
-  const monthly = scoredItems.filter((item) => item.count / totalOrders >= 0.2 && item.count / totalOrders < 0.35).slice(0, 5);
+  const weekly = scoredItems.filter((item) => item.count / totalOrders >= 0.7);
+  const fortnightly = scoredItems.filter((item) => item.count / totalOrders >= 0.35 && item.count / totalOrders < 0.7);
+  const monthly = scoredItems.filter((item) => item.count / totalOrders >= 0.2 && item.count / totalOrders < 0.35);
 
   const seen = new Set<string>();
 
@@ -284,7 +298,78 @@ function buildHistorySnapshot(orders: HistoryOrder[]) {
     })
   };
 
-  return { cadence, historyCounts, totalOrders, scoredItems };
+  return { cadence, historyCounts, totalOrders, scoredItems, latestRowsByName };
+}
+
+function findLatestOrderedRow(itemName: string, latestRowsByName: Map<string, OrderHistoryRow>) {
+  const canonical = canonicalName(itemName);
+  if (!canonical) return null;
+
+  const exact = latestRowsByName.get(canonical);
+  if (exact) return exact;
+
+  for (const [historyName, row] of latestRowsByName.entries()) {
+    if (isSimilarItem(historyName, canonical)) {
+      return row;
+    }
+  }
+
+  return null;
+}
+
+function cadenceIntervalDays(cadence: CadenceKey) {
+  if (cadence === "weekly") return 7;
+  if (cadence === "fortnightly") return 14;
+  return 28;
+}
+
+function buildCadenceFromTemplate(args: {
+  nextOrderDate: string;
+  cadenceTemplate: Record<CadenceKey, CadenceTemplateItem[]>;
+  latestRowsByName: Map<string, OrderHistoryRow>;
+}) {
+  const cadence = {
+    weekly: [] as CadenceTemplateItem[],
+    fortnightly: [] as CadenceTemplateItem[],
+    monthly: [] as CadenceTemplateItem[]
+  };
+
+  for (const cadenceKey of ["weekly", "fortnightly", "monthly"] as const) {
+    for (const item of args.cadenceTemplate[cadenceKey]) {
+      const latestRow = findLatestOrderedRow(item.name, args.latestRowsByName);
+
+      if (cadenceKey === "weekly") {
+        cadence.weekly.push({
+          name: titleCase(item.name),
+          qty: item.qty,
+          note: latestRow?.order_date ? `last ordered ${latestRow.order_date}` : item.note
+        });
+        continue;
+      }
+
+      if (!latestRow?.order_date) {
+        cadence[cadenceKey].push({
+          name: titleCase(item.name),
+          qty: item.qty,
+          note: "not seen in order history yet"
+        });
+        continue;
+      }
+
+      const daysSinceLastOrder = differenceInDays(args.nextOrderDate, latestRow.order_date);
+      if (daysSinceLastOrder < cadenceIntervalDays(cadenceKey)) {
+        continue;
+      }
+
+      cadence[cadenceKey].push({
+        name: titleCase(item.name),
+        qty: item.qty,
+        note: `last ordered ${latestRow.order_date}`
+      });
+    }
+  }
+
+  return cadence;
 }
 
 function buildMealPlan(
@@ -409,30 +494,39 @@ export function generateWeeklyPlanDraft(args: {
   historyRows: OrderHistoryRow[];
   recipes: Recipe[];
   recipeHistory: RecipeHistoryEntry[];
+  cadenceTemplate?: Record<CadenceKey, CadenceTemplateItem[]>;
 }) {
   const orders = groupHistoryOrders(args.historyRows).slice(0, 12);
   const snapshot = buildHistorySnapshot(orders);
+  const latestOrderDate = args.latestPlanDate ?? orders[0]?.orderDate ?? formatDate(new Date());
+  const nextOrderDate = addDays(latestOrderDate, 7);
   const mealPlan = buildMealPlan(args.recipes, snapshot.historyCounts, args.recipeHistory);
+  const cadence = args.cadenceTemplate
+    ? buildCadenceFromTemplate({
+        nextOrderDate,
+        cadenceTemplate: args.cadenceTemplate,
+        latestRowsByName: snapshot.latestRowsByName
+      })
+    : snapshot.cadence;
 
   const mealsWithRecipes = mealPlan.meals.map((meal) => ({
     ...meal,
     recipe: args.recipes.find((recipe) => recipe.name === meal.name)
   }));
 
-  const shoppingItems = buildShoppingItems(mealsWithRecipes, snapshot.cadence);
-  const latestOrderDate = args.latestPlanDate ?? orders[0]?.orderDate ?? formatDate(new Date());
-  const nextOrderDate = addDays(latestOrderDate, 7);
+  const shoppingItems = buildShoppingItems(mealsWithRecipes, cadence);
 
   return {
     orderDate: nextOrderDate,
     analysisWindow: `${orders.length} orders from ${orders.at(-1)?.orderDate ?? "unknown"} to ${orders[0]?.orderDate ?? "unknown"}`,
     meals: mealPlan.meals,
-    cadence: snapshot.cadence,
+    cadence,
     assumptions: [
       "BBQ sauce, Kewpie mayo, oil, salt, pepper and core pantry sauces are already on hand.",
       "The freezer batch is for bolognese top-ups rather than an extra dinner.",
       "The shopping list is driven by the most common items from the latest imported orders.",
-      "Rotating dinner picks prioritize recipes that have gone the longest without being scheduled."
+      "Rotating dinner picks prioritize recipes that have gone the longest without being scheduled.",
+      "Fortnightly and monthly staples are only included when order history shows they are due again."
     ],
     adjustments: [
       "Skip pantry ingredients already on hand.",
