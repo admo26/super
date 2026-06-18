@@ -765,6 +765,15 @@ p {
   font-size: 0.92rem;
 }
 
+.cadence-editor__row-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.cadence-editor__move-select {
+  min-width: 110px;
+}
+
 .cadence-editor__head,
 .cadence-editor__row {
   grid-template-columns: minmax(0, 1.2fr) minmax(96px, 0.5fr) minmax(0, 1.3fr) minmax(90px, auto);

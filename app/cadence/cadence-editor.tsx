@@ -13,6 +13,10 @@ type CadenceEditorProps = {
 
 const cadenceTabs: CadenceKey[] = ["weekly", "fortnightly", "monthly"];
 
+function cadenceLabel(cadence: CadenceKey) {
+  return cadence[0].toUpperCase() + cadence.slice(1);
+}
+
 function createEmptyItem(): EditableCadenceItem {
   return {
     name: "",
@@ -74,6 +78,21 @@ export function CadenceEditor({
       ...current,
       [selectedCadence]: current[selectedCadence].filter((_, currentIndex) => currentIndex !== index)
     }));
+  }
+
+  function moveItem(index: number, targetCadence: CadenceKey) {
+    if (targetCadence === selectedCadence) return;
+
+    setDraftCadence((current) => {
+      const item = current[selectedCadence][index];
+      if (!item) return current;
+
+      return {
+        ...current,
+        [selectedCadence]: current[selectedCadence].filter((_, currentIndex) => currentIndex !== index),
+        [targetCadence]: [...current[targetCadence], { ...item }]
+      };
+    });
   }
 
   function resetCadence() {
@@ -138,7 +157,7 @@ export function CadenceEditor({
             className={`cadence-tab ${selectedCadence === cadence ? "cadence-tab--active" : ""}`}
             onClick={() => setSelectedCadence(cadence)}
           >
-            <span>{cadence[0].toUpperCase() + cadence.slice(1)}</span>
+            <span>{cadenceLabel(cadence)}</span>
             <strong>{counts[cadence]}</strong>
           </button>
         ))}
@@ -181,9 +200,31 @@ export function CadenceEditor({
                 placeholder="Note"
                 rows={2}
               />
-              <button className="ghost-button ghost-button--small" type="button" onClick={() => removeItem(index)}>
-                Remove
-              </button>
+              <div className="cadence-editor__row-actions">
+                <select
+                  className="import-input cadence-editor__move-select"
+                  aria-label={`Move ${item.name || "item"} to another cadence`}
+                  defaultValue=""
+                  onChange={(event) => {
+                    const nextCadence = event.target.value as CadenceKey | "";
+                    if (!nextCadence) return;
+                    moveItem(index, nextCadence);
+                    event.target.value = "";
+                  }}
+                >
+                  <option value="">Move to…</option>
+                  {cadenceTabs
+                    .filter((cadence) => cadence !== selectedCadence)
+                    .map((cadence) => (
+                      <option key={cadence} value={cadence}>
+                        {cadenceLabel(cadence)}
+                      </option>
+                    ))}
+                </select>
+                <button className="ghost-button ghost-button--small" type="button" onClick={() => removeItem(index)}>
+                  Remove
+                </button>
+              </div>
             </div>
           ))
         ) : (
