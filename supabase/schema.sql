@@ -27,6 +27,17 @@ create table if not exists public.weekly_plan_cadence_items (
   note text not null
 );
 
+create table if not exists public.recurring_cadence_items (
+  id uuid primary key default gen_random_uuid(),
+  position integer not null default 0,
+  cadence text not null check (cadence in ('weekly', 'fortnightly', 'monthly')),
+  name text not null,
+  qty text not null,
+  note text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.weekly_plan_items (
   id uuid primary key default gen_random_uuid(),
   weekly_plan_id uuid not null references public.weekly_plans(id) on delete cascade,
@@ -76,6 +87,7 @@ alter table public.weekly_plan_items enable row level security;
 alter table public.pending_ad_hoc_items enable row level security;
 alter table public.recipes enable row level security;
 alter table public.order_history_items enable row level security;
+alter table public.recurring_cadence_items enable row level security;
 
 drop policy if exists "Public can read weekly plans" on public.weekly_plans;
 create policy "Public can read weekly plans"
@@ -234,4 +246,33 @@ create policy "Public can read order history items"
 on public.order_history_items
 for select
 to anon, authenticated
+using (true);
+
+drop policy if exists "Public can read recurring cadence items" on public.recurring_cadence_items;
+create policy "Public can read recurring cadence items"
+on public.recurring_cadence_items
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Authenticated can manage recurring cadence items" on public.recurring_cadence_items;
+create policy "Authenticated can manage recurring cadence items"
+on public.recurring_cadence_items
+for insert
+to authenticated
+with check (true);
+
+drop policy if exists "Authenticated can update recurring cadence items" on public.recurring_cadence_items;
+create policy "Authenticated can update recurring cadence items"
+on public.recurring_cadence_items
+for update
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated can delete recurring cadence items" on public.recurring_cadence_items;
+create policy "Authenticated can delete recurring cadence items"
+on public.recurring_cadence_items
+for delete
+to authenticated
 using (true);

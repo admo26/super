@@ -38,7 +38,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const planSummaries = hasSupabaseConfig() ? await getWeeklyPlanSummaries() : [];
   const today = getTodayInPacificAuckland();
   const currentPlanDate = planSummaries
-    .filter((plan) => plan.orderDate <= today)
+    .filter((plan) => plan.orderDate < today)
     .at(-1)?.orderDate ?? null;
   const nextPlan = currentPlanDate
     ? planSummaries.find((plan) => plan.orderDate > currentPlanDate) ?? null

@@ -51,7 +51,7 @@ async function resolveTargetWeek(supabase: Awaited<ReturnType<typeof createClien
   const latestCurrentPlan = await supabase
     .from("weekly_plans")
     .select("order_date")
-    .lte("order_date", today)
+    .lt("order_date", today)
     .order("order_date", { ascending: false })
     .limit(1)
     .maybeSingle();

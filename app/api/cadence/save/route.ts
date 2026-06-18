@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import type { CadenceKey, CadenceItem } from "@/lib/types";
 
 type SaveCadenceRequest = {
-  weeklyPlanId: string;
   cadence: Record<CadenceKey, CadenceItem[]>;
 };
 
@@ -41,15 +40,10 @@ export async function POST(request: Request) {
 
   const body = (await request.json()) as SaveCadenceRequest;
 
-  if (!body.weeklyPlanId) {
-    return NextResponse.json({ error: "Missing weekly plan id." }, { status: 400 });
-  }
-
   const cadenceRows = Object.entries(body.cadence).flatMap(([cadence, items]) =>
     items
       .filter((item) => item.name.trim().length > 0)
       .map((item, index) => ({
-        weekly_plan_id: body.weeklyPlanId,
         position: index,
         cadence,
         name: item.name.trim(),
@@ -59,9 +53,9 @@ export async function POST(request: Request) {
   );
 
   const deleteResult = await supabase
-    .from("weekly_plan_cadence_items")
+    .from("recurring_cadence_items")
     .delete()
-    .eq("weekly_plan_id", body.weeklyPlanId);
+    .gte("position", 0);
 
   if (deleteResult.error) {
     return NextResponse.json({ error: deleteResult.error.message }, { status: 500 });
@@ -71,7 +65,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, saved: 0 });
   }
 
-  const insertResult = await supabase.from("weekly_plan_cadence_items").insert(cadenceRows);
+  const insertResult = await supabase.from("recurring_cadence_items").insert(cadenceRows);
 
   if (insertResult.error) {
     return NextResponse.json({ error: insertResult.error.message }, { status: 500 });

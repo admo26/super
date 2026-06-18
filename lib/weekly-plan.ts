@@ -45,6 +45,12 @@ type CadenceRow = {
   note: string;
 };
 
+export type RecurringCadence = {
+  cadence: Record<CadenceKey, CadenceItem[]>;
+  source: "master" | "latest-plan-fallback";
+  sourceOrderDate: string | null;
+};
+
 type PendingAdHocRow = {
   id: string;
   name: string;
@@ -67,6 +73,10 @@ function getTodayInPacificAuckland() {
     month: "2-digit",
     day: "2-digit"
   }).format(new Date());
+}
+
+function applyCurrentPlanCutoff<T extends { lt: (column: string, value: string) => T }>(query: T, today: string): T {
+  return query.lt("order_date", today);
 }
 
 function rowsToCadence(rows: CadenceRow[]): Record<CadenceKey, CadenceItem[]> {
@@ -92,6 +102,24 @@ function rowsToMeals(rows: MealRow[]): Meal[] {
   }));
 }
 
+async function fetchCadenceRowsForPlan(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  weeklyPlanId: string
+): Promise<CadenceRow[] | null> {
+  const cadenceResult = await supabase
+    .from("weekly_plan_cadence_items")
+    .select("cadence, name, qty, note")
+    .eq("weekly_plan_id", weeklyPlanId)
+    .order("position", { ascending: true })
+    .returns<CadenceRow[]>();
+
+  if (cadenceResult.error) {
+    return null;
+  }
+
+  return cadenceResult.data ?? [];
+}
+
 async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createClient>>, orderDate: string): Promise<WeeklyPlan | null> {
   const planResult = await supabase
     .from("weekly_plans")
@@ -104,7 +132,7 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
   }
 
   const planRow = planResult.data as PlanRow;
-  const [mealsResult, itemsResult, cadenceResult] = await Promise.all([
+  const [mealsResult, itemsResult, cadenceRows] = await Promise.all([
     supabase
       .from("weekly_plan_meals")
       .select("name, type, note, recipe_url")
@@ -117,15 +145,10 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
       .eq("weekly_plan_id", planRow.id)
       .order("position", { ascending: true })
       .returns<ItemRow[]>(),
-    supabase
-      .from("weekly_plan_cadence_items")
-      .select("cadence, name, qty, note")
-      .eq("weekly_plan_id", planRow.id)
-      .order("position", { ascending: true })
-      .returns<CadenceRow[]>()
+    fetchCadenceRowsForPlan(supabase, planRow.id)
   ]);
 
-  if (mealsResult.error || itemsResult.error || cadenceResult.error) {
+  if (mealsResult.error || itemsResult.error || cadenceRows === null) {
     return null;
   }
 
@@ -135,7 +158,7 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
     analysisWindow: planRow.analysis_window ?? defaultPlan.analysisWindow,
     sourceLabel: "Supabase",
     meals: rowsToMeals(mealsResult.data ?? []),
-    cadence: rowsToCadence(cadenceResult.data ?? []),
+    cadence: rowsToCadence(cadenceRows),
     assumptions: defaultPlan.assumptions,
     adjustments: defaultPlan.adjustments,
     items: itemsResult.data ?? []
@@ -157,22 +180,17 @@ async function fetchEditableWeeklyPlanByDate(
   }
 
   const planRow = planResult.data as PlanRow;
-  const [mealsResult, cadenceResult] = await Promise.all([
+  const [mealsResult, cadenceRows] = await Promise.all([
     supabase
       .from("weekly_plan_meals")
       .select("name, type, note, recipe_url")
       .eq("weekly_plan_id", planRow.id)
       .order("position", { ascending: true })
       .returns<MealRow[]>(),
-    supabase
-      .from("weekly_plan_cadence_items")
-      .select("cadence, name, qty, note")
-      .eq("weekly_plan_id", planRow.id)
-      .order("position", { ascending: true })
-      .returns<CadenceRow[]>()
+    fetchCadenceRowsForPlan(supabase, planRow.id)
   ]);
 
-  if (mealsResult.error || cadenceResult.error) {
+  if (mealsResult.error || cadenceRows === null) {
     return null;
   }
 
@@ -181,8 +199,67 @@ async function fetchEditableWeeklyPlanByDate(
     orderDate: planRow.order_date,
     analysisWindow: planRow.analysis_window,
     meals: rowsToMeals(mealsResult.data ?? []),
-    cadence: rowsToCadence(cadenceResult.data ?? [])
+    cadence: rowsToCadence(cadenceRows)
   };
+}
+
+export async function getRecurringCadence(): Promise<RecurringCadence> {
+  const emptyCadence = { weekly: [], fortnightly: [], monthly: [] } satisfies Record<CadenceKey, CadenceItem[]>;
+
+  if (!hasSupabaseConfig()) {
+    return {
+      cadence: emptyCadence,
+      source: "master",
+      sourceOrderDate: null
+    };
+  }
+
+  try {
+    const supabase = await createClient();
+    const masterResult = await supabase
+      .from("recurring_cadence_items")
+      .select("cadence, name, qty, note")
+      .order("cadence", { ascending: true })
+      .order("position", { ascending: true })
+      .returns<CadenceRow[]>();
+
+    if (!masterResult.error && masterResult.data?.length) {
+      return {
+        cadence: rowsToCadence(masterResult.data),
+        source: "master",
+        sourceOrderDate: null
+      };
+    }
+
+    const latestPlan = await supabase
+      .from("weekly_plans")
+      .select("id, order_date")
+      .order("order_date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (latestPlan.error || !latestPlan.data?.id) {
+      return {
+        cadence: emptyCadence,
+        source: "master",
+        sourceOrderDate: null
+      };
+    }
+
+    const fallbackRows = await fetchCadenceRowsForPlan(supabase, latestPlan.data.id);
+
+    return {
+      cadence: rowsToCadence(fallbackRows ?? []),
+      source: "latest-plan-fallback",
+      sourceOrderDate: latestPlan.data.order_date
+    };
+  } catch {
+    return {
+      cadence: emptyCadence,
+      source: "master",
+      sourceOrderDate: null
+    };
+  }
 }
 
 export async function getWeeklyPlan(targetOrderDate?: string): Promise<WeeklyPlan> {
@@ -196,10 +273,10 @@ export async function getWeeklyPlan(targetOrderDate?: string): Promise<WeeklyPla
     const selectedOrderDate = targetOrderDate
       ? targetOrderDate
       : (
-          await supabase
-            .from("weekly_plans")
-            .select("order_date")
-            .lte("order_date", today)
+          await applyCurrentPlanCutoff(
+            supabase.from("weekly_plans").select("order_date"),
+            today
+          )
             .order("order_date", { ascending: false })
             .limit(1)
             .maybeSingle()
@@ -259,10 +336,10 @@ export async function getEditableWeeklyPlan(targetOrderDate?: string): Promise<E
     const selectedOrderDate = targetOrderDate
       ? targetOrderDate
       : (
-          await supabase
-            .from("weekly_plans")
-            .select("order_date")
-            .lte("order_date", today)
+          await applyCurrentPlanCutoff(
+            supabase.from("weekly_plans").select("order_date"),
+            today
+          )
             .order("order_date", { ascending: false })
             .limit(1)
             .maybeSingle()

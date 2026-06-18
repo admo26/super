@@ -7,9 +7,7 @@ import type { CadenceKey, CadenceItem } from "@/lib/types";
 type EditableCadenceItem = CadenceItem;
 
 type CadenceEditorProps = {
-  weeklyPlanId: string;
-  orderDate: string;
-  analysisWindow: string | null;
+  sourceLabel: string;
   initialCadence: Record<CadenceKey, EditableCadenceItem[]>;
 };
 
@@ -32,9 +30,7 @@ function cloneCadence(cadence: Record<CadenceKey, EditableCadenceItem[]>) {
 }
 
 export function CadenceEditor({
-  weeklyPlanId,
-  orderDate,
-  analysisWindow,
+  sourceLabel,
   initialCadence
 }: CadenceEditorProps) {
   const [selectedCadence, setSelectedCadence] = useState<CadenceKey>("weekly");
@@ -98,7 +94,6 @@ export function CadenceEditor({
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          weeklyPlanId,
           cadence: draftCadence
         })
       });
@@ -121,7 +116,7 @@ export function CadenceEditor({
       <div className="section-header cadence-editor__header">
         <div>
           <h2>Recurring Staples Master List</h2>
-          <p>Static household list last synced from {orderDate}.</p>
+          <p>{sourceLabel}</p>
         </div>
         <div className="cadence-editor__actions">
           <button className="ghost-button" type="button" onClick={resetCadence}>
@@ -150,7 +145,6 @@ export function CadenceEditor({
       </div>
 
       <div className="cadence-editor__meta">
-        {analysisWindow ? <span className="status-tag status-tag--muted">{analysisWindow}</span> : null}
         {saveMessage ? <span className="success-text">{saveMessage}</span> : null}
         {error ? <span className="error-text">{error}</span> : null}
       </div>

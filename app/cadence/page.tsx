@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CadenceEditor } from "@/app/cadence/cadence-editor";
 import { MealPlanEditor } from "@/app/cadence/meal-plan-editor";
 import { getRecipes } from "@/lib/recipes";
-import { getEditableWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
+import { getEditableWeeklyPlan, getRecurringCadence, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
 type CadencePageProps = {
   searchParams?: Promise<{
@@ -25,10 +25,10 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
   const today = getTodayInPacificAuckland();
   const summaries = await getWeeklyPlanSummaries();
   const { recipes } = await getRecipes();
-  const recurringPlan = await getEditableWeeklyPlan();
+  const recurringCadence = await getRecurringCadence();
   const selectedWeek =
     resolvedSearchParams.week ??
-    summaries.filter((plan) => plan.orderDate <= today).at(-1)?.orderDate ??
+    summaries.filter((plan) => plan.orderDate < today).at(-1)?.orderDate ??
     summaries.at(-1)?.orderDate ??
     null;
   const mealPlan = selectedWeek ? await getEditableWeeklyPlan(selectedWeek) : null;
@@ -55,7 +55,13 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
         </article>
         <article className="metric-card">
           <span className="metric-label">Recurring list</span>
-          <strong>{recurringPlan ? "Static master" : "Empty"}</strong>
+          <strong>
+            {recurringCadence.source === "master"
+              ? "Independent master"
+              : recurringCadence.sourceOrderDate
+                ? `Fallback from ${recurringCadence.sourceOrderDate}`
+                : "Independent master"}
+          </strong>
         </article>
         <article className="metric-card">
           <span className="metric-label">Meal week</span>
@@ -63,59 +69,57 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
         </article>
       </section>
 
-      {recurringPlan ? (
-        <div className="stack">
-          <CadenceEditor
-            weeklyPlanId={recurringPlan.id}
-            orderDate={recurringPlan.orderDate}
-            analysisWindow={recurringPlan.analysisWindow}
-            initialCadence={recurringPlan.cadence}
-          />
+      <div className="stack">
+        <CadenceEditor
+          sourceLabel={
+            recurringCadence.source === "master"
+              ? "Independent household staples list used for future generations."
+              : recurringCadence.sourceOrderDate
+                ? `Loaded from the latest saved week (${recurringCadence.sourceOrderDate}) until you save this master list.`
+                : "Independent household staples list used for future generations."
+          }
+          initialCadence={recurringCadence.cadence}
+        />
 
-          <section className="panel">
-            <div className="section-header cadence-page__header">
-              <div>
-                <h2>Meal Week Switcher</h2>
-                <p>Pick the saved week to inspect or edit its meal lineup.</p>
-              </div>
-            </div>
-
-            <div className="cadence-plan-pills">
-              {summaries.length ? (
-                summaries.map((summary) => (
-                  <Link
-                    key={summary.id}
-                    href={`/cadence${summary.orderDate ? `?week=${summary.orderDate}` : ""}`}
-                    className={`pill cadence-plan-pill ${selectedWeek === summary.orderDate ? "cadence-plan-pill--active" : ""}`}
-                  >
-                    {summary.orderDate}
-                  </Link>
-                ))
-              ) : (
-                <p className="helper-text">No weekly plans are available yet.</p>
-              )}
-            </div>
-          </section>
-
-          {mealPlan ? (
-            <MealPlanEditor
-              weeklyPlanId={mealPlan.id}
-              orderDate={mealPlan.orderDate}
-              analysisWindow={mealPlan.analysisWindow}
-              initialMeals={mealPlan.meals}
-              recipes={recipes}
-            />
-          ) : (
-            <section className="panel">
-              <p className="helper-text">There is no saved meal plan selected yet.</p>
-            </section>
-          )}
-        </div>
-      ) : (
         <section className="panel">
-          <p className="helper-text">There is no recurring staples list available yet.</p>
+          <div className="section-header cadence-page__header">
+            <div>
+              <h2>Meal Week Switcher</h2>
+              <p>Pick the saved week to inspect or edit its meal lineup.</p>
+            </div>
+          </div>
+
+          <div className="cadence-plan-pills">
+            {summaries.length ? (
+              summaries.map((summary) => (
+                <Link
+                  key={summary.id}
+                  href={`/cadence${summary.orderDate ? `?week=${summary.orderDate}` : ""}`}
+                  className={`pill cadence-plan-pill ${selectedWeek === summary.orderDate ? "cadence-plan-pill--active" : ""}`}
+                >
+                  {summary.orderDate}
+                </Link>
+              ))
+            ) : (
+              <p className="helper-text">No weekly plans are available yet.</p>
+            )}
+          </div>
         </section>
-      )}
+
+        {mealPlan ? (
+          <MealPlanEditor
+            weeklyPlanId={mealPlan.id}
+            orderDate={mealPlan.orderDate}
+            analysisWindow={mealPlan.analysisWindow}
+            initialMeals={mealPlan.meals}
+            recipes={recipes}
+          />
+        ) : (
+          <section className="panel">
+            <p className="helper-text">There is no saved meal plan selected yet.</p>
+          </section>
+        )}
+      </div>
     </main>
   );
 }

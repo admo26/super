@@ -4,20 +4,14 @@ import { NextResponse } from "next/server";
 
 import { isAllowedAuthEmail } from "@/lib/auth";
 import { getRecipes } from "@/lib/recipes";
+import { getRecurringCadence } from "@/lib/weekly-plan";
 import { createClient } from "@/lib/supabase/server";
 import { buildShoppingItems } from "@/lib/weekly-generation";
-import type { CadenceItem, CadenceKey, Meal } from "@/lib/types";
+import type { Meal } from "@/lib/types";
 
 type SaveMealsRequest = {
   weeklyPlanId: string;
   meals: Meal[];
-};
-
-type CadenceRow = {
-  cadence: CadenceKey;
-  name: string;
-  qty: string;
-  note: string;
 };
 
 type ShoppingItemRow = {
@@ -77,28 +71,8 @@ export async function POST(request: Request) {
       recipe_url: normalizeText(meal.url)
     }));
 
-  const cadenceResult = await supabase
-    .from("weekly_plan_cadence_items")
-    .select("cadence, name, qty, note")
-    .eq("weekly_plan_id", body.weeklyPlanId)
-    .order("position", { ascending: true })
-    .returns<CadenceRow[]>();
-
-  if (cadenceResult.error) {
-    return NextResponse.json({ error: cadenceResult.error.message }, { status: 500 });
-  }
-
-  const cadence = (cadenceResult.data ?? []).reduce<Record<CadenceKey, CadenceItem[]>>(
-    (acc, item) => {
-      acc[item.cadence].push({
-        name: item.name,
-        qty: item.qty,
-        note: item.note
-      });
-      return acc;
-    },
-    { weekly: [], fortnightly: [], monthly: [] }
-  );
+  const recurringCadence = await getRecurringCadence();
+  const cadence = recurringCadence.cadence;
 
   const { recipes } = await getRecipes();
   const shoppingItems = buildShoppingItems(
