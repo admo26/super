@@ -10,8 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Weekly Grocery Plan",
-  description: "Weekly grocery planning with recipes, staples, and a shareable order view."
+  title: "Super",
+  description: "A calmer way to plan dinners, staples, and the next grocery shop."
 };
 
 function hasSupabaseConfig() {
@@ -38,13 +38,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               fallback={
                 <nav className="site-links" aria-label="Main navigation">
                   <Link className="site-link" href="/">
-                    Current
+                    This Week
                   </Link>
                   <Link className="site-link" href="/cadence">
-                    Planner
+                    Plan Ahead
                   </Link>
                   <Link className="site-link" href="/recipes">
-                    Recipes
+                    Meal Ideas
                   </Link>
                 </nav>
               }
@@ -55,11 +55,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               {user ? (
                 <form action={signOut}>
                   <button className="ghost-button ghost-button--small" type="submit">
-                    Sign out
+                    Log out
                   </button>
                 </form>
               ) : (
-                <Link href="/login">Sign in</Link>
+                <Link href="/login">Log in</Link>
               )}
             </div>
           </div>

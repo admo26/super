@@ -64,7 +64,7 @@ export function MealPlanEditor({
   recipes
 }: MealPlanEditorProps) {
   const [draftMeals, setDraftMeals] = useState(() => cloneMeals(initialMeals));
-  const [saveMessage, setSaveMessage] = useState("Autosaves changes.");
+  const [saveMessage, setSaveMessage] = useState("Changes save automatically.");
   const [error, setError] = useState<string | null>(null);
   const hasMounted = useRef(false);
   const saveRequestId = useRef(0);
@@ -146,15 +146,15 @@ export function MealPlanEditor({
         if (requestId !== saveRequestId.current) return;
 
         if (!response.ok) {
-          setSaveMessage("Autosave paused.");
+          setSaveMessage("Auto-save paused.");
           setError(payload.error ?? "Failed to save meal plan.");
           return;
         }
 
-        setSaveMessage(`Saved ${payload.saved} meals and refreshed ${payload.itemsSaved} shopping rows.`);
+        setSaveMessage(`Saved ${payload.saved} meals and refreshed ${payload.itemsSaved} shopping list items.`);
       } catch {
         if (requestId !== saveRequestId.current) return;
-        setSaveMessage("Autosave paused.");
+        setSaveMessage("Auto-save paused.");
         setError("Failed to save meal plan.");
       }
     }, 800);
@@ -166,8 +166,8 @@ export function MealPlanEditor({
     <section className="panel cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
-          <h2>Meal Lineup</h2>
-          <p>{orderDate} · changes autosave and refresh the shopping list.</p>
+          <h2>Next week&apos;s dinners</h2>
+          <p>{orderDate} · update the lineup here and your shopping list will keep up.</p>
         </div>
       </div>
 
@@ -190,7 +190,7 @@ export function MealPlanEditor({
                       value={meal.name}
                       onChange={(event) => swapMeal(index, event.target.value)}
                     >
-                      <option value="">Remove this slot</option>
+                      <option value="">Clear this slot</option>
                       {meal.name && !recipeOptions.some((option) => option.name === meal.name) ? (
                         <option value={meal.name}>{meal.name} (current custom)</option>
                       ) : null}
@@ -209,7 +209,7 @@ export function MealPlanEditor({
                     type="text"
                     value={meal.type}
                     onChange={(event) => updateMeal(index, "type", event.target.value)}
-                    placeholder="Meal type"
+                    placeholder="Type"
                   />
                 </label>
                 <label className="field-stack">
@@ -218,7 +218,7 @@ export function MealPlanEditor({
                     className="import-textarea"
                     value={meal.note}
                     onChange={(event) => updateMeal(index, "note", event.target.value)}
-                    placeholder="Meal note"
+                    placeholder="A quick note"
                     rows={2}
                   />
                 </label>
@@ -232,15 +232,15 @@ export function MealPlanEditor({
           ))
         ) : (
           <div className="cadence-editor__empty">
-            No meals are saved for this week yet. Add one from the recipe list to get started.
+            Nothing is lined up yet. Add a meal to start building next week.
           </div>
         )}
       </div>
 
       <div className="import-footer">
-        <p className="helper-text">Recipe-backed meals add mapped ingredients automatically.</p>
+        <p className="helper-text">Pick from your saved recipes and the shopping list will update for you.</p>
         <button className="ghost-button" type="button" onClick={addMeal}>
-          Add meal slot
+          Add a meal
         </button>
       </div>
     </section>

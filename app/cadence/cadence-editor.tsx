@@ -39,7 +39,7 @@ export function CadenceEditor({
 }: CadenceEditorProps) {
   const [selectedCadence, setSelectedCadence] = useState<CadenceKey>("weekly");
   const [draftCadence, setDraftCadence] = useState(() => cloneCadence(initialCadence));
-  const [saveMessage, setSaveMessage] = useState("Autosaves changes.");
+  const [saveMessage, setSaveMessage] = useState("Changes save automatically.");
   const [error, setError] = useState<string | null>(null);
   const hasMounted = useRef(false);
   const saveRequestId = useRef(0);
@@ -124,15 +124,15 @@ export function CadenceEditor({
         if (requestId !== saveRequestId.current) return;
 
         if (!response.ok) {
-          setSaveMessage("Autosave paused.");
+          setSaveMessage("Auto-save paused.");
           setError(payload.error ?? "Failed to save cadence items.");
           return;
         }
 
-        setSaveMessage(`Saved ${payload.saved} staple rows.`);
+        setSaveMessage(`Saved ${payload.saved} staples.`);
       } catch {
         if (requestId !== saveRequestId.current) return;
-        setSaveMessage("Autosave paused.");
+        setSaveMessage("Auto-save paused.");
         setError("Failed to save cadence items.");
       }
     }, 800);
@@ -146,7 +146,7 @@ export function CadenceEditor({
     <section className="panel cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
-          <h2>Recurring Staples Master List</h2>
+          <h2>Staples you like to keep on hand</h2>
           <p>{sourceLabel}</p>
         </div>
       </div>
@@ -255,15 +255,15 @@ export function CadenceEditor({
           ))
         ) : (
           <div className="cadence-editor__empty">
-            No items in this cadence bucket yet. Add the first line to get started.
+            Nothing in this bucket yet. Add your first staple to get it started.
           </div>
         )}
       </div>
 
       <div className="import-footer">
-        <p className="helper-text">Editing the shared {selectedCadence} staples list used for future generations.</p>
+        <p className="helper-text">These {selectedCadence} staples help build future shopping lists faster.</p>
         <button className="ghost-button" type="button" onClick={addItem}>
-          Add line
+          Add a staple
         </button>
       </div>
     </section>

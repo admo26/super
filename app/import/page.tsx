@@ -127,10 +127,10 @@ export default function ImportPage() {
     <main className="page-shell">
       <section className="page-header">
         <div>
-          <p className="page-kicker">Order Import</p>
-          <h1>Upload, Review, Save</h1>
+          <p className="page-kicker">Add Orders</p>
+          <h1>Bring in a past shop</h1>
           <p className="page-summary">
-            Turn supermarket PDFs or screenshots into structured history for future plans.
+            Turn a supermarket PDF or screenshot into order history for easier planning later on.
           </p>
         </div>
       </section>
@@ -138,8 +138,8 @@ export default function ImportPage() {
       <section className="panel">
         <div className="section-header">
           <div>
-            <h2>Upload Document</h2>
-            <p>Parse one order at a time, then review before saving.</p>
+            <h2>Upload a receipt or order</h2>
+            <p>We&apos;ll pull out the items, then you can give it a quick once-over before saving.</p>
           </div>
         </div>
 
@@ -150,16 +150,16 @@ export default function ImportPage() {
             onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           />
           <button onClick={handleParse} disabled={!file || isParsing}>
-            {isParsing ? "Parsing..." : "Parse order"}
+            {isParsing ? "Reading order..." : "Read order"}
           </button>
           {parsed ? (
             <button className="ghost-button" onClick={handleSave} disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save rows"}
+              {isSaving ? "Saving..." : "Save to history"}
             </button>
           ) : null}
         </div>
 
-        {file ? <p className="helper-text">Selected file: {file.name}</p> : null}
+        {file ? <p className="helper-text">Ready to review: {file.name}</p> : null}
         {error ? <p className="error-text">{error}</p> : null}
         {saveMessage ? <p className="success-text">{saveMessage}</p> : null}
       </section>
@@ -169,7 +169,7 @@ export default function ImportPage() {
           <section className="panel">
             <div className="section-header">
               <div>
-                <h2>Parse Summary</h2>
+                <h2>What we found</h2>
                 <p>{parsed.summary}</p>
               </div>
             </div>
@@ -184,11 +184,11 @@ export default function ImportPage() {
           <section className="panel">
             <div className="section-header">
               <div>
-                <h2>Review Rows</h2>
-                <p>Edit extraction details before saving to history.</p>
+                <h2>Give it a quick tidy-up</h2>
+                <p>Fix anything that looks off before you save it to your history.</p>
               </div>
               <button className="ghost-button" onClick={addRow} type="button">
-                Add line
+                Add an item
               </button>
             </div>
 
@@ -255,10 +255,10 @@ export default function ImportPage() {
 
             <div className="import-footer">
               <p className="helper-text">
-                {draftItems.length} line{draftItems.length === 1 ? "" : "s"} in the editable draft.
+                {draftItems.length} item{draftItems.length === 1 ? "" : "s"} in this draft.
               </p>
               <button className="ghost-button" onClick={addRow} type="button">
-                Add line
+                Add an item
               </button>
             </div>
           </section>

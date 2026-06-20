@@ -40,10 +40,10 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search recipes, type, or ingredients"
+          placeholder="Search meals or ingredients"
           aria-label="Search recipes"
         />
-        <span className="status-tag status-tag--muted">{filteredRecipes.length} shown</span>
+        <span className="status-tag status-tag--muted">{filteredRecipes.length} meals</span>
       </div>
 
       {filteredRecipes.length ? (
@@ -71,7 +71,7 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
               <p className="meal-note">{recipe.rotationNotes}</p>
 
               <div className="ingredients-block">
-                <strong>Mapped ingredients</strong>
+                <strong>Shopping list ingredients</strong>
                 <ul>
                   {recipe.ingredientsToMap.map((item) => (
                     <li key={`${recipe.name}-${item}`}>{item}</li>
@@ -82,7 +82,7 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
           ))}
         </div>
       ) : (
-        <div className="empty-state">No recipes match that search.</div>
+        <div className="empty-state">No meals match that search yet.</div>
       )}
     </>
   );

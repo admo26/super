@@ -8,10 +8,10 @@ export default async function RecipesPage() {
     <main className="page-shell">
       <section className="page-header">
         <div>
-          <p className="page-kicker">Recipe Library</p>
-          <h1>Family Rotation Meals</h1>
+          <p className="page-kicker">Meal Ideas</p>
+          <h1>Your regular dinner rotation</h1>
           <p className="page-summary">
-            The source list for meal planning and ingredient mapping.
+            The meals you come back to, ready to use when planning the week ahead.
           </p>
         </div>
       </section>
@@ -19,8 +19,8 @@ export default async function RecipesPage() {
       <section className="panel">
         <div className="section-header">
           <div>
-            <h2>Library</h2>
-            <p>Search by meal, cadence, serving pattern, or ingredient.</p>
+            <h2>Recipes</h2>
+            <p>Search by meal name, ingredient, or how often it tends to show up.</p>
           </div>
         </div>
 

@@ -15,10 +15,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className="page-shell auth-shell">
       <section className="auth-card">
-        <p className="page-kicker">Household Access</p>
-        <h1>Sign in to Super</h1>
+        <p className="page-kicker">Welcome Back</p>
+        <h1>Log in to Super</h1>
         <p className="page-summary">
-          Secure access for the weekly grocery planner and order import tools.
+          Jump back into your weekly plan, shopping list, and past orders.
         </p>
 
         <form className="auth-form" action={signInWithGoogle}>

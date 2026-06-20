@@ -63,11 +63,11 @@ export function AdHocItemForm({ targetWeek }: AdHocItemFormProps) {
               addItem();
             }
           }}
-          placeholder="Add item for next order"
+          placeholder="Add something extra for the next shop"
           aria-label="Ad hoc item name"
         />
         <button className="action-button" type="button" onClick={addItem} disabled={isPending}>
-          {isPending ? "Adding..." : "Add"}
+          {isPending ? "Adding..." : "Add item"}
         </button>
       </div>
       {error ? <p className="error-text">{error}</p> : null}

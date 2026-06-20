@@ -44,16 +44,16 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
     <main className="page-shell">
       {generated ? (
         <section className="notice-banner">
-          New weekly plan generated.
+          Next week&apos;s plan is ready.
         </section>
       ) : null}
       {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="page-header">
         <div>
-          <p className="page-kicker">Planning Settings</p>
-          <h1>Planner</h1>
+          <p className="page-kicker">Plan Ahead</p>
+          <h1>Stay one step ahead</h1>
           <p className="page-summary">
-            Maintain household staples separately from the meals planned for the next order.
+            Keep your regular staples handy and line up next week&apos;s meals before things get hectic.
           </p>
         </div>
       </section>
@@ -78,10 +78,10 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
           <CadenceEditor
             sourceLabel={
               recurringCadence.source === "master"
-                ? "Independent household staples list used for future generations."
+                ? "Your go-to staples list for future shops."
                 : recurringCadence.sourceOrderDate
-                  ? `Loaded from the latest saved week (${recurringCadence.sourceOrderDate}) until you save this master list.`
-                  : "Independent household staples list used for future generations."
+                  ? `Starting with your latest saved shop from ${recurringCadence.sourceOrderDate} until you make it your go-to staples list.`
+                  : "Your go-to staples list for future shops."
             }
             initialCadence={recurringCadence.cadence}
           />
@@ -97,13 +97,13 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
           <section className="panel">
             <div className="section-header">
               <div>
-                <h2>No Next Week Meal Plan Yet</h2>
-                <p>Generate one now if the scheduled Friday run has not created it yet.</p>
+                <h2>Next week hasn&apos;t been lined up yet</h2>
+                <p>If Friday&apos;s automatic run missed it, you can spin one up here.</p>
               </div>
               <form action={generateNextWeeklyPlan}>
                 <input type="hidden" name="returnTo" value="/cadence" />
                 <button className="action-button" type="submit">
-                  Generate next week
+                  Build next week&apos;s plan
                 </button>
               </form>
             </div>

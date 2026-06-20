@@ -51,7 +51,7 @@ function PendingAdHocList({ items, targetWeek }: { items: PendingAdHocItem[]; ta
   return (
     <section className="pending-ad-hoc" aria-label="Pending ad hoc items">
       <div className="shopping-group__header">
-        <span>Pending For Next Order</span>
+        <span>Saved for the next shop</span>
         <span>{items.length}</span>
       </div>
       <div className="pending-ad-hoc__list">
@@ -93,18 +93,21 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <main className="page-shell">
       {generated ? (
         <section className="notice-banner">
-          New weekly plan generated from Supabase history and recipes.
+          Next week is ready to go.
         </section>
       ) : null}
       {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="page-header">
         <div>
-          <p className="page-kicker">Current Week</p>
-          <h1>This Week&apos;s Meal Plan</h1>
+          <p className="page-kicker">This Week</p>
+          <h1>Dinners for the week</h1>
+          <p className="page-summary">
+            A quick view of what&apos;s on for dinner now, plus the list for the next shop.
+          </p>
         </div>
         <div className="page-actions">
           <Link className="ghost-button" href="/cadence">
-            Edit meals
+            Plan next week
           </Link>
         </div>
       </section>
@@ -114,8 +117,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="panel">
             <div className="section-header">
               <div>
-                <h2>Meal Plan</h2>
-                <p>Meals for the current week.</p>
+                <h2>What&apos;s for dinner</h2>
+                <p>Your current week at a glance.</p>
               </div>
             </div>
 
@@ -143,13 +146,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="panel">
             <div className="section-header">
               <div>
-                <h2>{isPreparingNextOrder ? "Next Order Shopping List" : "Shopping List"}</h2>
+                <h2>{isPreparingNextOrder ? "Next shop" : "Shopping list"}</h2>
                 <p>
                   {canEditShoppingList
                     ? isPreparingNextOrder
-                      ? `Prep list for the ${shoppingPlan.orderDate} order.`
-                      : "Online-order view grouped by why each item is needed."
-                    : "Shopping list editing is available for saved Supabase-backed plans."}
+                      ? `Everything you need for the ${shoppingPlan.orderDate} order.`
+                      : "Your list, grouped so it&apos;s easier to sense-check before you shop."
+                    : "List editing is available once this plan has been saved."}
                 </p>
               </div>
               <AdHocItemForm targetWeek={adHocTargetWeek} />

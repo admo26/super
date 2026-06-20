@@ -11,10 +11,10 @@ type NavLinksProps = {
 };
 
 const links = [
-  { href: "/cadence", label: "Planner" },
-  { href: "/recipes", label: "Recipes" },
-  { href: "/history", label: "History" },
-  { href: "/import", label: "Import" }
+  { href: "/cadence", label: "Plan Ahead" },
+  { href: "/recipes", label: "Meal Ideas" },
+  { href: "/history", label: "Past Orders" },
+  { href: "/import", label: "Add Orders" }
 ];
 
 export function NavLinks({ isAuthenticated }: NavLinksProps) {
@@ -42,7 +42,7 @@ export function NavLinks({ isAuthenticated }: NavLinksProps) {
       </button>
       <nav className="site-links" id="site-navigation" aria-label="Main navigation">
         <Link className={pathname === "/" ? "site-link site-link--active" : "site-link"} href="/">
-          Current
+          This Week
         </Link>
         {links.map((link) => (
           <Link
@@ -57,12 +57,12 @@ export function NavLinks({ isAuthenticated }: NavLinksProps) {
           {isAuthenticated ? (
             <form action={signOut}>
               <button className="site-link site-links__auth-button" type="submit">
-                Sign out
+                Log out
               </button>
             </form>
           ) : (
             <Link className="site-link" href="/login">
-              Sign in
+              Log in
             </Link>
           )}
         </div>

@@ -4,16 +4,16 @@ export default function UnauthorizedPage() {
   return (
     <main className="page-shell auth-shell">
       <section className="auth-card">
-        <p className="page-kicker">Access Restricted</p>
-        <h1>Not on the allowlist</h1>
+        <p className="page-kicker">Almost There</p>
+        <h1>This account doesn&apos;t have access yet</h1>
         <p className="page-summary">
-          You signed in successfully, but this account is not approved for the grocery planner.
+          You signed in successfully, but this Google account hasn&apos;t been approved for Super yet.
         </p>
         <p className="page-summary">
-          If this should be allowed, add the Google email to the allowlist and try again.
+          If it should have access, add the email to the allowlist and then try again.
         </p>
         <Link className="login-link" href="/login">
-          Back to sign in
+          Back to login
         </Link>
       </section>
     </main>
