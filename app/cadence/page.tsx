@@ -59,7 +59,7 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
             className={`cadence-tab ${selectedTab === "next-week" ? "cadence-tab--active" : ""}`}
             href="/cadence?tab=next-week"
           >
-            Next Week
+            Next Week&apos;s Meals
           </Link>
         </nav>
 
