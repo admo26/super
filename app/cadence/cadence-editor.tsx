@@ -215,7 +215,6 @@ export function CadenceEditor({
                       <circle cx="10" cy="10" r="1.2" fill="currentColor" stroke="none" />
                       <circle cx="16" cy="10" r="1.2" fill="currentColor" stroke="none" />
                     </svg>
-                    <span className="action-menu__label">Actions</span>
                   </summary>
                   <div className="action-menu__panel">
                     <label className="field-stack field-stack--compact">
