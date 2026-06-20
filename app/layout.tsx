@@ -43,9 +43,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                   <Link className="site-link" href="/cadence">
                     Plan
                   </Link>
-                  <Link className="site-link" href="/recipes">
-                    Recipes
-                  </Link>
                 </nav>
               }
             >

@@ -12,7 +12,6 @@ type NavLinksProps = {
 
 const links = [
   { href: "/cadence", label: "Plan" },
-  { href: "/recipes", label: "Recipes" },
   { href: "/history", label: "Past Orders" },
   { href: "/import", label: "Import Orders" }
 ];

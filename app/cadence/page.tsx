@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CadenceEditor } from "@/app/cadence/cadence-editor";
 import { MealPlanEditor } from "@/app/cadence/meal-plan-editor";
 import { generateNextWeeklyPlan } from "@/app/plan/actions";
+import { RecipeLibrary } from "@/app/recipes/recipe-library";
 import { formatHumanDate } from "@/lib/date-format";
 import { getRecipes } from "@/lib/recipes";
 import { getEditableWeeklyPlan, getRecurringCadence, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
@@ -15,7 +16,7 @@ type CadencePageProps = {
   }>;
 };
 
-type PlannerTab = "staples" | "next-week";
+type PlannerTab = "staples" | "next-week" | "recipes";
 
 function getTodayInPacificAuckland() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -38,7 +39,12 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
   const nextWeek = currentWeek
     ? summaries.find((plan) => plan.orderDate > currentWeek)?.orderDate ?? null
     : summaries.find((plan) => plan.orderDate >= today)?.orderDate ?? summaries.at(-1)?.orderDate ?? null;
-  const selectedTab: PlannerTab = resolvedSearchParams.tab === "staples" ? "staples" : "next-week";
+  const selectedTab: PlannerTab =
+    resolvedSearchParams.tab === "staples"
+      ? "staples"
+      : resolvedSearchParams.tab === "recipes"
+        ? "recipes"
+        : "next-week";
   const mealPlan = selectedTab === "next-week" && nextWeek ? await getEditableWeeklyPlan(nextWeek) : null;
 
   return (
@@ -73,6 +79,12 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
           >
             Staples
           </Link>
+          <Link
+            className={`cadence-tab ${selectedTab === "recipes" ? "cadence-tab--active" : ""}`}
+            href="/cadence?tab=recipes"
+          >
+            Recipe List
+          </Link>
         </nav>
 
         {selectedTab === "staples" ? (
@@ -94,6 +106,17 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
             initialMeals={mealPlan.meals}
             recipes={recipes}
           />
+        ) : selectedTab === "recipes" ? (
+          <section className="panel">
+            <div className="section-header">
+              <div>
+                <h2>Recipes</h2>
+                <p>Search by meal name, ingredient, or how often it tends to show up.</p>
+              </div>
+            </div>
+
+            <RecipeLibrary recipes={recipes} />
+          </section>
         ) : (
           <section className="panel">
             <div className="section-header">
