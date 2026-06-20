@@ -800,7 +800,7 @@ p {
 }
 
 .editor-card__fields--staples {
-  grid-template-columns: minmax(160px, 1.4fr) minmax(100px, 0.45fr) minmax(180px, 1.2fr);
+  grid-template-columns: minmax(180px, 1.4fr) minmax(100px, 0.45fr);
 }
 
 .editor-card__fields--meals {

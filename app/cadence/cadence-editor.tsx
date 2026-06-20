@@ -197,16 +197,6 @@ export function CadenceEditor({
                     placeholder="Quantity"
                   />
                 </label>
-                <label className="field-stack">
-                  <span>Note</span>
-                  <textarea
-                    className="import-textarea"
-                    value={item.note}
-                    onChange={(event) => updateItem(index, "note", event.target.value)}
-                    placeholder="Note"
-                    rows={2}
-                  />
-                </label>
               </div>
               <div className="editor-card__actions editor-card__actions--menu">
                 <details className="action-menu">
