@@ -12,8 +12,7 @@ type NavLinksProps = {
 
 const links = [
   { href: "/cadence", label: "Plan" },
-  { href: "/history", label: "Past Orders" },
-  { href: "/import", label: "Import Orders" }
+  { href: "/history", label: "Order History" }
 ];
 
 export function NavLinks({ isAuthenticated }: NavLinksProps) {

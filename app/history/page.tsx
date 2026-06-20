@@ -15,7 +15,7 @@ export default async function OrderHistoryPage() {
     <main className="page-shell">
       <section className="page-header">
         <div>
-          <p className="page-kicker">Past Orders</p>
+          <p className="page-kicker">Order History</p>
           <h1>Your grocery history</h1>
           <p className="page-summary">
             A look back at past shops so Super can spot patterns and make smarter suggestions.
