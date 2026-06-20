@@ -9,7 +9,6 @@ type HomePageProps = {
   searchParams?: Promise<{
     generated?: string;
     error?: string;
-    week?: string;
   }>;
 };
 
@@ -76,24 +75,19 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const generated = resolvedSearchParams.generated === "1";
   const error = resolvedSearchParams.error ?? null;
-  const selectedWeek = resolvedSearchParams.week ?? null;
   const [plan, planSummaries] = await Promise.all([
-    getWeeklyPlan(selectedWeek ?? undefined),
+    getWeeklyPlan(),
     getWeeklyPlanSummaries()
   ]);
-  const selectedLabel = selectedWeek ? "Next Week Preview" : "Current Week";
-  const pageTitle = selectedWeek ? "Next Week's Grocery Run" : "This Week's Meal Plan";
-  const nextWeekSummary = selectedWeek
-    ? null
-    : planSummaries.find((summary) => summary.orderDate > plan.orderDate) ?? null;
+  const nextWeekSummary = planSummaries.find((summary) => summary.orderDate > plan.orderDate) ?? null;
   const shoppingPlan = nextWeekSummary ? await getWeeklyPlan(nextWeekSummary.orderDate) : plan;
-  const adHocTargetWeek = selectedWeek ?? shoppingPlan.orderDate ?? addDays(plan.orderDate, 7);
-  const pendingAdHocItems = !selectedWeek && !nextWeekSummary
+  const adHocTargetWeek = shoppingPlan.orderDate ?? addDays(plan.orderDate, 7);
+  const pendingAdHocItems = !nextWeekSummary
     ? await getPendingAdHocItems(adHocTargetWeek)
     : [];
   const canEditShoppingList = Boolean(shoppingPlan.id);
   const groupedItems = groupItemsByReason(shoppingPlan.items);
-  const isPreparingNextOrder = !selectedWeek && Boolean(nextWeekSummary);
+  const isPreparingNextOrder = Boolean(nextWeekSummary);
 
   return (
     <main className="page-shell">
@@ -102,23 +96,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           New weekly plan generated from Supabase history and recipes.
         </section>
       ) : null}
-      {selectedWeek ? (
-        <section className="notice-banner">
-          Previewing the generated plan for {selectedWeek}. Use Current Week to jump back.
-        </section>
-      ) : null}
       {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="page-header">
         <div>
-          <p className="page-kicker">{selectedLabel}</p>
-          <h1>{pageTitle}</h1>
+          <p className="page-kicker">Current Week</p>
+          <h1>This Week&apos;s Meal Plan</h1>
         </div>
         <div className="page-actions">
-          {!selectedWeek && nextWeekSummary ? (
-            <Link className="action-button" href={`/?week=${nextWeekSummary.orderDate}`}>
-              View next meals
-            </Link>
-          ) : null}
           <Link className="ghost-button" href="/cadence?tab=next-week">
             Edit meals
           </Link>
@@ -193,7 +177,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                         {item.id ? (
                           <form action={deleteShoppingListItem}>
                             <input type="hidden" name="itemId" value={item.id} />
-                            {selectedWeek ? <input type="hidden" name="week" value={selectedWeek} /> : null}
                             <button className="ghost-button ghost-button--small" type="submit">
                               Remove
                             </button>

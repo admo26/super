@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { signOut } from "@/app/auth/actions";
 
 type NavLinksProps = {
   isAuthenticated: boolean;
-  nextPlanDate: string | null;
 };
 
 const links = [
@@ -18,15 +17,13 @@ const links = [
   { href: "/import", label: "Import" }
 ];
 
-export function NavLinks({ isAuthenticated, nextPlanDate }: NavLinksProps) {
+export function NavLinks({ isAuthenticated }: NavLinksProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const selectedWeek = searchParams.get("week");
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setIsOpen(false);
-  }, [pathname, selectedWeek]);
+  }, [pathname]);
 
   return (
     <div className={`site-links-shell${isOpen ? " site-links-shell--open" : ""}`}>
@@ -44,17 +41,9 @@ export function NavLinks({ isAuthenticated, nextPlanDate }: NavLinksProps) {
         <span />
       </button>
       <nav className="site-links" id="site-navigation" aria-label="Main navigation">
-        <Link className={pathname === "/" && !selectedWeek ? "site-link site-link--active" : "site-link"} href="/">
+        <Link className={pathname === "/" ? "site-link site-link--active" : "site-link"} href="/">
           Current
         </Link>
-        {nextPlanDate ? (
-          <Link
-            className={pathname === "/" && selectedWeek === nextPlanDate ? "site-link site-link--active" : "site-link"}
-            href={`/?week=${nextPlanDate}`}
-          >
-            Next
-          </Link>
-        ) : null}
         {links.map((link) => (
           <Link
             className={pathname === link.href ? "site-link site-link--active" : "site-link"}

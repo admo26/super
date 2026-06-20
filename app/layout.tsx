@@ -6,7 +6,6 @@ import { Analytics } from "@vercel/analytics/react";
 import { signOut } from "@/app/auth/actions";
 import { NavLinks } from "@/app/nav-links";
 import { createClient } from "@/lib/supabase/server";
-import { getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
 import "./globals.css";
 
@@ -22,27 +21,10 @@ function hasSupabaseConfig() {
   );
 }
 
-function getTodayInPacificAuckland() {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Pacific/Auckland",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(new Date());
-}
-
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const supabase = hasSupabaseConfig() ? await createClient() : null;
   const userResult = supabase ? await supabase.auth.getUser() : null;
   const user = userResult?.data.user ?? null;
-  const planSummaries = hasSupabaseConfig() ? await getWeeklyPlanSummaries() : [];
-  const today = getTodayInPacificAuckland();
-  const currentPlanDate = planSummaries
-    .filter((plan) => plan.orderDate < today)
-    .at(-1)?.orderDate ?? null;
-  const nextPlan = currentPlanDate
-    ? planSummaries.find((plan) => plan.orderDate > currentPlanDate) ?? null
-    : planSummaries.at(-1) ?? null;
 
   return (
     <html lang="en">
@@ -67,7 +49,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 </nav>
               }
             >
-              <NavLinks nextPlanDate={nextPlan?.orderDate ?? null} isAuthenticated={Boolean(user)} />
+              <NavLinks isAuthenticated={Boolean(user)} />
             </Suspense>
             <div className="site-auth">
               {user ? (
