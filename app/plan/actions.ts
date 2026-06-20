@@ -18,13 +18,20 @@ function encodeError(message: string) {
   return encodeURIComponent(message);
 }
 
-function redirectWithError(message: string) {
-  redirect(`/?error=${encodeError(message)}`);
+function redirectWithError(message: string, returnTo = "/") {
+  const separator = returnTo.includes("?") ? "&" : "?";
+  redirect(`${returnTo}${separator}error=${encodeError(message)}`);
 }
 
-export async function generateNextWeeklyPlan() {
+export async function generateNextWeeklyPlan(formData?: FormData) {
+  const returnToValue = formData?.get("returnTo");
+  const returnTo =
+    typeof returnToValue === "string" && returnToValue.startsWith("/") && !returnToValue.startsWith("//")
+      ? returnToValue
+      : "/";
+
   if (!hasSupabaseConfig()) {
-    redirectWithError("Supabase is not configured.");
+    redirectWithError("Supabase is not configured.", returnTo);
   }
 
   const supabase = await createClient();
@@ -33,7 +40,7 @@ export async function generateNextWeeklyPlan() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?error=${encodeError("Please sign in first.")}`);
+    redirect(`/login?error=${encodeError("Please sign in first.")}&next=${encodeURIComponent(returnTo)}`);
   }
 
   if (!isAllowedAuthEmail(user.email)) {
@@ -44,13 +51,14 @@ export async function generateNextWeeklyPlan() {
     await generateAndStoreNextWeeklyPlan();
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to generate the weekly plan.";
-    redirectWithError(message);
+    redirectWithError(message, returnTo);
   }
 
   revalidatePath("/");
   revalidatePath("/history");
   revalidatePath("/cadence");
-  redirect(`/?generated=1`);
+  const separator = returnTo.includes("?") ? "&" : "?";
+  redirect(`${returnTo}${separator}generated=1`);
 }
 
 export async function deleteShoppingListItem(formData: FormData) {

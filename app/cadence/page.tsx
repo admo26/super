@@ -2,11 +2,14 @@ import Link from "next/link";
 
 import { CadenceEditor } from "@/app/cadence/cadence-editor";
 import { MealPlanEditor } from "@/app/cadence/meal-plan-editor";
+import { generateNextWeeklyPlan } from "@/app/plan/actions";
 import { getRecipes } from "@/lib/recipes";
 import { getEditableWeeklyPlan, getRecurringCadence, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
 type CadencePageProps = {
   searchParams?: Promise<{
+    error?: string;
+    generated?: string;
     tab?: string;
   }>;
 };
@@ -24,6 +27,8 @@ function getTodayInPacificAuckland() {
 
 export default async function CadencePage({ searchParams }: CadencePageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
+  const generated = resolvedSearchParams.generated === "1";
+  const error = resolvedSearchParams.error ?? null;
   const today = getTodayInPacificAuckland();
   const summaries = await getWeeklyPlanSummaries();
   const { recipes } = await getRecipes();
@@ -37,6 +42,12 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
 
   return (
     <main className="page-shell">
+      {generated ? (
+        <section className="notice-banner">
+          New weekly plan generated.
+        </section>
+      ) : null}
+      {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="page-header">
         <div>
           <p className="page-kicker">Planning Settings</p>
@@ -81,7 +92,18 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
           />
         ) : (
           <section className="panel">
-            <p className="helper-text">There is no next-week meal plan available yet.</p>
+            <div className="section-header">
+              <div>
+                <h2>No Next Week Meal Plan Yet</h2>
+                <p>Generate one now if the scheduled Friday run has not created it yet.</p>
+              </div>
+              <form action={generateNextWeeklyPlan}>
+                <input type="hidden" name="returnTo" value="/cadence?tab=next-week" />
+                <button className="action-button" type="submit">
+                  Generate next week
+                </button>
+              </form>
+            </div>
           </section>
         )}
       </div>
