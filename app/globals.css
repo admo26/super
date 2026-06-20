@@ -400,6 +400,10 @@ h1 {
   box-shadow: 0 8px 18px rgba(20, 122, 85, 0.14);
 }
 
+.quick-add-trigger--desktop {
+  display: inline-flex;
+}
+
 .quick-add-fab {
   position: fixed;
   right: 16px;
@@ -1433,6 +1437,9 @@ h1 {
 
   .quick-add-fab {
     display: inline-flex;
+    right: 12px;
+    top: auto;
+    bottom: max(14px, calc(env(safe-area-inset-bottom) + 4px));
   }
 }
 
@@ -1483,6 +1490,13 @@ h1 {
     width: 100%;
     border-radius: 18px 18px 10px 10px;
     padding: 14px;
+  }
+
+  .quick-add-fab {
+    right: 12px;
+    bottom: max(12px, calc(env(safe-area-inset-bottom) + 2px));
+    min-height: 46px;
+    padding: 0 14px 0 13px;
   }
 
   .quick-add-sheet__body {
