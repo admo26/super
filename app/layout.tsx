@@ -72,7 +72,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <div className="site-auth">
               {user ? (
                 <>
-                  <span className="site-user">{user.email}</span>
                   <form action={signOut}>
                     <button className="ghost-button ghost-button--small" type="submit">
                       Sign out

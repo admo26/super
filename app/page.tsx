@@ -115,7 +115,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div>
           <p className="page-kicker">{selectedLabel}</p>
           <h1>{pageTitle}</h1>
-          <p className="page-summary">{plan.analysisWindow}</p>
         </div>
         <div className="page-actions">
           {selectedWeek ? (
@@ -139,21 +138,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             Edit meals
           </Link>
         </div>
-      </section>
-
-      <section className="metric-strip" aria-label="Weekly plan summary">
-        <article className="metric-card">
-          <span className="metric-label">Order date</span>
-          <strong>{plan.orderDate}</strong>
-        </article>
-        <article className="metric-card">
-          <span className="metric-label">Meals</span>
-          <strong>{plan.meals.length}</strong>
-        </article>
-        <article className="metric-card">
-          <span className="metric-label">Items</span>
-          <strong>{plan.items.length}</strong>
-        </article>
       </section>
 
       <div className="content-grid">

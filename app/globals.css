@@ -66,12 +66,12 @@ button:disabled {
 .site-nav__inner {
   max-width: 1360px;
   margin: 0 auto;
-  min-height: 58px;
-  padding: 8px 20px;
+  min-height: 54px;
+  padding: 8px 16px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
 }
 
 .site-brand {
@@ -79,7 +79,7 @@ button:disabled {
   align-items: center;
   gap: 8px;
   color: var(--ink);
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 800;
   text-decoration: none;
 }
@@ -96,7 +96,8 @@ button:disabled {
 .site-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 2px;
   min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
@@ -115,8 +116,8 @@ button:disabled {
 
 .site-link {
   border-radius: 999px;
-  padding: 8px 11px;
-  font-size: 0.9rem;
+  padding: 7px 10px;
+  font-size: 0.88rem;
   font-weight: 700;
 }
 
@@ -131,18 +132,11 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   color: var(--muted);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 700;
-}
-
-.site-user {
-  max-width: 24ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .page-shell {
@@ -905,17 +899,6 @@ p {
 }
 
 @media (max-width: 900px) {
-  .site-nav__inner {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    align-items: start;
-  }
-
-  .site-auth {
-    justify-content: flex-start;
-    width: 100%;
-  }
-
   .page-header,
   .metric-strip,
   .hero-stats,
@@ -967,6 +950,11 @@ p {
     padding: 16px 12px 32px;
   }
 
+  .site-nav__inner {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
   .hero,
   .panel,
   .auth-card {
@@ -978,8 +966,9 @@ p {
     font-size: 1.8rem;
   }
 
-  .site-user {
-    max-width: 18ch;
+  .site-link {
+    padding: 6px 9px;
+    font-size: 0.84rem;
   }
 
   .ad-hoc-form__row {
