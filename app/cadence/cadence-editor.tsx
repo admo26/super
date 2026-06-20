@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { CadenceKey, CadenceItem } from "@/lib/types";
 
@@ -39,9 +39,10 @@ export function CadenceEditor({
 }: CadenceEditorProps) {
   const [selectedCadence, setSelectedCadence] = useState<CadenceKey>("weekly");
   const [draftCadence, setDraftCadence] = useState(() => cloneCadence(initialCadence));
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState("Autosaves changes.");
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, startSaving] = useTransition();
+  const hasMounted = useRef(false);
+  const saveRequestId = useRef(0);
 
   const counts = useMemo(
     () => ({
@@ -95,38 +96,49 @@ export function CadenceEditor({
     });
   }
 
-  function resetCadence() {
-    setDraftCadence(cloneCadence(initialCadence));
-    setSaveMessage(null);
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
     setError(null);
-    setSelectedCadence("weekly");
-  }
+    setSaveMessage("Saving...");
 
-  function saveCadence() {
-    setError(null);
-    setSaveMessage(null);
+    const requestId = saveRequestId.current + 1;
+    saveRequestId.current = requestId;
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/cadence/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            cadence: draftCadence
+          })
+        });
 
-    startSaving(async () => {
-      const response = await fetch("/api/cadence/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          cadence: draftCadence
-        })
-      });
+        const payload = await response.json();
 
-      const payload = await response.json();
+        if (requestId !== saveRequestId.current) return;
 
-      if (!response.ok) {
-        setError(payload.error ?? "Failed to save cadence items.");
-        return;
+        if (!response.ok) {
+          setSaveMessage("Autosave paused.");
+          setError(payload.error ?? "Failed to save cadence items.");
+          return;
+        }
+
+        setSaveMessage(`Saved ${payload.saved} staple rows.`);
+      } catch {
+        if (requestId !== saveRequestId.current) return;
+        setSaveMessage("Autosave paused.");
+        setError("Failed to save cadence items.");
       }
+    }, 800);
 
-      setSaveMessage(`Saved ${payload.saved} cadence rows to Supabase.`);
-    });
-  }
+    return () => window.clearTimeout(timeoutId);
+  }, [draftCadence]);
 
   const visibleItems = draftCadence[selectedCadence];
 
@@ -136,14 +148,6 @@ export function CadenceEditor({
         <div>
           <h2>Recurring Staples Master List</h2>
           <p>{sourceLabel}</p>
-        </div>
-        <div className="cadence-editor__actions">
-          <button className="ghost-button" type="button" onClick={resetCadence}>
-            Reset draft
-          </button>
-          <button className="action-button" type="button" onClick={saveCadence} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save cadence"}
-          </button>
         </div>
       </div>
 
