@@ -40,11 +40,11 @@ export async function GET(request: Request) {
 
   const cronWindow = getAucklandCronWindow();
 
-  if (cronWindow.weekday !== "Fri" || cronWindow.hour !== "00" || cronWindow.minute !== "00") {
+  if (cronWindow.weekday !== "Fri" || cronWindow.hour !== "00") {
     return NextResponse.json({
       ok: true,
       skipped: true,
-      reason: "Outside Friday midnight Pacific/Auckland execution window.",
+      reason: "Outside Friday midnight Pacific/Auckland execution hour.",
       cronWindow
     });
   }

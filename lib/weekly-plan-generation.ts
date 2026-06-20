@@ -48,17 +48,43 @@ function getAdminSupabaseClient() {
   });
 }
 
+function getTodayInPacificAuckland() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Pacific/Auckland",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+}
+
 export async function generateAndStoreNextWeeklyPlan() {
   const supabase = getAdminSupabaseClient();
 
-  const [latestPlanResult, planHistoryResult, mealHistoryResult, recurringCadenceResult, orderHistoryResult, recipesResult] =
+  const latestPlanResult = await supabase
+    .from("weekly_plans")
+    .select("id, order_date")
+    .order("order_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (latestPlanResult.error) throw new Error(latestPlanResult.error.message);
+
+  const today = getTodayInPacificAuckland();
+
+  if (latestPlanResult.data?.order_date && latestPlanResult.data.order_date > today) {
+    return {
+      skipped: true,
+      reason: "A future weekly plan already exists.",
+      orderDate: latestPlanResult.data.order_date,
+      weeklyPlanId: latestPlanResult.data.id,
+      mealsSaved: 0,
+      cadenceItemsSaved: 0,
+      shoppingItemsSaved: 0
+    };
+  }
+
+  const [planHistoryResult, mealHistoryResult, recurringCadenceResult, orderHistoryResult, recipesResult] =
     await Promise.all([
-      supabase
-        .from("weekly_plans")
-        .select("id, order_date")
-        .order("order_date", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
       supabase
         .from("weekly_plans")
         .select("id, order_date")
@@ -83,7 +109,6 @@ export async function generateAndStoreNextWeeklyPlan() {
       getRecipes()
     ]);
 
-  if (latestPlanResult.error) throw new Error(latestPlanResult.error.message);
   if (planHistoryResult.error) throw new Error(planHistoryResult.error.message);
   if (mealHistoryResult.error) throw new Error(mealHistoryResult.error.message);
   if (recurringCadenceResult.error) throw new Error(recurringCadenceResult.error.message);
