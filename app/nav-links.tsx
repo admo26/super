@@ -33,6 +33,7 @@ export function NavLinks({ isAuthenticated, nextPlanDate }: NavLinksProps) {
       <button
         type="button"
         className="site-links__toggle"
+        aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-controls="site-navigation"
         aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}

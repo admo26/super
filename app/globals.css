@@ -110,6 +110,10 @@ button:disabled {
   cursor: pointer;
 }
 
+.site-links__auth form {
+  margin: 0;
+}
+
 .site-links__toggle {
   display: none;
   align-items: center;
@@ -1012,21 +1016,24 @@ p {
   }
 
   .site-links {
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 50%;
-    transform: translateX(-50%);
+    position: fixed;
+    top: 62px;
+    right: 12px;
+    left: 12px;
+    z-index: 30;
+    transform: none;
     display: none;
-    width: min(240px, calc(100vw - 24px));
-    padding: 10px;
+    width: auto;
+    max-height: calc(100dvh - 78px);
+    padding: 8px;
     border: 1px solid var(--line);
-    border-radius: 16px;
+    border-radius: 14px;
     background: rgba(255, 253, 248, 0.98);
     box-shadow: var(--shadow);
     flex-direction: column;
     align-items: stretch;
-    gap: 6px;
-    overflow: visible;
+    gap: 4px;
+    overflow-y: auto;
   }
 
   .site-links-shell--open .site-links {
@@ -1041,8 +1048,9 @@ p {
 
   .site-link {
     width: 100%;
-    padding: 9px 12px;
-    text-align: center;
+    min-height: 44px;
+    padding: 11px 12px;
+    text-align: left;
   }
 
   .site-auth {

@@ -33,6 +33,9 @@ Always provide:
 - If Supabase is configured, sync `data/current_weekly_plan.json` into the database as part of the weekly-order publish flow.
 - Stage, commit, and push the changes before handing the result back unless the user explicitly asks not to publish the repo update yet.
 
+## Shipping Rule
+- For this project, ship completed code and content changes to production by default: verify, stage, commit, and push to `origin/main` before handing the result back unless the user explicitly asks not to publish yet.
+
 ## Safety and Automation Guardrails
 - Never place, submit, or confirm a real supermarket order without explicit user approval.
 - For browser/computer-use automation, run in dry-run mode first:
