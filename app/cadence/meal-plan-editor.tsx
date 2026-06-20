@@ -170,25 +170,22 @@ export function MealPlanEditor({
           draftMeals.map((meal, index) => (
             <article className="editor-card" key={`meal-${index}`}>
               <div className="editor-card__fields editor-card__fields--meals">
-                <div className="meal-editor__slot">
-                  <p className="meal-editor__slot-label">Dinner {index + 1}</p>
-                  <select
-                    className="import-input meal-editor__select"
-                    value={meal.name}
-                    onChange={(event) => swapMeal(index, event.target.value)}
-                    aria-label={`Dinner ${index + 1}`}
-                  >
-                    <option value="">Choose a meal</option>
-                    {meal.name && !recipeOptions.some((option) => option.name === meal.name) ? (
-                      <option value={meal.name}>{meal.name} (current custom)</option>
-                    ) : null}
-                    {recipeOptions.map((option) => (
-                      <option key={option.name} value={option.name}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <select
+                  className="import-input meal-editor__select"
+                  value={meal.name}
+                  onChange={(event) => swapMeal(index, event.target.value)}
+                  aria-label={`Dinner ${index + 1}`}
+                >
+                  <option value="">Choose a meal</option>
+                  {meal.name && !recipeOptions.some((option) => option.name === meal.name) ? (
+                    <option value={meal.name}>{meal.name} (current custom)</option>
+                  ) : null}
+                  {recipeOptions.map((option) => (
+                    <option key={option.name} value={option.name}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
                 <div className="meal-editor__details">
                   <span className="meal-type meal-editor__type">{meal.type}</span>
                   {meal.note ? <p className="meal-note meal-editor__note">{meal.note}</p> : null}

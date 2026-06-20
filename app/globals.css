@@ -804,7 +804,8 @@ p {
 }
 
 .editor-card__fields--meals {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 1.2fr) minmax(0, 0.95fr);
+  align-items: center;
 }
 
 .editor-card__actions {
@@ -906,20 +907,6 @@ p {
   gap: 5px;
 }
 
-.meal-editor__slot {
-  display: grid;
-  gap: 8px;
-}
-
-.meal-editor__slot-label {
-  margin: 0;
-  color: var(--subtle);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .meal-editor__select {
   font-size: 1.02rem;
   font-weight: 700;
@@ -927,16 +914,19 @@ p {
 }
 
 .meal-editor__details {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .meal-editor__type {
-  justify-self: start;
+  flex: none;
 }
 
 .meal-editor__note {
   margin: 0;
+  min-width: 0;
 }
 
 .cadence-editor__empty,
