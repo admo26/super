@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import { AlertCircle, CheckCircle2, Plus, ShoppingBasket, X } from "lucide-react";
 
 import { Button, Field, IconButton } from "@/app/ui";
@@ -13,7 +14,12 @@ export function QuickAddItem() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setPortalRoot(document.body);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -74,16 +80,8 @@ export function QuickAddItem() {
     });
   }
 
-  return (
+  const mobileQuickAdd = (
     <>
-      <Button
-        className="quick-add-trigger quick-add-trigger--desktop"
-        icon={<Plus aria-hidden="true" />}
-        type="button"
-        onClick={openQuickAdd}
-      >
-        Add item
-      </Button>
       <button className="quick-add-fab" type="button" onClick={openQuickAdd} aria-label="Add item to next shop">
         <Plus aria-hidden="true" />
         <span>Add</span>
@@ -143,6 +141,20 @@ export function QuickAddItem() {
           </section>
         </div>
       ) : null}
+    </>
+  );
+
+  return (
+    <>
+      <Button
+        className="quick-add-trigger quick-add-trigger--desktop"
+        icon={<Plus aria-hidden="true" />}
+        type="button"
+        onClick={openQuickAdd}
+      >
+        Add item
+      </Button>
+      {portalRoot ? createPortal(mobileQuickAdd, portalRoot) : null}
     </>
   );
 }
