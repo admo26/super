@@ -393,9 +393,15 @@ h1 {
   font-weight: 800;
 }
 
+.site-auth .ghost-button {
+  min-height: 38px;
+  padding: 8px 14px;
+}
+
 /* Global quick add */
 .quick-add-trigger {
   min-height: 38px;
+  padding: 8px 14px;
   white-space: nowrap;
   box-shadow: 0 8px 18px rgba(20, 122, 85, 0.14);
 }
