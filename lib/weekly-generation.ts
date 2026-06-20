@@ -1,4 +1,5 @@
 import type { OrderHistoryRow } from "@/lib/order-history";
+import { formatHumanDate } from "@/lib/date-format";
 import { isBatchCook, type Recipe, type RecipeFrequency } from "@/lib/recipes";
 import type { CadenceKey, Meal, ShoppingItem } from "@/lib/types";
 
@@ -518,7 +519,7 @@ export function generateWeeklyPlanDraft(args: {
 
   return {
     orderDate: nextOrderDate,
-    analysisWindow: `${orders.length} orders from ${orders.at(-1)?.orderDate ?? "unknown"} to ${orders[0]?.orderDate ?? "unknown"}`,
+    analysisWindow: `${orders.length} orders from ${orders.at(-1)?.orderDate ? formatHumanDate(orders.at(-1)!.orderDate) : "unknown"} to ${orders[0]?.orderDate ? formatHumanDate(orders[0].orderDate) : "unknown"}`,
     meals: mealPlan.meals,
     cadence,
     assumptions: [

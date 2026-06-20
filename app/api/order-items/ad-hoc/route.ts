@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { isAllowedAuthEmail } from "@/lib/auth";
+import { formatHumanDate } from "@/lib/date-format";
 import { createClient } from "@/lib/supabase/server";
 
 type AdHocItemRequest = {
@@ -150,7 +151,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       status: "added-to-plan",
-      message: `Added to ${targetWeek}.`,
+      message: `Added to ${formatHumanDate(targetWeek)}.`,
       item: insertResult.data
     });
   }
@@ -173,7 +174,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     status: "pending",
-    message: `Saved for ${targetWeek}.`,
+    message: `Saved for ${formatHumanDate(targetWeek)}.`,
     item: pendingResult.data
   });
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { AdHocItemForm } from "@/app/order-items/ad-hoc-item-form";
 import { deleteShoppingListItem } from "@/app/plan/actions";
+import { formatHumanDate } from "@/lib/date-format";
 import { getPendingAdHocItems, getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 import type { PendingAdHocItem, ShoppingItem } from "@/lib/types";
 
@@ -60,7 +61,7 @@ function PendingAdHocList({ items, targetWeek }: { items: PendingAdHocItem[]; ta
             <div>
               <div className="shopping-name">{item.name}</div>
               <div className="shopping-meta">
-                Qty: {item.qty} · saved for {targetWeek}
+                Qty: {item.qty} · saved for {formatHumanDate(targetWeek)}
               </div>
             </div>
             <span className="reason-tag">Pending</span>
@@ -150,7 +151,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <p>
                   {canEditShoppingList
                     ? isPreparingNextOrder
-                      ? `Everything you need for the ${shoppingPlan.orderDate} order.`
+                      ? `Everything you need for the ${formatHumanDate(shoppingPlan.orderDate)} order.`
                       : "Your list, grouped so it&apos;s easier to sense-check before you shop."
                     : "List editing is available once this plan has been saved."}
                 </p>

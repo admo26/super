@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CadenceEditor } from "@/app/cadence/cadence-editor";
 import { MealPlanEditor } from "@/app/cadence/meal-plan-editor";
 import { generateNextWeeklyPlan } from "@/app/plan/actions";
+import { formatHumanDate } from "@/lib/date-format";
 import { getRecipes } from "@/lib/recipes";
 import { getEditableWeeklyPlan, getRecurringCadence, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
@@ -80,7 +81,7 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
               recurringCadence.source === "master"
                 ? "Your go-to staples list for future shops."
                 : recurringCadence.sourceOrderDate
-                  ? `Starting with your latest saved shop from ${recurringCadence.sourceOrderDate} until you make it your go-to staples list.`
+                  ? `Starting with your latest saved shop from ${formatHumanDate(recurringCadence.sourceOrderDate)} until you make it your go-to staples list.`
                   : "Your go-to staples list for future shops."
             }
             initialCadence={recurringCadence.cadence}

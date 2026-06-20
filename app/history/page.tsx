@@ -1,4 +1,5 @@
 import { getOrderHistory } from "@/lib/order-history";
+import { formatHumanDate } from "@/lib/date-format";
 
 function formatSourceLabel(sourceType: string) {
   if (sourceType === "repo_csv") return "Repo CSV";
@@ -35,7 +36,7 @@ export default async function OrderHistoryPage() {
               <article className="history-card" key={`${order.orderDate}-${order.sourceType}-${order.sourceName ?? "none"}`}>
                 <div className="history-card__header">
                   <div>
-                    <div className="item-strong">{order.orderDate}</div>
+                    <div className="item-strong">{formatHumanDate(order.orderDate, { includeYear: true })}</div>
                     <p className="shopping-meta">
                       {formatSourceLabel(order.sourceType)}
                       {order.sourceName ? ` · ${order.sourceName}` : ""}
