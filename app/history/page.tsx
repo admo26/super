@@ -1,3 +1,4 @@
+import { ImportHistoryManager } from "@/app/import/import-history-manager";
 import { getOrderHistory } from "@/lib/order-history";
 import { formatHumanDate } from "@/lib/date-format";
 
@@ -21,6 +22,8 @@ export default async function OrderHistoryPage() {
           </p>
         </div>
       </section>
+
+      <ImportHistoryManager />
 
       <section className="panel">
         <div className="section-header">
