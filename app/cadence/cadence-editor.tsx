@@ -208,33 +208,46 @@ export function CadenceEditor({
                   />
                 </label>
               </div>
-              <div className="editor-card__actions">
-                <label className="field-stack field-stack--compact">
-                  <span>Move</span>
-                  <select
-                    className="import-input cadence-editor__move-select"
-                    aria-label={`Move ${item.name || "item"} to another cadence`}
-                    defaultValue=""
-                    onChange={(event) => {
-                      const nextCadence = event.target.value as CadenceKey | "";
-                      if (!nextCadence) return;
-                      moveItem(index, nextCadence);
-                      event.target.value = "";
-                    }}
-                  >
-                    <option value="">Move to...</option>
-                    {cadenceTabs
-                      .filter((cadence) => cadence !== selectedCadence)
-                      .map((cadence) => (
-                        <option key={cadence} value={cadence}>
-                          {cadenceLabel(cadence)}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <button className="ghost-button ghost-button--small" type="button" onClick={() => removeItem(index)}>
-                  Remove
-                </button>
+              <div className="editor-card__actions editor-card__actions--menu">
+                <details className="action-menu">
+                  <summary className="action-menu__trigger" aria-label={`Actions for ${item.name || "item"}`}>
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
+                    <span aria-hidden="true" />
+                  </summary>
+                  <div className="action-menu__panel">
+                    <label className="field-stack field-stack--compact">
+                      <span>Move to</span>
+                      <select
+                        className="import-input cadence-editor__move-select"
+                        aria-label={`Move ${item.name || "item"} to another cadence`}
+                        defaultValue=""
+                        onChange={(event) => {
+                          const nextCadence = event.target.value as CadenceKey | "";
+                          if (!nextCadence) return;
+                          moveItem(index, nextCadence);
+                          event.target.value = "";
+                        }}
+                      >
+                        <option value="">Choose...</option>
+                        {cadenceTabs
+                          .filter((cadence) => cadence !== selectedCadence)
+                          .map((cadence) => (
+                            <option key={cadence} value={cadence}>
+                              {cadenceLabel(cadence)}
+                            </option>
+                          ))}
+                      </select>
+                    </label>
+                    <button
+                      className="ghost-button ghost-button--small action-menu__remove"
+                      type="button"
+                      onClick={() => removeItem(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </details>
               </div>
             </article>
           ))
