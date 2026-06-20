@@ -45,9 +45,6 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
             Maintain household staples separately from the meals planned for the next order.
           </p>
         </div>
-        <Link className="ghost-button" href="/">
-          Back to current week
-        </Link>
       </section>
 
       <div className="stack">
