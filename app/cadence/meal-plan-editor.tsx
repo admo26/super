@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { Meal } from "@/lib/types";
 import { isBatchCook, type Recipe, type RecipeFrequency } from "@/lib/recipes";
@@ -64,9 +64,10 @@ export function MealPlanEditor({
   recipes
 }: MealPlanEditorProps) {
   const [draftMeals, setDraftMeals] = useState(() => cloneMeals(initialMeals));
-  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState("Autosaves changes.");
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, startSaving] = useTransition();
+  const hasMounted = useRef(false);
+  const saveRequestId = useRef(0);
 
   const recipeOptions = useMemo(() => toRecipeOptions(recipes), [recipes]);
 
@@ -116,53 +117,57 @@ export function MealPlanEditor({
     setDraftMeals((current) => current.filter((_, currentIndex) => currentIndex !== index));
   }
 
-  function resetMeals() {
-    setDraftMeals(cloneMeals(initialMeals));
-    setSaveMessage(null);
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
     setError(null);
-  }
+    setSaveMessage("Saving...");
 
-  function saveMeals() {
-    setError(null);
-    setSaveMessage(null);
+    const requestId = saveRequestId.current + 1;
+    saveRequestId.current = requestId;
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/meals/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            weeklyPlanId,
+            meals: draftMeals
+          })
+        });
 
-    startSaving(async () => {
-      const response = await fetch("/api/meals/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          weeklyPlanId,
-          meals: draftMeals
-        })
-      });
+        const payload = await response.json();
 
-      const payload = await response.json();
+        if (requestId !== saveRequestId.current) return;
 
-      if (!response.ok) {
-        setError(payload.error ?? "Failed to save meal plan.");
-        return;
+        if (!response.ok) {
+          setSaveMessage("Autosave paused.");
+          setError(payload.error ?? "Failed to save meal plan.");
+          return;
+        }
+
+        setSaveMessage(`Saved ${payload.saved} meals and refreshed ${payload.itemsSaved} shopping rows.`);
+      } catch {
+        if (requestId !== saveRequestId.current) return;
+        setSaveMessage("Autosave paused.");
+        setError("Failed to save meal plan.");
       }
+    }, 800);
 
-      setSaveMessage(`Saved ${payload.saved} meal rows and refreshed ${payload.itemsSaved} shopping list rows.`);
-    });
-  }
+    return () => window.clearTimeout(timeoutId);
+  }, [draftMeals, weeklyPlanId]);
 
   return (
     <section className="panel cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
           <h2>Meal Lineup</h2>
-          <p>{orderDate} · saving meals refreshes the shopping list.</p>
-        </div>
-        <div className="cadence-editor__actions">
-          <button className="ghost-button" type="button" onClick={resetMeals}>
-            Reset draft
-          </button>
-          <button className="action-button" type="button" onClick={saveMeals} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save meals"}
-          </button>
+          <p>{orderDate} · changes autosave and refresh the shopping list.</p>
         </div>
       </div>
 
