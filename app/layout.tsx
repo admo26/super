@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { signOut } from "@/app/auth/actions";
 import { NavLinks } from "@/app/nav-links";
+import { QuickAddItem } from "@/app/order-items/quick-add-item";
 import { createClient } from "@/lib/supabase/server";
 
 import "./globals.css";
@@ -50,6 +51,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             >
               <NavLinks isAuthenticated={Boolean(user)} />
             </Suspense>
+            {user ? <QuickAddItem /> : null}
             <div className="site-auth">
               {user ? (
                 <form action={signOut}>

@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import { forwardRef, type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react";
 
 type Tone = "default" | "primary" | "accent" | "success" | "warning" | "danger" | "info" | "muted";
 type ButtonVariant = "primary" | "secondary" | "accent" | "danger" | "ghost";
@@ -67,8 +67,11 @@ type FieldProps = ComponentPropsWithoutRef<"input"> & {
   icon?: ReactNode;
 };
 
-export function Field({ className, helper, icon, label, ...props }: FieldProps) {
-  const input = <input className={cx("ui-input", Boolean(icon) && "ui-input--with-icon", className)} {...props} />;
+export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
+  { className, helper, icon, label, ...props },
+  ref
+) {
+  const input = <input ref={ref} className={cx("ui-input", Boolean(icon) && "ui-input--with-icon", className)} {...props} />;
   return (
     <label className="ui-field">
       {label ? <span className="ui-label">{label}</span> : null}
@@ -83,7 +86,7 @@ export function Field({ className, helper, icon, label, ...props }: FieldProps) 
       {helper ? <span className="ui-helper">{helper}</span> : null}
     </label>
   );
-}
+});
 
 type SelectFieldProps = ComponentPropsWithoutRef<"select"> & {
   label?: string;
