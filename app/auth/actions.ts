@@ -12,12 +12,17 @@ function sanitizeNextPath(value: FormDataEntryValue | null) {
 
 async function getRequestOrigin() {
   const headerStore = await headers();
+  const requestOrigin = headerStore.get("origin");
   const forwardedHost = headerStore.get("x-forwarded-host");
   const host = forwardedHost ?? headerStore.get("host");
   const forwardedProto = headerStore.get("x-forwarded-proto") ?? "https";
 
+  if (requestOrigin) {
+    return requestOrigin;
+  }
+
   if (!host) {
-    return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    return process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
   }
 
   return `${forwardedProto}://${host}`;
