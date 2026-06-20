@@ -1001,14 +1001,21 @@ p {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .site-nav__inner {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
     gap: 8px;
   }
 
+  .site-brand {
+    grid-column: 2;
+    justify-self: center;
+  }
+
   .site-links-shell {
-    justify-self: end;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
   }
 
   .site-links__toggle {
