@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { LogIn } from "lucide-react";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { signOut } from "@/app/auth/actions";
 import { NavLinks } from "@/app/nav-links";
@@ -66,6 +67,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         </header>
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
