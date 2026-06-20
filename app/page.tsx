@@ -103,7 +103,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <h1>This Week&apos;s Meal Plan</h1>
         </div>
         <div className="page-actions">
-          <Link className="ghost-button" href="/cadence?tab=next-week">
+          <Link className="ghost-button" href="/cadence">
             Edit meals
           </Link>
         </div>

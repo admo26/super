@@ -37,7 +37,7 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
   const nextWeek = currentWeek
     ? summaries.find((plan) => plan.orderDate > currentWeek)?.orderDate ?? null
     : summaries.find((plan) => plan.orderDate >= today)?.orderDate ?? summaries.at(-1)?.orderDate ?? null;
-  const selectedTab: PlannerTab = resolvedSearchParams.tab === "next-week" ? "next-week" : "staples";
+  const selectedTab: PlannerTab = resolvedSearchParams.tab === "staples" ? "staples" : "next-week";
   const mealPlan = selectedTab === "next-week" && nextWeek ? await getEditableWeeklyPlan(nextWeek) : null;
 
   return (
@@ -60,12 +60,15 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
 
       <div className="stack">
         <nav className="cadence-tabs" aria-label="Planner sections">
-          <Link className={`cadence-tab ${selectedTab === "staples" ? "cadence-tab--active" : ""}`} href="/cadence">
+          <Link
+            className={`cadence-tab ${selectedTab === "staples" ? "cadence-tab--active" : ""}`}
+            href="/cadence?tab=staples"
+          >
             Staples
           </Link>
           <Link
             className={`cadence-tab ${selectedTab === "next-week" ? "cadence-tab--active" : ""}`}
-            href="/cadence?tab=next-week"
+            href="/cadence"
           >
             Next Week&apos;s Meals
           </Link>
@@ -98,7 +101,7 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
                 <p>Generate one now if the scheduled Friday run has not created it yet.</p>
               </div>
               <form action={generateNextWeeklyPlan}>
-                <input type="hidden" name="returnTo" value="/cadence?tab=next-week" />
+                <input type="hidden" name="returnTo" value="/cadence" />
                 <button className="action-button" type="submit">
                   Generate next week
                 </button>
