@@ -72,19 +72,6 @@ export function MealPlanEditor({
 
   const recipeOptions = useMemo(() => toRecipeOptions(recipes), [recipes]);
 
-  function updateMeal(index: number, field: keyof EditableMeal, value: string) {
-    setDraftMeals((current) =>
-      current.map((meal, currentIndex) =>
-        currentIndex === index
-          ? {
-              ...meal,
-              [field]: value
-            }
-          : meal
-      )
-    );
-  }
-
   function swapMeal(index: number, selectedName: string) {
     if (!selectedName) {
       setDraftMeals((current) =>
@@ -183,46 +170,29 @@ export function MealPlanEditor({
           draftMeals.map((meal, index) => (
             <article className="editor-card" key={`meal-${index}`}>
               <div className="editor-card__fields editor-card__fields--meals">
-                <div className="meal-editor__recipe-picker">
-                  <label className="field-stack">
-                    <span>Recipe</span>
-                    <select
-                      className="import-input"
-                      value={meal.name}
-                      onChange={(event) => swapMeal(index, event.target.value)}
-                    >
-                      <option value="">Clear this slot</option>
-                      {meal.name && !recipeOptions.some((option) => option.name === meal.name) ? (
-                        <option value={meal.name}>{meal.name} (current custom)</option>
-                      ) : null}
-                      {recipeOptions.map((option) => (
-                        <option key={option.name} value={option.name}>
-                          {option.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                <div className="meal-editor__slot">
+                  <p className="meal-editor__slot-label">Dinner {index + 1}</p>
+                  <select
+                    className="import-input meal-editor__select"
+                    value={meal.name}
+                    onChange={(event) => swapMeal(index, event.target.value)}
+                    aria-label={`Dinner ${index + 1}`}
+                  >
+                    <option value="">Choose a meal</option>
+                    {meal.name && !recipeOptions.some((option) => option.name === meal.name) ? (
+                      <option value={meal.name}>{meal.name} (current custom)</option>
+                    ) : null}
+                    {recipeOptions.map((option) => (
+                      <option key={option.name} value={option.name}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <label className="field-stack">
-                  <span>Type</span>
-                  <input
-                    className="import-input"
-                    type="text"
-                    value={meal.type}
-                    onChange={(event) => updateMeal(index, "type", event.target.value)}
-                    placeholder="Type"
-                  />
-                </label>
-                <label className="field-stack">
-                  <span>Note</span>
-                  <textarea
-                    className="import-textarea"
-                    value={meal.note}
-                    onChange={(event) => updateMeal(index, "note", event.target.value)}
-                    placeholder="A quick note"
-                    rows={2}
-                  />
-                </label>
+                <div className="meal-editor__details">
+                  <span className="meal-type meal-editor__type">{meal.type}</span>
+                  {meal.note ? <p className="meal-note meal-editor__note">{meal.note}</p> : null}
+                </div>
               </div>
               <div className="editor-card__actions">
                 <button className="ghost-button ghost-button--small" type="button" onClick={() => removeMeal(index)}>

@@ -804,7 +804,7 @@ p {
 }
 
 .editor-card__fields--meals {
-  grid-template-columns: minmax(220px, 1.35fr) minmax(130px, 0.6fr) minmax(220px, 1.15fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .editor-card__actions {
@@ -906,9 +906,37 @@ p {
   gap: 5px;
 }
 
-.meal-editor__recipe-picker {
+.meal-editor__slot {
   display: grid;
   gap: 8px;
+}
+
+.meal-editor__slot-label {
+  margin: 0;
+  color: var(--subtle);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meal-editor__select {
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding-block: 11px;
+}
+
+.meal-editor__details {
+  display: grid;
+  gap: 10px;
+}
+
+.meal-editor__type {
+  justify-self: start;
+}
+
+.meal-editor__note {
+  margin: 0;
 }
 
 .cadence-editor__empty,
