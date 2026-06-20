@@ -51,7 +51,7 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
       {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
       <section className="page-header">
         <div>
-          <p className="page-kicker">Plan Ahead</p>
+          <p className="page-kicker">Plan</p>
           <h1>Stay one step ahead</h1>
           <p className="page-summary">
             Keep your regular staples handy and line up next week&apos;s meals before things get hectic.

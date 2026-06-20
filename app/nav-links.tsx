@@ -11,10 +11,10 @@ type NavLinksProps = {
 };
 
 const links = [
-  { href: "/cadence", label: "Plan Ahead" },
-  { href: "/recipes", label: "Meal Ideas" },
+  { href: "/cadence", label: "Plan" },
+  { href: "/recipes", label: "Recipes" },
   { href: "/history", label: "Past Orders" },
-  { href: "/import", label: "Add Orders" }
+  { href: "/import", label: "Import Orders" }
 ];
 
 export function NavLinks({ isAuthenticated }: NavLinksProps) {

@@ -8,7 +8,7 @@ export default async function RecipesPage() {
     <main className="page-shell">
       <section className="page-header">
         <div>
-          <p className="page-kicker">Meal Ideas</p>
+          <p className="page-kicker">Recipes</p>
           <h1>Your regular dinner rotation</h1>
           <p className="page-summary">
             The meals you come back to, ready to use when planning the week ahead.

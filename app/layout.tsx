@@ -41,10 +41,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                     This Week
                   </Link>
                   <Link className="site-link" href="/cadence">
-                    Plan Ahead
+                    Plan
                   </Link>
                   <Link className="site-link" href="/recipes">
-                    Meal Ideas
+                    Recipes
                   </Link>
                 </nav>
               }

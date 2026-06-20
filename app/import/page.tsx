@@ -127,7 +127,7 @@ export default function ImportPage() {
     <main className="page-shell">
       <section className="page-header">
         <div>
-          <p className="page-kicker">Add Orders</p>
+          <p className="page-kicker">Import Orders</p>
           <h1>Bring in a past shop</h1>
           <p className="page-summary">
             Turn a supermarket PDF or screenshot into order history for easier planning later on.
