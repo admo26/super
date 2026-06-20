@@ -271,42 +271,6 @@ p {
   gap: 10px;
 }
 
-.metric-strip,
-.hero-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.metric-card,
-.stat-card {
-  min-width: 0;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: rgba(255, 253, 248, 0.84);
-}
-
-.metric-label,
-.stat-label {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--subtle);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.metric-card strong,
-.stat-card strong {
-  color: var(--ink);
-  font-size: 1.14rem;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-}
-
 .notice-banner {
   margin-bottom: 12px;
   padding: 10px 12px;
@@ -908,30 +872,6 @@ p {
   grid-template-columns: minmax(0, 1.8fr) minmax(90px, 0.7fr) minmax(110px, 0.8fr) minmax(120px, 1fr);
 }
 
-.step-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.step-card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 12px;
-  background: rgba(255, 253, 248, 0.84);
-}
-
-.step-card strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.step-card span {
-  color: var(--muted);
-  font-size: 0.88rem;
-}
-
 .auth-shell {
   display: grid;
   place-items: center;
@@ -956,11 +896,8 @@ p {
 
 @media (max-width: 900px) {
   .page-header,
-  .metric-strip,
-  .hero-stats,
   .meal-list,
-  .recipe-grid,
-  .step-strip {
+  .recipe-grid {
     grid-template-columns: 1fr;
   }
 

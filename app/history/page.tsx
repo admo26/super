@@ -21,21 +21,6 @@ export default async function OrderHistoryPage() {
         </div>
       </section>
 
-      <section className="metric-strip" aria-label="Order history summary">
-        <article className="metric-card">
-          <span className="metric-label">Orders</span>
-          <strong>{history.totalOrders}</strong>
-        </article>
-        <article className="metric-card">
-          <span className="metric-label">Rows</span>
-          <strong>{history.totalRows}</strong>
-        </article>
-        <article className="metric-card">
-          <span className="metric-label">Window</span>
-          <strong>{history.earliestOrderDate ?? "—"} to {history.latestOrderDate ?? "—"}</strong>
-        </article>
-      </section>
-
       <section className="panel">
         <div className="section-header">
           <div>

@@ -135,21 +135,6 @@ export default function ImportPage() {
         </div>
       </section>
 
-      <section className="step-strip" aria-label="Import progress">
-        <article className="step-card">
-          <strong>1. Upload</strong>
-          <span>{file ? file.name : "PDF, PNG, or JPG"}</span>
-        </article>
-        <article className="step-card">
-          <strong>2. Review</strong>
-          <span>{parsed ? `${draftItems.length} extracted rows` : "Waiting for parse"}</span>
-        </article>
-        <article className="step-card">
-          <strong>3. Save</strong>
-          <span>{saveMessage ? "Saved" : `${reviewedRows} ready rows`}</span>
-        </article>
-      </section>
-
       <section className="panel">
         <div className="section-header">
           <div>

@@ -48,27 +48,6 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
         </Link>
       </section>
 
-      <section className="metric-strip" aria-label="Planner summary">
-        <article className="metric-card">
-          <span className="metric-label">Plans</span>
-          <strong>{summaries.length}</strong>
-        </article>
-        <article className="metric-card">
-          <span className="metric-label">Recurring list</span>
-          <strong>
-            {recurringCadence.source === "master"
-              ? "Independent master"
-              : recurringCadence.sourceOrderDate
-                ? `Fallback from ${recurringCadence.sourceOrderDate}`
-                : "Independent master"}
-          </strong>
-        </article>
-        <article className="metric-card">
-          <span className="metric-label">Meal week</span>
-          <strong>{selectedWeek ?? "None"}</strong>
-        </article>
-      </section>
-
       <div className="stack">
         <CadenceEditor
           sourceLabel={
