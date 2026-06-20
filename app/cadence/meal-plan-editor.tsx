@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { formatDatesInText, formatHumanDate } from "@/lib/date-format";
+import { formatHumanDate } from "@/lib/date-format";
 import type { Meal } from "@/lib/types";
 import { isBatchCook, type Recipe, type RecipeFrequency } from "@/lib/recipes";
 
@@ -160,7 +160,6 @@ export function MealPlanEditor({
       </div>
 
       <div className="cadence-editor__meta">
-        {analysisWindow ? <span className="status-tag status-tag--muted">{formatDatesInText(analysisWindow)}</span> : null}
         {saveMessage ? <span className="success-text">{saveMessage}</span> : null}
         {error ? <span className="error-text">{error}</span> : null}
       </div>
