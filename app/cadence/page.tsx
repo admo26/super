@@ -7,9 +7,11 @@ import { getEditableWeeklyPlan, getRecurringCadence, getWeeklyPlanSummaries } fr
 
 type CadencePageProps = {
   searchParams?: Promise<{
-    week?: string;
+    tab?: string;
   }>;
 };
+
+type PlannerTab = "staples" | "next-week";
 
 function getTodayInPacificAuckland() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -26,21 +28,21 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
   const summaries = await getWeeklyPlanSummaries();
   const { recipes } = await getRecipes();
   const recurringCadence = await getRecurringCadence();
-  const selectedWeek =
-    resolvedSearchParams.week ??
-    summaries.filter((plan) => plan.orderDate < today).at(-1)?.orderDate ??
-    summaries.at(-1)?.orderDate ??
-    null;
-  const mealPlan = selectedWeek ? await getEditableWeeklyPlan(selectedWeek) : null;
+  const currentWeek = summaries.filter((plan) => plan.orderDate < today).at(-1)?.orderDate ?? null;
+  const nextWeek = currentWeek
+    ? summaries.find((plan) => plan.orderDate > currentWeek)?.orderDate ?? null
+    : summaries.find((plan) => plan.orderDate >= today)?.orderDate ?? summaries.at(-1)?.orderDate ?? null;
+  const selectedTab: PlannerTab = resolvedSearchParams.tab === "next-week" ? "next-week" : "staples";
+  const mealPlan = selectedTab === "next-week" && nextWeek ? await getEditableWeeklyPlan(nextWeek) : null;
 
   return (
     <main className="page-shell">
       <section className="page-header">
         <div>
           <p className="page-kicker">Planning Settings</p>
-          <h1>Meals And Recurring Items</h1>
+          <h1>Planner</h1>
           <p className="page-summary">
-            Tune the selected week, recurring staples, and meal lineup that generate the order.
+            Maintain household staples separately from the meals planned for the next order.
           </p>
         </div>
         <Link className="ghost-button" href="/">
@@ -49,43 +51,30 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
       </section>
 
       <div className="stack">
-        <CadenceEditor
-          sourceLabel={
-            recurringCadence.source === "master"
-              ? "Independent household staples list used for future generations."
-              : recurringCadence.sourceOrderDate
-                ? `Loaded from the latest saved week (${recurringCadence.sourceOrderDate}) until you save this master list.`
-                : "Independent household staples list used for future generations."
-          }
-          initialCadence={recurringCadence.cadence}
-        />
+        <nav className="cadence-tabs" aria-label="Planner sections">
+          <Link className={`cadence-tab ${selectedTab === "staples" ? "cadence-tab--active" : ""}`} href="/cadence">
+            Staples
+          </Link>
+          <Link
+            className={`cadence-tab ${selectedTab === "next-week" ? "cadence-tab--active" : ""}`}
+            href="/cadence?tab=next-week"
+          >
+            Next Week
+          </Link>
+        </nav>
 
-        <section className="panel">
-          <div className="section-header cadence-page__header">
-            <div>
-              <h2>Meal Week Switcher</h2>
-              <p>Pick the saved week to inspect or edit its meal lineup.</p>
-            </div>
-          </div>
-
-          <div className="cadence-plan-pills">
-            {summaries.length ? (
-              summaries.map((summary) => (
-                <Link
-                  key={summary.id}
-                  href={`/cadence${summary.orderDate ? `?week=${summary.orderDate}` : ""}`}
-                  className={`pill cadence-plan-pill ${selectedWeek === summary.orderDate ? "cadence-plan-pill--active" : ""}`}
-                >
-                  {summary.orderDate}
-                </Link>
-              ))
-            ) : (
-              <p className="helper-text">No weekly plans are available yet.</p>
-            )}
-          </div>
-        </section>
-
-        {mealPlan ? (
+        {selectedTab === "staples" ? (
+          <CadenceEditor
+            sourceLabel={
+              recurringCadence.source === "master"
+                ? "Independent household staples list used for future generations."
+                : recurringCadence.sourceOrderDate
+                  ? `Loaded from the latest saved week (${recurringCadence.sourceOrderDate}) until you save this master list.`
+                  : "Independent household staples list used for future generations."
+            }
+            initialCadence={recurringCadence.cadence}
+          />
+        ) : mealPlan ? (
           <MealPlanEditor
             weeklyPlanId={mealPlan.id}
             orderDate={mealPlan.orderDate}
@@ -95,7 +84,7 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
           />
         ) : (
           <section className="panel">
-            <p className="helper-text">There is no saved meal plan selected yet.</p>
+            <p className="helper-text">There is no next-week meal plan available yet.</p>
           </section>
         )}
       </div>

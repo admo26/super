@@ -119,7 +119,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               View next meals
             </Link>
           ) : null}
-          <Link className="ghost-button" href={selectedWeek ? `/cadence?week=${selectedWeek}` : "/cadence"}>
+          <Link className="ghost-button" href="/cadence?tab=next-week">
             Edit meals
           </Link>
         </div>
