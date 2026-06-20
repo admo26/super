@@ -201,9 +201,21 @@ export function CadenceEditor({
               <div className="editor-card__actions editor-card__actions--menu">
                 <details className="action-menu">
                   <summary className="action-menu__trigger" aria-label={`Actions for ${item.name || "item"}`}>
-                    <span aria-hidden="true" />
-                    <span aria-hidden="true" />
-                    <span aria-hidden="true" />
+                    <svg
+                      className="action-menu__icon"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="4" cy="10" r="1.2" fill="currentColor" stroke="none" />
+                      <circle cx="10" cy="10" r="1.2" fill="currentColor" stroke="none" />
+                      <circle cx="16" cy="10" r="1.2" fill="currentColor" stroke="none" />
+                    </svg>
+                    <span className="action-menu__label">Actions</span>
                   </summary>
                   <div className="action-menu__panel">
                     <label className="field-stack field-stack--compact">
