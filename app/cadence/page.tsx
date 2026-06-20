@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { Beef, CheckCircle2, ClipboardList, CookingPot, PackageCheck, Sparkles, XCircle } from "lucide-react";
 
 import { CadenceEditor } from "@/app/cadence/cadence-editor";
 import { MealPlanEditor } from "@/app/cadence/meal-plan-editor";
 import { generateNextWeeklyPlan } from "@/app/plan/actions";
 import { RecipeLibrary } from "@/app/recipes/recipe-library";
+import { Button, Notice, PageHeader, Panel, Tabs } from "@/app/ui";
 import { formatHumanDate } from "@/lib/date-format";
 import { getRecipes } from "@/lib/recipes";
 import { getEditableWeeklyPlan, getRecurringCadence, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
@@ -50,42 +52,41 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
   return (
     <main className="page-shell">
       {generated ? (
-        <section className="notice-banner">
+        <Notice icon={<CheckCircle2 aria-hidden="true" />}>
           Next week&apos;s plan is ready.
-        </section>
+        </Notice>
       ) : null}
-      {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
-      <section className="page-header">
-        <div>
-          <p className="page-kicker">Plan</p>
-          <h1>Stay one step ahead</h1>
-          <p className="page-summary">
-            Keep your regular staples handy and line up next week&apos;s meals before things get hectic.
-          </p>
-        </div>
-      </section>
+      {error ? <Notice tone="danger" icon={<XCircle aria-hidden="true" />}>{error}</Notice> : null}
+      <PageHeader
+        eyebrow="Plan"
+        title="Stay one step ahead"
+        summary={<>Keep your regular staples handy and line up next week&apos;s meals before things get hectic.</>}
+      />
 
       <div className="stack">
-        <nav className="cadence-tabs" aria-label="Planner sections">
+        <Tabs aria-label="Planner sections">
           <Link
             className={`cadence-tab ${selectedTab === "next-week" ? "cadence-tab--active" : ""}`}
             href="/cadence"
           >
+            <CookingPot aria-hidden="true" />
             Next Week&apos;s Meals
           </Link>
           <Link
             className={`cadence-tab ${selectedTab === "staples" ? "cadence-tab--active" : ""}`}
             href="/cadence?tab=staples"
           >
+            <PackageCheck aria-hidden="true" />
             Staples
           </Link>
           <Link
             className={`cadence-tab ${selectedTab === "recipes" ? "cadence-tab--active" : ""}`}
             href="/cadence?tab=recipes"
           >
+            <Beef aria-hidden="true" />
             Recipe List
           </Link>
-        </nav>
+        </Tabs>
 
         {selectedTab === "staples" ? (
           <CadenceEditor
@@ -107,18 +108,18 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
             recipes={recipes}
           />
         ) : selectedTab === "recipes" ? (
-          <section className="panel">
+          <Panel>
             <div className="section-header">
               <div>
-                <h2>Recipes</h2>
+                <h2><ClipboardList aria-hidden="true" size={19} /> Recipes</h2>
                 <p>Search by meal name, ingredient, or how often it tends to show up.</p>
               </div>
             </div>
 
             <RecipeLibrary recipes={recipes} />
-          </section>
+          </Panel>
         ) : (
-          <section className="panel">
+          <Panel>
             <div className="section-header">
               <div>
                 <h2>Next week hasn&apos;t been lined up yet</h2>
@@ -126,12 +127,12 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
               </div>
               <form action={generateNextWeeklyPlan}>
                 <input type="hidden" name="returnTo" value="/cadence" />
-                <button className="action-button" type="submit">
+                <Button icon={<Sparkles aria-hidden="true" />} type="submit">
                   Build next week&apos;s plan
-                </button>
+                </Button>
               </form>
             </div>
-          </section>
+          </Panel>
         )}
       </div>
     </main>

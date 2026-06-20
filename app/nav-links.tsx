@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CalendarDays, ClipboardList, History, LogIn, LogOut } from "lucide-react";
 
 import { signOut } from "@/app/auth/actions";
 
@@ -11,8 +12,8 @@ type NavLinksProps = {
 };
 
 const links = [
-  { href: "/cadence", label: "Plan" },
-  { href: "/history", label: "Order History" }
+  { href: "/cadence", label: "Plan", icon: ClipboardList },
+  { href: "/history", label: "Order History", icon: History }
 ];
 
 export function NavLinks({ isAuthenticated }: NavLinksProps) {
@@ -40,6 +41,7 @@ export function NavLinks({ isAuthenticated }: NavLinksProps) {
       </button>
       <nav className="site-links" id="site-navigation" aria-label="Main navigation">
         <Link className={pathname === "/" ? "site-link site-link--active" : "site-link"} href="/">
+          <CalendarDays aria-hidden="true" />
           This Week
         </Link>
         {links.map((link) => (
@@ -48,6 +50,7 @@ export function NavLinks({ isAuthenticated }: NavLinksProps) {
             href={link.href}
             key={link.href}
           >
+            <link.icon aria-hidden="true" />
             {link.label}
           </Link>
         ))}
@@ -55,11 +58,13 @@ export function NavLinks({ isAuthenticated }: NavLinksProps) {
           {isAuthenticated ? (
             <form action={signOut}>
               <button className="site-link site-links__auth-button" type="submit">
+                <LogOut aria-hidden="true" />
                 Log out
               </button>
             </form>
           ) : (
             <Link className="site-link" href="/login">
+              <LogIn aria-hidden="true" />
               Log in
             </Link>
           )}

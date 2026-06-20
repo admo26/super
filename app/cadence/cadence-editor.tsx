@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MoreHorizontal, Plus, Save, Trash2 } from "lucide-react";
 
+import { ActionMenu, Button, Field, Panel, SelectField, Tag } from "@/app/ui";
 import type { CadenceKey, CadenceItem } from "@/lib/types";
 
 type EditableCadenceItem = CadenceItem;
@@ -143,7 +145,7 @@ export function CadenceEditor({
   const visibleItems = draftCadence[selectedCadence];
 
   return (
-    <section className="panel cadence-editor">
+    <Panel className="cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
           <h2>Staples you like to keep on hand</h2>
@@ -168,7 +170,7 @@ export function CadenceEditor({
       </div>
 
       <div className="cadence-editor__meta">
-        {saveMessage ? <span className="success-text">{saveMessage}</span> : null}
+        {saveMessage ? <Tag tone="success"><Save aria-hidden="true" size={14} /> {saveMessage}</Tag> : null}
         {error ? <span className="error-text">{error}</span> : null}
       </div>
 
@@ -177,78 +179,54 @@ export function CadenceEditor({
           visibleItems.map((item, index) => (
             <article className="editor-card" key={`${selectedCadence}-${index}`}>
               <div className="editor-card__fields editor-card__fields--staples">
-                <label className="field-stack">
-                  <span>Name</span>
-                  <input
-                    className="import-input"
-                    type="text"
-                    value={item.name}
-                    onChange={(event) => updateItem(index, "name", event.target.value)}
-                    placeholder="Item name"
-                  />
-                </label>
-                <label className="field-stack">
-                  <span>Qty</span>
-                  <input
-                    className="import-input"
-                    type="text"
-                    value={item.qty}
-                    onChange={(event) => updateItem(index, "qty", event.target.value)}
-                    placeholder="Quantity"
-                  />
-                </label>
+                <Field
+                  label="Name"
+                  type="text"
+                  value={item.name}
+                  onChange={(event) => updateItem(index, "name", event.target.value)}
+                  placeholder="Item name"
+                />
+                <Field
+                  label="Qty"
+                  type="text"
+                  value={item.qty}
+                  onChange={(event) => updateItem(index, "qty", event.target.value)}
+                  placeholder="Quantity"
+                />
               </div>
               <div className="editor-card__actions editor-card__actions--menu">
-                <details className="action-menu">
-                  <summary className="action-menu__trigger" aria-label={`Actions for ${item.name || "item"}`}>
-                    <svg
-                      className="action-menu__icon"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <circle cx="4" cy="10" r="1.2" fill="currentColor" stroke="none" />
-                      <circle cx="10" cy="10" r="1.2" fill="currentColor" stroke="none" />
-                      <circle cx="16" cy="10" r="1.2" fill="currentColor" stroke="none" />
-                    </svg>
-                  </summary>
-                  <div className="action-menu__panel">
-                    <label className="field-stack field-stack--compact">
-                      <span>Move to</span>
-                      <select
-                        className="import-input cadence-editor__move-select"
-                        aria-label={`Move ${item.name || "item"} to another cadence`}
-                        defaultValue=""
-                        onChange={(event) => {
-                          const nextCadence = event.target.value as CadenceKey | "";
-                          if (!nextCadence) return;
-                          moveItem(index, nextCadence);
-                          event.target.value = "";
-                        }}
-                      >
-                        <option value="">Choose...</option>
-                        {cadenceTabs
-                          .filter((cadence) => cadence !== selectedCadence)
-                          .map((cadence) => (
-                            <option key={cadence} value={cadence}>
-                              {cadenceLabel(cadence)}
-                            </option>
-                          ))}
-                      </select>
-                    </label>
-                    <button
-                      className="ghost-button ghost-button--small action-menu__remove"
-                      type="button"
-                      onClick={() => removeItem(index)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </details>
+                <ActionMenu label={`Actions for ${item.name || "item"}`} triggerIcon={<MoreHorizontal className="action-menu__icon" aria-hidden="true" />}>
+                  <SelectField
+                    label="Move to"
+                    className="cadence-editor__move-select"
+                    aria-label={`Move ${item.name || "item"} to another cadence`}
+                    defaultValue=""
+                    onChange={(event) => {
+                      const nextCadence = event.target.value as CadenceKey | "";
+                      if (!nextCadence) return;
+                      moveItem(index, nextCadence);
+                      event.target.value = "";
+                    }}
+                  >
+                    <option value="">Choose...</option>
+                    {cadenceTabs
+                      .filter((cadence) => cadence !== selectedCadence)
+                      .map((cadence) => (
+                        <option key={cadence} value={cadence}>
+                          {cadenceLabel(cadence)}
+                        </option>
+                      ))}
+                  </SelectField>
+                  <Button
+                    className="ghost-button--small action-menu__remove"
+                    icon={<Trash2 aria-hidden="true" />}
+                    variant="danger"
+                    type="button"
+                    onClick={() => removeItem(index)}
+                  >
+                    Remove
+                  </Button>
+                </ActionMenu>
               </div>
             </article>
           ))
@@ -261,10 +239,10 @@ export function CadenceEditor({
 
       <div className="import-footer">
         <p className="helper-text">These {selectedCadence} staples help build future shopping lists faster.</p>
-        <button className="ghost-button" type="button" onClick={addItem}>
+        <Button icon={<Plus aria-hidden="true" />} variant="secondary" type="button" onClick={addItem}>
           Add a staple
-        </button>
+        </Button>
       </div>
-    </section>
+    </Panel>
   );
 }
