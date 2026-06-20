@@ -2,6 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { Plus, ShoppingBasket } from "lucide-react";
+
+import { Button, Field } from "@/app/ui";
 
 type AdHocItemFormProps = {
   targetWeek: string;
@@ -52,8 +55,7 @@ export function AdHocItemForm({ targetWeek }: AdHocItemFormProps) {
   return (
     <div className="ad-hoc-form">
       <div className="ad-hoc-form__row">
-        <input
-          className="import-input"
+        <Field
           type="text"
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -63,12 +65,13 @@ export function AdHocItemForm({ targetWeek }: AdHocItemFormProps) {
               addItem();
             }
           }}
+          icon={<ShoppingBasket aria-hidden="true" />}
           placeholder="Add something extra for the next shop"
           aria-label="Ad hoc item name"
         />
-        <button className="action-button" type="button" onClick={addItem} disabled={isPending}>
+        <Button icon={<Plus aria-hidden="true" />} type="button" onClick={addItem} disabled={isPending}>
           {isPending ? "Adding..." : "Add item"}
-        </button>
+        </Button>
       </div>
       {error ? <p className="error-text">{error}</p> : null}
       {message ? <p className="success-text">{message}</p> : null}

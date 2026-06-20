@@ -1,4 +1,7 @@
+import { History, PackageSearch } from "lucide-react";
+
 import { ImportHistoryManager } from "@/app/import/import-history-manager";
+import { EmptyState, PageHeader, Panel, Tag } from "@/app/ui";
 import { getOrderHistory } from "@/lib/order-history";
 import { formatHumanDate } from "@/lib/date-format";
 
@@ -13,22 +16,18 @@ export default async function OrderHistoryPage() {
 
   return (
     <main className="page-shell">
-      <section className="page-header">
-        <div>
-          <p className="page-kicker">Order History</p>
-          <h1>Your grocery history</h1>
-          <p className="page-summary">
-            A look back at past shops so Super can spot patterns and make smarter suggestions.
-          </p>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Order History"
+        title="Your grocery history"
+        summary="A look back at past shops so Super can spot patterns and make smarter suggestions."
+      />
 
       <ImportHistoryManager />
 
-      <section className="panel">
+      <Panel>
         <div className="section-header">
           <div>
-            <h2>Saved shops</h2>
+            <h2><History aria-hidden="true" size={19} /> Saved shops</h2>
             <p>Grouped by order date and where they came from.</p>
           </div>
         </div>
@@ -45,7 +44,7 @@ export default async function OrderHistoryPage() {
                       {order.sourceName ? ` · ${order.sourceName}` : ""}
                     </p>
                   </div>
-                  <span className="reason-tag">{order.items.length} items</span>
+                  <Tag tone="info">{order.items.length} items</Tag>
                 </div>
 
                 <div className="history-table">
@@ -58,12 +57,12 @@ export default async function OrderHistoryPage() {
 
                   {order.items.map((item, index) => (
                     <div className="history-table__row" key={`${order.orderDate}-${item.itemName}-${index}`}>
-                      <span>{item.itemName}</span>
-                      <span>
+                      <span data-label="Item">{item.itemName}</span>
+                      <span data-label="Qty">
                         {[item.quantity, item.unit].filter(Boolean).join(" ") || "—"}
                       </span>
-                      <span>{item.category ?? "—"}</span>
-                      <span>{item.notes ?? "—"}</span>
+                      <span data-label="Category">{item.category ?? "—"}</span>
+                      <span data-label="Notes">{item.notes ?? "—"}</span>
                     </div>
                   ))}
                 </div>
@@ -71,9 +70,9 @@ export default async function OrderHistoryPage() {
             ))}
           </div>
         ) : (
-          <div className="empty-state">No past orders yet. Import one to get started.</div>
+          <EmptyState icon={<PackageSearch aria-hidden="true" />}>No past orders yet. Import one to get started.</EmptyState>
         )}
-      </section>
+      </Panel>
     </main>
   );
 }

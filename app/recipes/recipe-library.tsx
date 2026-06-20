@@ -1,7 +1,9 @@
 "use client";
 
 import { useDeferredValue, useState } from "react";
+import { Link as LinkIcon, Search, Soup } from "lucide-react";
 
+import { EmptyState, Field, Tag } from "@/app/ui";
 import { recipeFrequencyLabel, type Recipe } from "@/lib/recipes";
 
 type RecipeLibraryProps = {
@@ -35,15 +37,15 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
   return (
     <>
       <div className="library-controls">
-        <input
-          className="library-search"
+        <Field
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          icon={<Search aria-hidden="true" />}
           placeholder="Search meals or ingredients"
           aria-label="Search recipes"
         />
-        <span className="status-tag status-tag--muted">{filteredRecipes.length} meals</span>
+        <Tag tone="info">{filteredRecipes.length} meals</Tag>
       </div>
 
       {filteredRecipes.length ? (
@@ -65,7 +67,10 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
                     {recipeFrequencyLabel(recipe.cookFrequency)} · {recipe.servingPattern}
                   </p>
                 </div>
-                <span className="meal-type">{isUrl(recipe.source) ? "Linked" : "Standard"}</span>
+                <Tag tone={isUrl(recipe.source) ? "info" : "muted"}>
+                  {isUrl(recipe.source) ? <LinkIcon aria-hidden="true" size={14} /> : null}
+                  {isUrl(recipe.source) ? "Linked" : "Standard"}
+                </Tag>
               </div>
 
               <p className="meal-note">{recipe.rotationNotes}</p>
@@ -82,7 +87,7 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
           ))}
         </div>
       ) : (
-        <div className="empty-state">No meals match that search yet.</div>
+        <EmptyState icon={<Soup aria-hidden="true" />}>No meals match that search yet.</EmptyState>
       )}
     </>
   );

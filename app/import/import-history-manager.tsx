@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { FileUp, ListPlus, Save, Trash2, UploadCloud } from "lucide-react";
 
+import { Button, DataTable, Field, Panel, Tag } from "@/app/ui";
 import type { ParsedOrderHistoryItem, ParsedOrderHistoryPayload } from "@/lib/order-import";
 
 function createEmptyRow(): ParsedOrderHistoryItem {
@@ -126,10 +128,10 @@ export function ImportHistoryManager() {
 
   return (
     <>
-      <section className="panel">
+      <Panel>
         <div className="section-header">
           <div>
-            <h2>Upload a receipt or order</h2>
+            <h2><UploadCloud aria-hidden="true" size={19} /> Upload a receipt or order</h2>
             <p>We&apos;ll pull out the items, then you can give it a quick once-over before saving.</p>
           </div>
         </div>
@@ -140,24 +142,24 @@ export function ImportHistoryManager() {
             accept=".pdf,image/png,image/jpeg"
             onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           />
-          <button onClick={handleParse} disabled={!file || isParsing}>
+          <Button icon={<FileUp aria-hidden="true" />} onClick={handleParse} disabled={!file || isParsing}>
             {isParsing ? "Reading order..." : "Read order"}
-          </button>
+          </Button>
           {parsed ? (
-            <button className="ghost-button" onClick={handleSave} disabled={isSaving}>
+            <Button variant="secondary" icon={<Save aria-hidden="true" />} onClick={handleSave} disabled={isSaving}>
               {isSaving ? "Saving..." : "Save to history"}
-            </button>
+            </Button>
           ) : null}
         </div>
 
-        {file ? <p className="helper-text">Ready to review: {file.name}</p> : null}
+        {file ? <p className="helper-text">Ready to review: <strong>{file.name}</strong></p> : null}
         {error ? <p className="error-text">{error}</p> : null}
         {saveMessage ? <p className="success-text">{saveMessage}</p> : null}
-      </section>
+      </Panel>
 
       {parsed ? (
         <>
-          <section className="panel">
+          <Panel tone="tinted">
             <div className="section-header">
               <div>
                 <h2>What we found</h2>
@@ -170,20 +172,20 @@ export function ImportHistoryManager() {
                 <li key={note}>{note}</li>
               ))}
             </ul>
-          </section>
+          </Panel>
 
-          <section className="panel">
+          <Panel>
             <div className="section-header">
               <div>
                 <h2>Give it a quick tidy-up</h2>
                 <p>Fix anything that looks off before you save it to your history.</p>
               </div>
-              <button className="ghost-button" onClick={addRow} type="button">
+              <Button icon={<ListPlus aria-hidden="true" />} variant="secondary" onClick={addRow} type="button">
                 Add an item
-              </button>
+              </Button>
             </div>
 
-            <div className="import-table">
+            <DataTable className="import-table">
               <div className="import-table__head">
                 <span>Date</span>
                 <span>Item</span>
@@ -196,63 +198,70 @@ export function ImportHistoryManager() {
 
               {draftItems.map((item, index) => (
                 <div className="import-table__row" key={index}>
-                  <input
-                    className="import-input"
+                  <Field
                     type="date"
                     value={item.order_date ?? ""}
                     onChange={(event) => updateRow(index, "order_date", event.target.value)}
+                    aria-label="Order date"
                   />
-                  <input
-                    className="import-input"
+                  <Field
                     type="text"
                     value={item.item_name}
                     onChange={(event) => updateRow(index, "item_name", event.target.value)}
                     placeholder="Item name"
+                    aria-label="Item name"
                   />
-                  <input
-                    className="import-input"
+                  <Field
                     type="text"
                     value={item.quantity ?? ""}
                     onChange={(event) => updateRow(index, "quantity", event.target.value)}
                     placeholder="Qty"
+                    aria-label="Quantity"
                   />
-                  <input
-                    className="import-input"
+                  <Field
                     type="text"
                     value={item.unit ?? ""}
                     onChange={(event) => updateRow(index, "unit", event.target.value)}
                     placeholder="Unit"
+                    aria-label="Unit"
                   />
-                  <input
-                    className="import-input"
+                  <Field
                     type="text"
                     value={item.category ?? ""}
                     onChange={(event) => updateRow(index, "category", event.target.value)}
                     placeholder="Category"
+                    aria-label="Category"
                   />
                   <textarea
-                    className="import-textarea"
+                    className="ui-input import-textarea"
                     value={item.notes ?? ""}
                     onChange={(event) => updateRow(index, "notes", event.target.value)}
                     placeholder="Notes"
+                    aria-label="Notes"
                     rows={2}
                   />
-                  <button className="ghost-button ghost-button--small" type="button" onClick={() => removeRow(index)}>
+                  <Button
+                    className="ghost-button--small"
+                    icon={<Trash2 aria-hidden="true" />}
+                    variant="danger"
+                    type="button"
+                    onClick={() => removeRow(index)}
+                  >
                     Remove
-                  </button>
+                  </Button>
                 </div>
               ))}
-            </div>
+            </DataTable>
 
             <div className="import-footer">
-              <p className="helper-text">
+              <Tag tone="info">
                 {draftItems.length} item{draftItems.length === 1 ? "" : "s"} in this draft.
-              </p>
-              <button className="ghost-button" onClick={addRow} type="button">
+              </Tag>
+              <Button icon={<ListPlus aria-hidden="true" />} variant="secondary" onClick={addRow} type="button">
                 Add an item
-              </button>
+              </Button>
             </div>
-          </section>
+          </Panel>
         </>
       ) : null}
     </>

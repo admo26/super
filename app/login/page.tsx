@@ -1,4 +1,7 @@
+import { LogIn } from "lucide-react";
+
 import { signInWithGoogle } from "@/app/auth/actions";
+import { Button } from "@/app/ui";
 
 type LoginPageProps = {
   searchParams?: Promise<{
@@ -23,7 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         <form className="auth-form" action={signInWithGoogle}>
           <input type="hidden" name="next" value={nextPath} />
-          <button type="submit">Continue with Google</button>
+          <Button icon={<LogIn aria-hidden="true" />} type="submit">Continue with Google</Button>
           {error ? <p className="error-text">{error}</p> : null}
         </form>
       </section>

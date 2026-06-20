@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Plus, Save, Trash2 } from "lucide-react";
 
+import { Button, Panel, Tag } from "@/app/ui";
 import { formatHumanDate } from "@/lib/date-format";
 import type { Meal } from "@/lib/types";
 import { isBatchCook, type Recipe, type RecipeFrequency } from "@/lib/recipes";
@@ -151,7 +153,7 @@ export function MealPlanEditor({
   }, [draftMeals, weeklyPlanId]);
 
   return (
-    <section className="panel cadence-editor">
+    <Panel className="cadence-editor">
       <div className="section-header cadence-editor__header">
         <div>
           <h2>Next week&apos;s dinners</h2>
@@ -160,7 +162,7 @@ export function MealPlanEditor({
       </div>
 
       <div className="cadence-editor__meta">
-        {saveMessage ? <span className="success-text">{saveMessage}</span> : null}
+        {saveMessage ? <Tag tone="success"><Save aria-hidden="true" size={14} /> {saveMessage}</Tag> : null}
         {error ? <span className="error-text">{error}</span> : null}
       </div>
 
@@ -170,7 +172,7 @@ export function MealPlanEditor({
             <article className="editor-card" key={`meal-${index}`}>
               <div className="editor-card__fields editor-card__fields--meals">
                 <select
-                  className="import-input meal-editor__select"
+                  className="ui-input meal-editor__select"
                   value={meal.name}
                   onChange={(event) => swapMeal(index, event.target.value)}
                   aria-label={`Dinner ${index + 1}`}
@@ -186,14 +188,22 @@ export function MealPlanEditor({
                   ))}
                 </select>
                 <div className="meal-editor__details">
-                  <span className="meal-type meal-editor__type">{meal.type}</span>
+                  <Tag className="meal-editor__type" tone={meal.type.toLowerCase().includes("batch") ? "warning" : "success"}>
+                    {meal.type}
+                  </Tag>
                   {meal.note ? <p className="meal-note meal-editor__note">{meal.note}</p> : null}
                 </div>
               </div>
               <div className="editor-card__actions">
-                <button className="ghost-button ghost-button--small" type="button" onClick={() => removeMeal(index)}>
+                <Button
+                  className="ghost-button--small"
+                  icon={<Trash2 aria-hidden="true" />}
+                  variant="danger"
+                  type="button"
+                  onClick={() => removeMeal(index)}
+                >
                   Remove
-                </button>
+                </Button>
               </div>
             </article>
           ))
@@ -206,10 +216,10 @@ export function MealPlanEditor({
 
       <div className="import-footer">
         <p className="helper-text">Pick from your saved recipes and the shopping list will update for you.</p>
-        <button className="ghost-button" type="button" onClick={addMeal}>
+        <Button icon={<Plus aria-hidden="true" />} variant="secondary" type="button" onClick={addMeal}>
           Add a meal
-        </button>
+        </Button>
       </div>
-    </section>
+    </Panel>
   );
 }

@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { CheckCircle2, ChefHat, ShoppingBasket, Trash2, Wand2, XCircle } from "lucide-react";
 
 import { AdHocItemForm } from "@/app/order-items/ad-hoc-item-form";
 import { deleteShoppingListItem } from "@/app/plan/actions";
+import { LinkButton, Notice, PageHeader, Panel, Tag } from "@/app/ui";
 import { formatHumanDate } from "@/lib/date-format";
 import { getPendingAdHocItems, getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 import type { PendingAdHocItem, ShoppingItem } from "@/lib/types";
@@ -30,6 +32,15 @@ function formatReason(value: string) {
     .split(" ")
     .map((word) => word[0]?.toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+function reasonTone(value: string): "default" | "accent" | "info" | "success" | "warning" | "muted" {
+  if (value === "planned meal") return "accent";
+  if (value === "ad hoc") return "info";
+  if (value.includes("weekly")) return "success";
+  if (value.includes("fortnightly")) return "warning";
+  if (value.includes("monthly")) return "muted";
+  return "default";
 }
 
 function groupItemsByReason(items: ShoppingItem[]) {
@@ -64,7 +75,7 @@ function PendingAdHocList({ items, targetWeek }: { items: PendingAdHocItem[]; ta
                 Qty: {item.qty} · saved for {formatHumanDate(targetWeek)}
               </div>
             </div>
-            <span className="reason-tag">Pending</span>
+            <Tag tone="info">Pending</Tag>
           </article>
         ))}
       </div>
@@ -93,32 +104,28 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <main className="page-shell">
       {generated ? (
-        <section className="notice-banner">
+        <Notice icon={<CheckCircle2 aria-hidden="true" />}>
           Next week is ready to go.
-        </section>
+        </Notice>
       ) : null}
-      {error ? <section className="notice-banner notice-banner--error">{error}</section> : null}
-      <section className="page-header">
-        <div>
-          <p className="page-kicker">This Week</p>
-          <h1>Dinners for the week</h1>
-          <p className="page-summary">
-            A quick view of what&apos;s on for dinner now, plus the list for the next shop.
-          </p>
-        </div>
-        <div className="page-actions">
-          <Link className="ghost-button" href="/cadence">
+      {error ? <Notice tone="danger" icon={<XCircle aria-hidden="true" />}>{error}</Notice> : null}
+      <PageHeader
+        eyebrow="This Week"
+        title="Dinners for the week"
+        summary={<>A quick view of what&apos;s on for dinner now, plus the list for the next shop.</>}
+        actions={
+          <LinkButton as={Link} href="/cadence" icon={<Wand2 aria-hidden="true" />} variant="secondary">
             Plan next week
-          </Link>
-        </div>
-      </section>
+          </LinkButton>
+        }
+      />
 
       <div className="content-grid">
         <div className="dashboard-board">
-          <section className="panel">
+          <Panel>
             <div className="section-header">
               <div>
-                <h2>What&apos;s for dinner</h2>
+                <h2><ChefHat aria-hidden="true" size={19} /> What&apos;s for dinner</h2>
                 <p>Your current week at a glance.</p>
               </div>
             </div>
@@ -138,16 +145,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     </div>
                     <p className="meal-note">{meal.note}</p>
                   </div>
-                  <span className="meal-type">{meal.type}</span>
+                  <Tag tone={meal.type.toLowerCase().includes("batch") ? "warning" : "success"}>{meal.type}</Tag>
                 </article>
               ))}
             </div>
-          </section>
+          </Panel>
 
-          <section className="panel">
+          <Panel tone="tinted">
             <div className="section-header">
               <div>
-                <h2>{isPreparingNextOrder ? "Next shop" : "Shopping list"}</h2>
+                <h2><ShoppingBasket aria-hidden="true" size={19} /> {isPreparingNextOrder ? "Next shop" : "Shopping list"}</h2>
                 <p>
                   {canEditShoppingList
                     ? isPreparingNextOrder
@@ -177,11 +184,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                         </div>
                       </div>
                       <div className="shopping-item__actions">
-                        <span className="reason-tag">{item.group}</span>
+                        <Tag tone={reasonTone(reason)}>{item.group}</Tag>
                         {item.id ? (
                           <form action={deleteShoppingListItem}>
                             <input type="hidden" name="itemId" value={item.id} />
                             <button className="ghost-button ghost-button--small" type="submit">
+                              <Trash2 aria-hidden="true" />
                               Remove
                             </button>
                           </form>
@@ -192,7 +200,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 </section>
               ))}
             </div>
-          </section>
+          </Panel>
         </div>
       </div>
     </main>
