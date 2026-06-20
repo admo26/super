@@ -201,16 +201,6 @@ export function MealPlanEditor({
                       ))}
                     </select>
                   </label>
-                  <label className="field-stack">
-                    <span>Custom name</span>
-                    <input
-                      className="import-input"
-                      type="text"
-                      value={meal.name}
-                      onChange={(event) => updateMeal(index, "name", event.target.value)}
-                      placeholder="Meal name"
-                    />
-                  </label>
                 </div>
                 <label className="field-stack">
                   <span>Type</span>
