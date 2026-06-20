@@ -12,18 +12,18 @@
   --line-strong: #afc9ba;
   --primary: #147a55;
   --primary-strong: #0f6245;
-  --primary-soft: #dff5eb;
+  --primary-soft: #edf9f2;
   --accent: #f05a44;
   --accent-strong: #c94432;
-  --accent-soft: #ffe5df;
+  --accent-soft: #fff1ec;
   --info: #2563eb;
-  --info-soft: #e7efff;
+  --info-soft: #f0f5ff;
   --warning: #b76a00;
-  --warning-soft: #fff2cc;
+  --warning-soft: #fff7e5;
   --danger: #b42318;
-  --danger-soft: #fee4e2;
+  --danger-soft: #fff0ef;
   --success: #027a48;
-  --success-soft: #dcfae6;
+  --success-soft: #eefbf2;
   --mango: #ffce5c;
   --blueberry: #4966d6;
   --radius: 8px;
@@ -616,7 +616,8 @@ h1 {
   gap: 5px;
   border-radius: 999px;
   padding: 5px 9px;
-  background: var(--primary-soft);
+  border: 1px solid rgba(23, 33, 43, 0.06);
+  background: #f8fbf9;
   color: var(--primary-strong);
   font-size: 0.78rem;
   font-weight: 900;
@@ -627,7 +628,7 @@ h1 {
 .ui-tag--muted,
 .status-tag--muted,
 .reason-tag {
-  background: #eef4f0;
+  background: #f6f8f6;
   color: var(--subtle);
 }
 
