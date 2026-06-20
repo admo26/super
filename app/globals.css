@@ -98,6 +98,18 @@ button:disabled {
   min-width: 0;
 }
 
+.site-links__auth {
+  display: none;
+}
+
+.site-links__auth-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
 .site-links__toggle {
   display: none;
   align-items: center;
@@ -987,12 +999,12 @@ p {
 
 @media (max-width: 700px) {
   .site-nav__inner {
-    grid-template-columns: auto auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px;
   }
 
   .site-links-shell {
-    justify-self: center;
+    justify-self: end;
   }
 
   .site-links__toggle {
@@ -1021,6 +1033,12 @@ p {
     display: flex;
   }
 
+  .site-links__auth {
+    display: block;
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+  }
+
   .site-link {
     width: 100%;
     padding: 9px 12px;
@@ -1028,7 +1046,7 @@ p {
   }
 
   .site-auth {
-    justify-content: flex-end;
+    display: none;
   }
 }
 

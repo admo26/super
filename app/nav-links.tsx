@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { signOut } from "@/app/auth/actions";
+
 type NavLinksProps = {
+  isAuthenticated: boolean;
   nextPlanDate: string | null;
 };
 
@@ -15,7 +18,7 @@ const links = [
   { href: "/import", label: "Import" }
 ];
 
-export function NavLinks({ nextPlanDate }: NavLinksProps) {
+export function NavLinks({ isAuthenticated, nextPlanDate }: NavLinksProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const selectedWeek = searchParams.get("week");
@@ -60,6 +63,19 @@ export function NavLinks({ nextPlanDate }: NavLinksProps) {
             {link.label}
           </Link>
         ))}
+        <div className="site-links__auth">
+          {isAuthenticated ? (
+            <form action={signOut}>
+              <button className="site-link site-links__auth-button" type="submit">
+                Sign out
+              </button>
+            </form>
+          ) : (
+            <Link className="site-link" href="/login">
+              Sign in
+            </Link>
+          )}
+        </div>
       </nav>
     </div>
   );

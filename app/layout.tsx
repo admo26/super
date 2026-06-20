@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
-import { signOut } from "@/app/auth/actions";
 import { NavLinks } from "@/app/nav-links";
 import { createClient } from "@/lib/supabase/server";
 import { getWeeklyPlanSummaries } from "@/lib/weekly-plan";
@@ -67,18 +66,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 </nav>
               }
             >
-              <NavLinks nextPlanDate={nextPlan?.orderDate ?? null} />
+              <NavLinks nextPlanDate={nextPlan?.orderDate ?? null} isAuthenticated={Boolean(user)} />
             </Suspense>
             <div className="site-auth">
-              {user ? (
-                <>
-                  <form action={signOut}>
-                    <button className="ghost-button ghost-button--small" type="submit">
-                      Sign out
-                    </button>
-                  </form>
-                </>
-              ) : (
+              {user ? null : (
                 <Link href="/login">Sign in</Link>
               )}
             </div>
