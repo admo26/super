@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { AdHocItemForm } from "@/app/order-items/ad-hoc-item-form";
-import { deleteShoppingListItem, generateNextWeeklyPlan } from "@/app/plan/actions";
+import { deleteShoppingListItem } from "@/app/plan/actions";
 import { getPendingAdHocItems, getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 import type { PendingAdHocItem, ShoppingItem } from "@/lib/types";
 
@@ -90,11 +90,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const pendingAdHocItems = !selectedWeek && !nextWeekSummary
     ? await getPendingAdHocItems(adHocTargetWeek)
     : [];
-  const primaryActionLabel = selectedWeek
-    ? "Regenerate"
-    : nextWeekSummary
-      ? "View next week"
-      : "Generate next week";
   const canEditShoppingList = Boolean(plan.id);
   const groupedItems = groupItemsByReason(plan.items);
 
@@ -117,23 +112,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <h1>{pageTitle}</h1>
         </div>
         <div className="page-actions">
-          {selectedWeek ? (
-            <form action={generateNextWeeklyPlan}>
-              <button className="action-button" type="submit">
-                {primaryActionLabel}
-              </button>
-            </form>
-          ) : nextWeekSummary ? (
+          {!selectedWeek && nextWeekSummary ? (
             <Link className="action-button" href={`/?week=${nextWeekSummary.orderDate}`}>
-              {primaryActionLabel}
+              View next week
             </Link>
-          ) : (
-            <form action={generateNextWeeklyPlan}>
-              <button className="action-button" type="submit">
-                {primaryActionLabel}
-              </button>
-            </form>
-          )}
+          ) : null}
           <Link className="ghost-button" href={selectedWeek ? `/cadence?week=${selectedWeek}` : "/cadence"}>
             Edit meals
           </Link>

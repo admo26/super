@@ -93,6 +93,46 @@ button:disabled {
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
+.site-links-shell {
+  position: relative;
+  min-width: 0;
+}
+
+.site-links__toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.site-links__toggle span {
+  width: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.site-links-shell--open .site-links__toggle span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.site-links-shell--open .site-links__toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+.site-links-shell--open .site-links__toggle span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
 .site-links {
   display: flex;
   align-items: center;
@@ -945,6 +985,53 @@ p {
   }
 }
 
+@media (max-width: 700px) {
+  .site-nav__inner {
+    grid-template-columns: auto auto auto;
+    gap: 8px;
+  }
+
+  .site-links-shell {
+    justify-self: center;
+  }
+
+  .site-links__toggle {
+    display: inline-flex;
+  }
+
+  .site-links {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    width: min(240px, calc(100vw - 24px));
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255, 253, 248, 0.98);
+    box-shadow: var(--shadow);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    overflow: visible;
+  }
+
+  .site-links-shell--open .site-links {
+    display: flex;
+  }
+
+  .site-link {
+    width: 100%;
+    padding: 9px 12px;
+    text-align: center;
+  }
+
+  .site-auth {
+    justify-content: flex-end;
+  }
+}
+
 @media (max-width: 560px) {
   .page-shell {
     padding: 16px 12px 32px;
@@ -966,9 +1053,8 @@ p {
     font-size: 1.8rem;
   }
 
-  .site-link {
-    padding: 6px 9px;
-    font-size: 0.84rem;
+  .site-brand {
+    font-size: 0.92rem;
   }
 
   .ad-hoc-form__row {
