@@ -554,7 +554,6 @@ p {
 .shopping-item,
 .recipe-card,
 .history-card,
-.cadence-editor__row,
 .list-row {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -738,7 +737,6 @@ p {
   align-items: center;
 }
 
-.cadence-editor__table,
 .import-table,
 .history-table {
   display: grid;
@@ -748,8 +746,6 @@ p {
   background: var(--surface-raised);
 }
 
-.cadence-editor__head,
-.cadence-editor__row,
 .import-table__head,
 .import-table__row,
 .history-table__head,
@@ -760,7 +756,6 @@ p {
   padding: 10px 12px;
 }
 
-.cadence-editor__head,
 .import-table__head,
 .history-table__head {
   background: #f7f3eb;
@@ -771,7 +766,6 @@ p {
   text-transform: uppercase;
 }
 
-.cadence-editor__row,
 .import-table__row,
 .history-table__row {
   border-top: 1px solid var(--line);
@@ -779,23 +773,65 @@ p {
   font-size: 0.92rem;
 }
 
-.cadence-editor__row-actions {
-  display: grid;
-  gap: 8px;
-}
-
 .cadence-editor__move-select {
   min-width: 110px;
 }
 
-.cadence-editor__head,
-.cadence-editor__row {
-  grid-template-columns: minmax(0, 1.2fr) minmax(96px, 0.5fr) minmax(0, 1.3fr) minmax(90px, auto);
+.editor-card-list {
+  display: grid;
+  gap: 10px;
 }
 
-.cadence-editor__head--meals,
-.cadence-editor__row--meals {
-  grid-template-columns: minmax(0, 1.3fr) minmax(130px, 0.7fr) minmax(0, 1.25fr) minmax(90px, auto);
+.editor-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+}
+
+.editor-card__fields {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.editor-card__fields--staples {
+  grid-template-columns: minmax(160px, 1.4fr) minmax(100px, 0.45fr) minmax(180px, 1.2fr);
+}
+
+.editor-card__fields--meals {
+  grid-template-columns: minmax(220px, 1.35fr) minmax(130px, 0.6fr) minmax(220px, 1.15fr);
+}
+
+.editor-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 130px;
+}
+
+.field-stack {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-stack span {
+  color: var(--subtle);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.field-stack--compact {
+  gap: 5px;
 }
 
 .meal-editor__recipe-picker {
@@ -921,10 +957,6 @@ p {
     width: 100%;
   }
 
-  .cadence-editor__head,
-  .cadence-editor__row,
-  .cadence-editor__head--meals,
-  .cadence-editor__row--meals,
   .import-table__head,
   .import-table__row,
   .history-table__head,
@@ -935,6 +967,16 @@ p {
   .import-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .editor-card,
+  .editor-card__fields--staples,
+  .editor-card__fields--meals {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-card__actions {
+    min-width: 0;
   }
 }
 

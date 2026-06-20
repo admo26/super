@@ -177,59 +177,68 @@ export function MealPlanEditor({
         {error ? <span className="error-text">{error}</span> : null}
       </div>
 
-      <div className="cadence-editor__table">
-        <div className="cadence-editor__head cadence-editor__head--meals">
-          <span>Recipe</span>
-          <span>Type</span>
-          <span>Note</span>
-          <span>Action</span>
-        </div>
-
+      <div className="editor-card-list">
         {draftMeals.length ? (
           draftMeals.map((meal, index) => (
-            <div className="cadence-editor__row cadence-editor__row--meals" key={`meal-${index}`}>
-              <div className="meal-editor__recipe-picker">
-                <select
-                  className="import-input"
-                  value={meal.name}
-                  onChange={(event) => swapMeal(index, event.target.value)}
-                >
-                  <option value="">Remove this slot</option>
-                  {meal.name && !recipeOptions.some((option) => option.name === meal.name) ? (
-                    <option value={meal.name}>{meal.name} (current custom)</option>
-                  ) : null}
-                  {recipeOptions.map((option) => (
-                    <option key={option.name} value={option.name}>
-                      {option.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className="import-input"
-                  type="text"
-                  value={meal.name}
-                  onChange={(event) => updateMeal(index, "name", event.target.value)}
-                  placeholder="Meal name"
-                />
+            <article className="editor-card" key={`meal-${index}`}>
+              <div className="editor-card__fields editor-card__fields--meals">
+                <div className="meal-editor__recipe-picker">
+                  <label className="field-stack">
+                    <span>Recipe</span>
+                    <select
+                      className="import-input"
+                      value={meal.name}
+                      onChange={(event) => swapMeal(index, event.target.value)}
+                    >
+                      <option value="">Remove this slot</option>
+                      {meal.name && !recipeOptions.some((option) => option.name === meal.name) ? (
+                        <option value={meal.name}>{meal.name} (current custom)</option>
+                      ) : null}
+                      {recipeOptions.map((option) => (
+                        <option key={option.name} value={option.name}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="field-stack">
+                    <span>Custom name</span>
+                    <input
+                      className="import-input"
+                      type="text"
+                      value={meal.name}
+                      onChange={(event) => updateMeal(index, "name", event.target.value)}
+                      placeholder="Meal name"
+                    />
+                  </label>
+                </div>
+                <label className="field-stack">
+                  <span>Type</span>
+                  <input
+                    className="import-input"
+                    type="text"
+                    value={meal.type}
+                    onChange={(event) => updateMeal(index, "type", event.target.value)}
+                    placeholder="Meal type"
+                  />
+                </label>
+                <label className="field-stack">
+                  <span>Note</span>
+                  <textarea
+                    className="import-textarea"
+                    value={meal.note}
+                    onChange={(event) => updateMeal(index, "note", event.target.value)}
+                    placeholder="Meal note"
+                    rows={2}
+                  />
+                </label>
               </div>
-              <input
-                className="import-input"
-                type="text"
-                value={meal.type}
-                onChange={(event) => updateMeal(index, "type", event.target.value)}
-                placeholder="Meal type"
-              />
-              <textarea
-                className="import-textarea"
-                value={meal.note}
-                onChange={(event) => updateMeal(index, "note", event.target.value)}
-                placeholder="Meal note"
-                rows={2}
-              />
-              <button className="ghost-button ghost-button--small" type="button" onClick={() => removeMeal(index)}>
-                Remove
-              </button>
-            </div>
+              <div className="editor-card__actions">
+                <button className="ghost-button ghost-button--small" type="button" onClick={() => removeMeal(index)}>
+                  Remove
+                </button>
+              </div>
+            </article>
           ))
         ) : (
           <div className="cadence-editor__empty">

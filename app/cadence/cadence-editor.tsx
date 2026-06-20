@@ -172,64 +172,71 @@ export function CadenceEditor({
         {error ? <span className="error-text">{error}</span> : null}
       </div>
 
-      <div className="cadence-editor__table">
-        <div className="cadence-editor__head">
-          <span>Name</span>
-          <span>Qty</span>
-          <span>Note</span>
-          <span>Action</span>
-        </div>
-
+      <div className="editor-card-list">
         {visibleItems.length ? (
           visibleItems.map((item, index) => (
-            <div className="cadence-editor__row" key={`${selectedCadence}-${index}`}>
-              <input
-                className="import-input"
-                type="text"
-                value={item.name}
-                onChange={(event) => updateItem(index, "name", event.target.value)}
-                placeholder="Item name"
-              />
-              <input
-                className="import-input"
-                type="text"
-                value={item.qty}
-                onChange={(event) => updateItem(index, "qty", event.target.value)}
-                placeholder="Quantity"
-              />
-              <textarea
-                className="import-textarea"
-                value={item.note}
-                onChange={(event) => updateItem(index, "note", event.target.value)}
-                placeholder="Note"
-                rows={2}
-              />
-              <div className="cadence-editor__row-actions">
-                <select
-                  className="import-input cadence-editor__move-select"
-                  aria-label={`Move ${item.name || "item"} to another cadence`}
-                  defaultValue=""
-                  onChange={(event) => {
-                    const nextCadence = event.target.value as CadenceKey | "";
-                    if (!nextCadence) return;
-                    moveItem(index, nextCadence);
-                    event.target.value = "";
-                  }}
-                >
-                  <option value="">Move to…</option>
-                  {cadenceTabs
-                    .filter((cadence) => cadence !== selectedCadence)
-                    .map((cadence) => (
-                      <option key={cadence} value={cadence}>
-                        {cadenceLabel(cadence)}
-                      </option>
-                    ))}
-                </select>
+            <article className="editor-card" key={`${selectedCadence}-${index}`}>
+              <div className="editor-card__fields editor-card__fields--staples">
+                <label className="field-stack">
+                  <span>Name</span>
+                  <input
+                    className="import-input"
+                    type="text"
+                    value={item.name}
+                    onChange={(event) => updateItem(index, "name", event.target.value)}
+                    placeholder="Item name"
+                  />
+                </label>
+                <label className="field-stack">
+                  <span>Qty</span>
+                  <input
+                    className="import-input"
+                    type="text"
+                    value={item.qty}
+                    onChange={(event) => updateItem(index, "qty", event.target.value)}
+                    placeholder="Quantity"
+                  />
+                </label>
+                <label className="field-stack">
+                  <span>Note</span>
+                  <textarea
+                    className="import-textarea"
+                    value={item.note}
+                    onChange={(event) => updateItem(index, "note", event.target.value)}
+                    placeholder="Note"
+                    rows={2}
+                  />
+                </label>
+              </div>
+              <div className="editor-card__actions">
+                <label className="field-stack field-stack--compact">
+                  <span>Move</span>
+                  <select
+                    className="import-input cadence-editor__move-select"
+                    aria-label={`Move ${item.name || "item"} to another cadence`}
+                    defaultValue=""
+                    onChange={(event) => {
+                      const nextCadence = event.target.value as CadenceKey | "";
+                      if (!nextCadence) return;
+                      moveItem(index, nextCadence);
+                      event.target.value = "";
+                    }}
+                  >
+                    <option value="">Move to...</option>
+                    {cadenceTabs
+                      .filter((cadence) => cadence !== selectedCadence)
+                      .map((cadence) => (
+                        <option key={cadence} value={cadence}>
+                          {cadenceLabel(cadence)}
+                        </option>
+                      ))}
+                  </select>
+                </label>
                 <button className="ghost-button ghost-button--small" type="button" onClick={() => removeItem(index)}>
                   Remove
                 </button>
               </div>
-            </div>
+            </article>
           ))
         ) : (
           <div className="cadence-editor__empty">
