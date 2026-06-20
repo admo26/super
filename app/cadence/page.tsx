@@ -62,16 +62,16 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
       <div className="stack">
         <nav className="cadence-tabs" aria-label="Planner sections">
           <Link
-            className={`cadence-tab ${selectedTab === "staples" ? "cadence-tab--active" : ""}`}
-            href="/cadence?tab=staples"
-          >
-            Staples
-          </Link>
-          <Link
             className={`cadence-tab ${selectedTab === "next-week" ? "cadence-tab--active" : ""}`}
             href="/cadence"
           >
             Next Week&apos;s Meals
+          </Link>
+          <Link
+            className={`cadence-tab ${selectedTab === "staples" ? "cadence-tab--active" : ""}`}
+            href="/cadence?tab=staples"
+          >
+            Staples
           </Link>
         </nav>
 
