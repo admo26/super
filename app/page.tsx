@@ -82,16 +82,18 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     getWeeklyPlanSummaries()
   ]);
   const selectedLabel = selectedWeek ? "Next Week Preview" : "Current Week";
-  const pageTitle = selectedWeek ? "Next Week's Grocery Run" : "This Week's Grocery Run";
+  const pageTitle = selectedWeek ? "Next Week's Grocery Run" : "This Week's Meal Plan";
   const nextWeekSummary = selectedWeek
     ? null
     : planSummaries.find((summary) => summary.orderDate > plan.orderDate) ?? null;
-  const adHocTargetWeek = selectedWeek ?? nextWeekSummary?.orderDate ?? addDays(plan.orderDate, 7);
+  const shoppingPlan = nextWeekSummary ? await getWeeklyPlan(nextWeekSummary.orderDate) : plan;
+  const adHocTargetWeek = selectedWeek ?? shoppingPlan.orderDate ?? addDays(plan.orderDate, 7);
   const pendingAdHocItems = !selectedWeek && !nextWeekSummary
     ? await getPendingAdHocItems(adHocTargetWeek)
     : [];
-  const canEditShoppingList = Boolean(plan.id);
-  const groupedItems = groupItemsByReason(plan.items);
+  const canEditShoppingList = Boolean(shoppingPlan.id);
+  const groupedItems = groupItemsByReason(shoppingPlan.items);
+  const isPreparingNextOrder = !selectedWeek && Boolean(nextWeekSummary);
 
   return (
     <main className="page-shell">
@@ -114,7 +116,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div className="page-actions">
           {!selectedWeek && nextWeekSummary ? (
             <Link className="action-button" href={`/?week=${nextWeekSummary.orderDate}`}>
-              View next week
+              View next meals
             </Link>
           ) : null}
           <Link className="ghost-button" href={selectedWeek ? `/cadence?week=${selectedWeek}` : "/cadence"}>
@@ -129,7 +131,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <div className="section-header">
               <div>
                 <h2>Meal Plan</h2>
-                <p>Meals driving this week&apos;s order.</p>
+                <p>Meals for the current week.</p>
               </div>
             </div>
 
@@ -157,10 +159,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <section className="panel">
             <div className="section-header">
               <div>
-                <h2>Shopping List</h2>
+                <h2>{isPreparingNextOrder ? "Next Order Shopping List" : "Shopping List"}</h2>
                 <p>
                   {canEditShoppingList
-                    ? "Online-order view grouped by why each item is needed."
+                    ? isPreparingNextOrder
+                      ? `Prep list for the ${shoppingPlan.orderDate} order.`
+                      : "Online-order view grouped by why each item is needed."
                     : "Shopping list editing is available for saved Supabase-backed plans."}
                 </p>
               </div>
