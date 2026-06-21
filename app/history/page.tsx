@@ -61,7 +61,9 @@ export default async function OrderHistoryPage() {
                       <span data-label="Qty">
                         {[item.quantity, item.unit].filter(Boolean).join(" ") || "—"}
                       </span>
-                      <span data-label="Category">{item.category ?? "—"}</span>
+                      <span data-label="Category">
+                        {item.category ? <Tag category={item.category}>{item.category}</Tag> : "—"}
+                      </span>
                       <span data-label="Notes">{item.notes ?? "—"}</span>
                     </div>
                   ))}

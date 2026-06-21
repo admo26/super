@@ -7,6 +7,22 @@ function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+function categoryTagClassName(category: string) {
+  const normalized = category.trim().toLowerCase();
+
+  if (!normalized) return "ui-tag--category-other";
+  if (/(protein|meat|chicken|beef|pork|lamb|fish|seafood)/.test(normalized)) return "ui-tag--category-protein";
+  if (/(vegetable|veg|produce|salad|herb)/.test(normalized)) return "ui-tag--category-vegetables";
+  if (/(fruit|berry|berries|banana|avocado)/.test(normalized)) return "ui-tag--category-fruit";
+  if (/(dairy|milk|cheese|yogh?urt|egg)/.test(normalized)) return "ui-tag--category-dairy";
+  if (/(bread|wrap|bakery|tortilla|bun|roll)/.test(normalized)) return "ui-tag--category-bread";
+  if (/(frozen|freezer)/.test(normalized)) return "ui-tag--category-frozen";
+  if (/(household|clean|paper|napp|toilet|laundry)/.test(normalized)) return "ui-tag--category-household";
+  if (/(pantry|sauce|spice|rice|pasta|tin|canned|baking|oil|snack)/.test(normalized)) return "ui-tag--category-pantry";
+
+  return "ui-tag--category-other";
+}
+
 type ButtonProps = ComponentPropsWithoutRef<"button"> & {
   icon?: ReactNode;
   variant?: ButtonVariant;
@@ -106,12 +122,15 @@ export function SelectField({ children, className, helper, label, ...props }: Se
 }
 
 type TagProps = ComponentPropsWithoutRef<"span"> & {
+  category?: string | null;
   tone?: Tone;
 };
 
-export function Tag({ children, className, tone = "default", ...props }: TagProps) {
+export function Tag({ category, children, className, tone = "default", ...props }: TagProps) {
+  const categoryClassName = category ? categoryTagClassName(category) : null;
+
   return (
-    <span className={cx("ui-tag", `ui-tag--${tone}`, className)} {...props}>
+    <span className={cx("ui-tag", categoryClassName ?? `ui-tag--${tone}`, className)} {...props}>
       {children}
     </span>
   );

@@ -780,6 +780,60 @@ h1 {
   color: var(--danger);
 }
 
+.ui-tag--category-protein {
+  border-color: #f3d7cf;
+  background: #fff1ec;
+  color: #bd3f2f;
+}
+
+.ui-tag--category-vegetables {
+  border-color: #c9ebd5;
+  background: #eaf8ef;
+  color: #087a48;
+}
+
+.ui-tag--category-fruit {
+  border-color: #f9dfad;
+  background: #fff6df;
+  color: #99630b;
+}
+
+.ui-tag--category-dairy {
+  border-color: #cfe3ff;
+  background: #eef6ff;
+  color: #2368a2;
+}
+
+.ui-tag--category-pantry {
+  border-color: #ddd2ff;
+  background: #f3efff;
+  color: #6554c0;
+}
+
+.ui-tag--category-bread {
+  border-color: #f3d9b4;
+  background: #fff3e2;
+  color: #99520f;
+}
+
+.ui-tag--category-frozen {
+  border-color: #c3e8f1;
+  background: #eaf8fb;
+  color: #08768a;
+}
+
+.ui-tag--category-household {
+  border-color: #d3deea;
+  background: #f0f5fa;
+  color: #475569;
+}
+
+.ui-tag--category-other {
+  border-color: var(--line);
+  background: #f6f8f6;
+  color: var(--subtle);
+}
+
 .ui-notice,
 .notice-banner {
   display: flex;

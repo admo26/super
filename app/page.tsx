@@ -34,15 +34,6 @@ function formatReason(value: string) {
     .join(" ");
 }
 
-function reasonTone(value: string): "default" | "accent" | "info" | "success" | "warning" | "muted" {
-  if (value === "planned meal") return "accent";
-  if (value === "ad hoc") return "info";
-  if (value.includes("weekly")) return "success";
-  if (value.includes("fortnightly")) return "warning";
-  if (value.includes("monthly")) return "muted";
-  return "default";
-}
-
 function groupItemsByReason(items: ShoppingItem[]) {
   const grouped = items.reduce<Record<string, ShoppingItem[]>>((acc, item) => {
     const key = item.reason || "other";
@@ -184,7 +175,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                         </div>
                       </div>
                       <div className="shopping-item__actions">
-                        <Tag tone={reasonTone(reason)}>{item.group}</Tag>
+                        <Tag category={item.group}>{item.group}</Tag>
                         {item.id ? (
                           <form action={deleteShoppingListItem}>
                             <input type="hidden" name="itemId" value={item.id} />
