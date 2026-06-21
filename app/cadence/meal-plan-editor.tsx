@@ -188,7 +188,7 @@ export function MealPlanEditor({
                   ))}
                 </select>
                 <div className="meal-editor__details">
-                  <Tag className="meal-editor__type" tone={meal.type.toLowerCase().includes("batch") ? "warning" : "success"}>
+                  <Tag className="meal-editor__type" category={meal.type}>
                     {meal.type}
                   </Tag>
                   {meal.note ? <p className="meal-note meal-editor__note">{meal.note}</p> : null}

@@ -11,6 +11,11 @@ function categoryTagClassName(category: string) {
   const normalized = category.trim().toLowerCase();
 
   if (!normalized) return "ui-tag--category-other";
+  if (/(weekly anchor|^weekly$)/.test(normalized)) return "ui-tag--category-weekly";
+  if (/(rotation|rotating)/.test(normalized)) return "ui-tag--category-rotation";
+  if (/(batch|batch cook)/.test(normalized)) return "ui-tag--category-batch";
+  if (/(linked|link)/.test(normalized)) return "ui-tag--category-linked";
+  if (/(standard|family standard)/.test(normalized)) return "ui-tag--category-standard";
   if (/(protein|meat|chicken|beef|pork|lamb|fish|seafood)/.test(normalized)) return "ui-tag--category-protein";
   if (/(vegetable|veg|produce|salad|herb)/.test(normalized)) return "ui-tag--category-vegetables";
   if (/(fruit|berry|berries|banana|avocado)/.test(normalized)) return "ui-tag--category-fruit";

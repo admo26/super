@@ -136,7 +136,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     </div>
                     <p className="meal-note">{meal.note}</p>
                   </div>
-                  <Tag tone={meal.type.toLowerCase().includes("batch") ? "warning" : "success"}>{meal.type}</Tag>
+                  <Tag category={meal.type}>{meal.type}</Tag>
                 </article>
               ))}
             </div>

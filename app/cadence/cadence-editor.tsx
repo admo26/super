@@ -160,7 +160,7 @@ export function CadenceEditor({
             type="button"
             role="tab"
             aria-selected={selectedCadence === cadence}
-            className={`cadence-tab ${selectedCadence === cadence ? "cadence-tab--active" : ""}`}
+            className={`cadence-tab cadence-tab--${cadence} ${selectedCadence === cadence ? "cadence-tab--active" : ""}`}
             onClick={() => setSelectedCadence(cadence)}
           >
             <span>{cadenceLabel(cadence)}</span>

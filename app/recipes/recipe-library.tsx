@@ -64,10 +64,13 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
                     )}
                   </h3>
                   <p className="recipe-meta">
-                    {recipeFrequencyLabel(recipe.cookFrequency)} · {recipe.servingPattern}
+                    <Tag category={recipeFrequencyLabel(recipe.cookFrequency)}>
+                      {recipeFrequencyLabel(recipe.cookFrequency)}
+                    </Tag>
+                    <span>{recipe.servingPattern}</span>
                   </p>
                 </div>
-                <Tag tone={isUrl(recipe.source) ? "info" : "muted"}>
+                <Tag category={isUrl(recipe.source) ? "Linked" : "Standard"}>
                   {isUrl(recipe.source) ? <LinkIcon aria-hidden="true" size={14} /> : null}
                   {isUrl(recipe.source) ? "Linked" : "Standard"}
                 </Tag>
