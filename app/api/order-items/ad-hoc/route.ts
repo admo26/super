@@ -7,6 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 
 type AdHocItemRequest = {
   name?: string;
+  qty?: string;
+  group?: string;
+  suggestionId?: string;
   week?: string;
 };
 
@@ -17,6 +20,13 @@ type PlanRow = {
 
 type PositionRow = {
   position: number;
+};
+
+type ForgottenSuggestionRow = {
+  id: string;
+  name: string;
+  qty: string;
+  group: string;
 };
 
 function hasSupabaseConfig() {
@@ -97,11 +107,10 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json()) as AdHocItemRequest;
-  const name = body.name?.trim();
-
-  if (!name) {
-    return NextResponse.json({ error: "Enter an item first." }, { status: 400 });
-  }
+  const requestedName = body.name?.trim();
+  const requestedQty = body.qty?.trim();
+  const requestedGroup = body.group?.trim();
+  const suggestionId = body.suggestionId?.trim();
 
   const targetWeek = await resolveTargetWeek(supabase, body.week?.trim() || null);
   const planResult = await supabase
@@ -113,6 +122,46 @@ export async function POST(request: Request) {
 
   if (planResult.error) {
     return NextResponse.json({ error: planResult.error.message }, { status: 500 });
+  }
+
+  let itemToAdd = {
+    name: requestedName ?? "",
+    qty: requestedQty || "1",
+    group: requestedGroup || "Other",
+    meal: "Added during week"
+  };
+
+  if (suggestionId) {
+    if (!planResult.data?.id) {
+      return NextResponse.json({ error: "Suggestion quick add is only available for saved plans." }, { status: 400 });
+    }
+
+    const suggestionResult = await supabase
+      .from("weekly_plan_forgotten_suggestions")
+      .select("id, name, qty, \"group\"")
+      .eq("id", suggestionId)
+      .eq("weekly_plan_id", planResult.data.id)
+      .maybeSingle()
+      .returns<ForgottenSuggestionRow>();
+
+    if (suggestionResult.error) {
+      return NextResponse.json({ error: suggestionResult.error.message }, { status: 500 });
+    }
+
+    if (!suggestionResult.data) {
+      return NextResponse.json({ error: "That suggestion is no longer available." }, { status: 404 });
+    }
+
+    itemToAdd = {
+      name: suggestionResult.data.name,
+      qty: suggestionResult.data.qty,
+      group: suggestionResult.data.group,
+      meal: "Forgotten-item suggestion"
+    };
+  }
+
+  if (!itemToAdd.name) {
+    return NextResponse.json({ error: "Enter an item first." }, { status: 400 });
   }
 
   if (planResult.data?.id) {
@@ -134,17 +183,29 @@ export async function POST(request: Request) {
       .insert({
         weekly_plan_id: planResult.data.id,
         position: (latestPosition.data?.position ?? -1) + 1,
-        name,
-        qty: "1",
+        name: itemToAdd.name,
+        qty: itemToAdd.qty,
         reason: "ad hoc",
-        meal: "Added during week",
-        group: "Other"
+        meal: itemToAdd.meal,
+        group: itemToAdd.group
       })
       .select("id, name, qty, reason, meal, group")
       .single();
 
     if (insertResult.error) {
       return NextResponse.json({ error: insertResult.error.message }, { status: 500 });
+    }
+
+    if (suggestionId) {
+      const deleteSuggestionResult = await supabase
+        .from("weekly_plan_forgotten_suggestions")
+        .delete()
+        .eq("id", suggestionId)
+        .eq("weekly_plan_id", planResult.data.id);
+
+      if (deleteSuggestionResult.error) {
+        return NextResponse.json({ error: deleteSuggestionResult.error.message }, { status: 500 });
+      }
     }
 
     revalidatePath("/");
@@ -159,8 +220,8 @@ export async function POST(request: Request) {
   const pendingResult = await supabase
     .from("pending_ad_hoc_items")
     .insert({
-      name,
-      qty: "1",
+      name: itemToAdd.name,
+      qty: itemToAdd.qty,
       target_order_date: targetWeek
     })
     .select("id, name, qty, target_order_date, created_at")

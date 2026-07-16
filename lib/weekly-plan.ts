@@ -1,6 +1,14 @@
 import { defaultPlan } from "@/lib/default-plan";
 import { createClient } from "@/lib/supabase/server";
-import type { CadenceItem, CadenceKey, Meal, PendingAdHocItem, ShoppingItem, WeeklyPlan } from "@/lib/types";
+import type {
+  CadenceItem,
+  CadenceKey,
+  ForgottenSuggestion,
+  Meal,
+  PendingAdHocItem,
+  ShoppingItem,
+  WeeklyPlan
+} from "@/lib/types";
 
 type PlanRow = {
   id: string;
@@ -36,6 +44,16 @@ type ItemRow = {
   reason: string;
   meal: string;
   group: string;
+};
+
+type ForgottenSuggestionRow = {
+  id: string;
+  name: string;
+  qty: string;
+  group: string;
+  last_ordered: string;
+  times_ordered: number;
+  note: string;
 };
 
 type CadenceRow = {
@@ -102,6 +120,18 @@ function rowsToMeals(rows: MealRow[]): Meal[] {
   }));
 }
 
+function rowsToForgottenSuggestions(rows: ForgottenSuggestionRow[]): ForgottenSuggestion[] {
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    qty: row.qty,
+    group: row.group,
+    lastOrdered: row.last_ordered,
+    timesOrdered: row.times_ordered,
+    note: row.note
+  }));
+}
+
 async function fetchCadenceRowsForPlan(
   supabase: Awaited<ReturnType<typeof createClient>>,
   weeklyPlanId: string
@@ -120,6 +150,24 @@ async function fetchCadenceRowsForPlan(
   return cadenceResult.data ?? [];
 }
 
+async function fetchForgottenSuggestionRowsForPlan(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  weeklyPlanId: string
+): Promise<ForgottenSuggestionRow[]> {
+  const suggestionsResult = await supabase
+    .from("weekly_plan_forgotten_suggestions")
+    .select("id, name, qty, \"group\", last_ordered, times_ordered, note")
+    .eq("weekly_plan_id", weeklyPlanId)
+    .order("position", { ascending: true })
+    .returns<ForgottenSuggestionRow[]>();
+
+  if (suggestionsResult.error) {
+    return [];
+  }
+
+  return suggestionsResult.data ?? [];
+}
+
 async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createClient>>, orderDate: string): Promise<WeeklyPlan | null> {
   const planResult = await supabase
     .from("weekly_plans")
@@ -132,7 +180,7 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
   }
 
   const planRow = planResult.data as PlanRow;
-  const [mealsResult, itemsResult, cadenceRows] = await Promise.all([
+  const [mealsResult, itemsResult, cadenceRows, forgottenSuggestionRows] = await Promise.all([
     supabase
       .from("weekly_plan_meals")
       .select("name, type, note, recipe_url")
@@ -145,7 +193,8 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
       .eq("weekly_plan_id", planRow.id)
       .order("position", { ascending: true })
       .returns<ItemRow[]>(),
-    fetchCadenceRowsForPlan(supabase, planRow.id)
+    fetchCadenceRowsForPlan(supabase, planRow.id),
+    fetchForgottenSuggestionRowsForPlan(supabase, planRow.id)
   ]);
 
   if (mealsResult.error || itemsResult.error || cadenceRows === null) {
@@ -161,7 +210,8 @@ async function fetchWeeklyPlanByDate(supabase: Awaited<ReturnType<typeof createC
     cadence: rowsToCadence(cadenceRows),
     assumptions: defaultPlan.assumptions,
     adjustments: defaultPlan.adjustments,
-    items: itemsResult.data ?? []
+    items: itemsResult.data ?? [],
+    forgottenSuggestions: rowsToForgottenSuggestions(forgottenSuggestionRows)
   };
 }
 

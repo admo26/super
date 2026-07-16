@@ -22,6 +22,11 @@ type ShoppingItemRow = {
   group: string;
 };
 
+type ForgottenSuggestionRow = {
+  id: string;
+  name: string;
+};
+
 function hasSupabaseConfig() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -32,6 +37,25 @@ function hasSupabaseConfig() {
 function normalizeText(value: string | null | undefined) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
+}
+
+function normalizeComparableText(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[\u2019']/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function canonicalName(value: string) {
+  return normalizeComparableText(value)
+    .replace(/\b(pack|bag|each|kg|g|jar|tube|bunch|box|bottle|loaf|punnet|tray|sachet|packet)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isSimilarItem(left: string, right: string) {
+  return left === right || left.includes(right) || right.includes(left);
 }
 
 export async function POST(request: Request) {
@@ -104,6 +128,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: existingAdHocResult.error.message }, { status: 500 });
   }
 
+  const existingForgottenSuggestionsResult = await supabase
+    .from("weekly_plan_forgotten_suggestions")
+    .select("id, name")
+    .eq("weekly_plan_id", body.weeklyPlanId)
+    .returns<ForgottenSuggestionRow[]>();
+
+  if (existingForgottenSuggestionsResult.error) {
+    return NextResponse.json({ error: existingForgottenSuggestionsResult.error.message }, { status: 500 });
+  }
+
   const deleteResult = await supabase
     .from("weekly_plan_meals")
     .delete()
@@ -148,6 +182,28 @@ export async function POST(request: Request) {
 
     if (insertItemsResult.error) {
       return NextResponse.json({ error: insertItemsResult.error.message }, { status: 500 });
+    }
+  }
+
+  const refreshedShoppingNames = shoppingItems
+    .map((item) => canonicalName(item.name))
+    .filter(Boolean);
+  const matchedSuggestionIds = (existingForgottenSuggestionsResult.data ?? [])
+    .filter((suggestion) => {
+      const suggestionName = canonicalName(suggestion.name);
+      return suggestionName && refreshedShoppingNames.some((itemName) => isSimilarItem(itemName, suggestionName));
+    })
+    .map((suggestion) => suggestion.id);
+
+  if (matchedSuggestionIds.length > 0) {
+    const deleteSuggestionsResult = await supabase
+      .from("weekly_plan_forgotten_suggestions")
+      .delete()
+      .in("id", matchedSuggestionIds)
+      .eq("weekly_plan_id", body.weeklyPlanId);
+
+    if (deleteSuggestionsResult.error) {
+      return NextResponse.json({ error: deleteSuggestionsResult.error.message }, { status: 500 });
     }
   }
 

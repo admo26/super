@@ -1026,6 +1026,17 @@ h1 {
   margin-bottom: 16px;
 }
 
+.forgotten-suggestions {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.forgotten-suggestions__list {
+  display: grid;
+  gap: 8px;
+}
+
 .shopping-group {
   display: grid;
   gap: 8px;

@@ -108,5 +108,6 @@
     { "name": "Boring No Added Sugar Oat Milk", "qty": "2 pack", "reason": "weekly staple", "meal": "Household staple", "group": "Dairy" },
     { "name": "Avocado", "qty": "3 each", "reason": "fortnightly staple", "meal": "Useful for fajitas or lunches", "group": "Fruit" },
     { "name": "The Berry Fix Snap Frozen Mixed Berries", "qty": "1 pack", "reason": "fortnightly staple", "meal": "Household staple", "group": "Frozen" }
-  ]
+  ],
+  "forgottenSuggestions": []
 }

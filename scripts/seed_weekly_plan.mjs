@@ -94,11 +94,25 @@ const shoppingItems = plan.items.map((item, index) => ({
   group: item.group
 }));
 
+const forgottenSuggestions = (plan.forgottenSuggestions ?? []).map((suggestion, index) => ({
+  weekly_plan_id: weeklyPlanId,
+  position: index,
+  name: suggestion.name,
+  qty: suggestion.qty,
+  group: suggestion.group,
+  last_ordered: suggestion.lastOrdered,
+  times_ordered: suggestion.timesOrdered,
+  note: suggestion.note
+}));
+
 for (const [label, rows, table] of [
   ["meals", meals, "weekly_plan_meals"],
   ["cadence items", cadenceItems, "weekly_plan_cadence_items"],
-  ["shopping items", shoppingItems, "weekly_plan_items"]
+  ["shopping items", shoppingItems, "weekly_plan_items"],
+  ["forgotten suggestions", forgottenSuggestions, "weekly_plan_forgotten_suggestions"]
 ]) {
+  if (rows.length === 0) continue;
+
   const result = await supabase.from(table).insert(rows);
   if (result.error) {
     console.error(`Failed inserting ${label}:`, result.error.message);

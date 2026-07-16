@@ -22,6 +22,16 @@ export type ShoppingItem = {
   group: string;
 };
 
+export type ForgottenSuggestion = {
+  id?: string;
+  name: string;
+  qty: string;
+  group: string;
+  lastOrdered: string;
+  timesOrdered: number;
+  note: string;
+};
+
 export type PendingAdHocItem = {
   id: string;
   name: string;
@@ -40,4 +50,5 @@ export type WeeklyPlan = {
   assumptions: string[];
   adjustments: string[];
   items: ShoppingItem[];
+  forgottenSuggestions: ForgottenSuggestion[];
 };

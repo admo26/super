@@ -49,6 +49,18 @@ create table if not exists public.weekly_plan_items (
   "group" text not null
 );
 
+create table if not exists public.weekly_plan_forgotten_suggestions (
+  id uuid primary key default gen_random_uuid(),
+  weekly_plan_id uuid not null references public.weekly_plans(id) on delete cascade,
+  position integer not null default 0,
+  name text not null,
+  qty text not null,
+  "group" text not null,
+  last_ordered date not null,
+  times_ordered integer not null,
+  note text not null
+);
+
 create table if not exists public.pending_ad_hoc_items (
   id uuid primary key default gen_random_uuid(),
   name text not null,
@@ -84,6 +96,7 @@ alter table public.weekly_plans enable row level security;
 alter table public.weekly_plan_meals enable row level security;
 alter table public.weekly_plan_cadence_items enable row level security;
 alter table public.weekly_plan_items enable row level security;
+alter table public.weekly_plan_forgotten_suggestions enable row level security;
 alter table public.pending_ad_hoc_items enable row level security;
 alter table public.recipes enable row level security;
 alter table public.order_history_items enable row level security;
@@ -201,6 +214,35 @@ with check (true);
 drop policy if exists "Authenticated can delete weekly plan items" on public.weekly_plan_items;
 create policy "Authenticated can delete weekly plan items"
 on public.weekly_plan_items
+for delete
+to authenticated
+using (true);
+
+drop policy if exists "Public can read weekly forgotten suggestions" on public.weekly_plan_forgotten_suggestions;
+create policy "Public can read weekly forgotten suggestions"
+on public.weekly_plan_forgotten_suggestions
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Authenticated can manage weekly forgotten suggestions" on public.weekly_plan_forgotten_suggestions;
+create policy "Authenticated can manage weekly forgotten suggestions"
+on public.weekly_plan_forgotten_suggestions
+for insert
+to authenticated
+with check (true);
+
+drop policy if exists "Authenticated can update weekly forgotten suggestions" on public.weekly_plan_forgotten_suggestions;
+create policy "Authenticated can update weekly forgotten suggestions"
+on public.weekly_plan_forgotten_suggestions
+for update
+to authenticated
+using (true)
+with check (true);
+
+drop policy if exists "Authenticated can delete weekly forgotten suggestions" on public.weekly_plan_forgotten_suggestions;
+create policy "Authenticated can delete weekly forgotten suggestions"
+on public.weekly_plan_forgotten_suggestions
 for delete
 to authenticated
 using (true);

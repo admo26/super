@@ -1,7 +1,7 @@
 import type { OrderHistoryRow } from "@/lib/order-history";
 import { formatHumanDate } from "@/lib/date-format";
 import { isBatchCook, type Recipe, type RecipeFrequency } from "@/lib/recipes";
-import type { CadenceKey, Meal, ShoppingItem } from "@/lib/types";
+import type { CadenceKey, ForgottenSuggestion, Meal, ShoppingItem } from "@/lib/types";
 
 type WeeklyPlanDraft = {
   orderDate: string;
@@ -11,6 +11,7 @@ type WeeklyPlanDraft = {
   assumptions: string[];
   adjustments: string[];
   items: ShoppingItem[];
+  forgottenSuggestions: ForgottenSuggestion[];
 };
 
 type HistoryOrder = {
@@ -324,6 +325,27 @@ function cadenceIntervalDays(cadence: CadenceKey) {
   return 28;
 }
 
+function inferHistoryCadence(count: number, totalOrders: number): CadenceKey {
+  const frequency = count / totalOrders;
+
+  if (frequency >= 0.7) return "weekly";
+  if (frequency >= 0.35) return "fortnightly";
+  return "monthly";
+}
+
+function forgottenThresholdDays(cadence: CadenceKey) {
+  if (cadence === "weekly") return 14;
+  if (cadence === "fortnightly") return 21;
+  return 35;
+}
+
+function formatWeeksSince(days: number) {
+  if (days < 14) return `${days} days ago`;
+
+  const weeks = Math.floor(days / 7);
+  return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
+}
+
 function buildCadenceFromTemplate(args: {
   nextOrderDate: string;
   cadenceTemplate: Record<CadenceKey, CadenceTemplateItem[]>;
@@ -490,6 +512,50 @@ export function buildShoppingItems(
   return items;
 }
 
+function buildForgottenSuggestions(args: {
+  nextOrderDate: string;
+  shoppingItems: ShoppingItem[];
+  snapshot: ReturnType<typeof buildHistorySnapshot>;
+}) {
+  const shoppingNames = args.shoppingItems
+    .map((item) => canonicalName(item.name))
+    .filter(Boolean);
+
+  return args.snapshot.scoredItems
+    .filter((item) => item.count >= 2 && Boolean(item.row.order_date))
+    .map((item) => {
+      const cadence = inferHistoryCadence(item.count, args.snapshot.totalOrders);
+      const daysSinceLastOrder = differenceInDays(args.nextOrderDate, item.row.order_date!);
+      const thresholdDays = forgottenThresholdDays(cadence);
+
+      return {
+        item,
+        daysSinceLastOrder,
+        overdueDays: daysSinceLastOrder - thresholdDays
+      };
+    })
+    .filter(({ item, overdueDays }) => {
+      if (overdueDays < 0) return false;
+
+      return !shoppingNames.some((shoppingName) => isSimilarItem(shoppingName, item.name));
+    })
+    .sort(
+      (left, right) =>
+        right.overdueDays - left.overdueDays ||
+        right.item.count - left.item.count ||
+        left.item.name.localeCompare(right.item.name)
+    )
+    .slice(0, 10)
+    .map(({ item, daysSinceLastOrder }) => ({
+      name: titleCase(item.row.item_name),
+      qty: formatQuantity(item.row),
+      group: inferGroup(item.row.category || item.row.item_name),
+      lastOrdered: item.row.order_date!,
+      timesOrdered: item.count,
+      note: `Last ordered ${formatWeeksSince(daysSinceLastOrder)} - seen in ${item.count}/${args.snapshot.totalOrders} orders`
+    }));
+}
+
 export function generateWeeklyPlanDraft(args: {
   latestPlanDate: string | null;
   historyRows: OrderHistoryRow[];
@@ -516,6 +582,11 @@ export function generateWeeklyPlanDraft(args: {
   }));
 
   const shoppingItems = buildShoppingItems(mealsWithRecipes, cadence);
+  const forgottenSuggestions = buildForgottenSuggestions({
+    nextOrderDate,
+    shoppingItems,
+    snapshot
+  });
 
   return {
     orderDate: nextOrderDate,
@@ -534,6 +605,7 @@ export function generateWeeklyPlanDraft(args: {
       "Trim produce quantities if the fridge is already full.",
       "Swap the rotation meal if the household wants a different dinner this week."
     ],
-    items: shoppingItems
+    items: shoppingItems,
+    forgottenSuggestions
   } satisfies WeeklyPlanDraft;
 }

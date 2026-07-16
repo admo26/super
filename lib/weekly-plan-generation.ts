@@ -29,6 +29,15 @@ type ShoppingItemRow = {
   group: string;
 };
 
+type ForgottenSuggestionRow = {
+  name: string;
+  qty: string;
+  group: string;
+  last_ordered: string;
+  times_ordered: number;
+  note: string;
+};
+
 type PendingAdHocRow = {
   id: string;
   name: string;
@@ -79,7 +88,8 @@ export async function generateAndStoreNextWeeklyPlan() {
       weeklyPlanId: latestPlanResult.data.id,
       mealsSaved: 0,
       cadenceItemsSaved: 0,
-      shoppingItemsSaved: 0
+      shoppingItemsSaved: 0,
+      forgottenSuggestionsSaved: 0
     };
   }
 
@@ -283,11 +293,25 @@ export async function generateAndStoreNextWeeklyPlan() {
     group: item.group
   }));
 
+  const forgottenSuggestions = draft.forgottenSuggestions.map((suggestion, index) => ({
+    weekly_plan_id: weeklyPlanId,
+    position: index,
+    name: suggestion.name,
+    qty: suggestion.qty,
+    group: suggestion.group,
+    last_ordered: suggestion.lastOrdered,
+    times_ordered: suggestion.timesOrdered,
+    note: suggestion.note
+  })) satisfies Array<ForgottenSuggestionRow & { weekly_plan_id: string; position: number }>;
+
   for (const [label, rows, table] of [
     ["meals", meals, "weekly_plan_meals"],
     ["cadence items", cadenceItems, "weekly_plan_cadence_items"],
-    ["shopping items", shoppingItems, "weekly_plan_items"]
+    ["shopping items", shoppingItems, "weekly_plan_items"],
+    ["forgotten suggestions", forgottenSuggestions, "weekly_plan_forgotten_suggestions"]
   ] as const) {
+    if (rows.length === 0) continue;
+
     const result = await supabase.from(table).insert(rows as never[]);
     if (result.error) {
       throw new Error(`Failed to save ${label}: ${result.error.message}`);
@@ -308,6 +332,7 @@ export async function generateAndStoreNextWeeklyPlan() {
     weeklyPlanId,
     mealsSaved: meals.length,
     cadenceItemsSaved: cadenceItems.length,
-    shoppingItemsSaved: shoppingItems.length
+    shoppingItemsSaved: shoppingItems.length,
+    forgottenSuggestionsSaved: forgottenSuggestions.length
   };
 }

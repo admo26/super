@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CheckCircle2, ChefHat, ShoppingBasket, Trash2, Wand2, XCircle } from "lucide-react";
 
 import { AdHocItemForm } from "@/app/order-items/ad-hoc-item-form";
+import { ForgottenSuggestionsList } from "@/app/order-items/forgotten-suggestions-list";
 import { deleteShoppingListItem } from "@/app/plan/actions";
 import { LinkButton, Notice, PageHeader, Panel, Tag } from "@/app/ui";
 import { formatHumanDate } from "@/lib/date-format";
@@ -191,6 +192,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 </section>
               ))}
             </div>
+
+            <ForgottenSuggestionsList
+              canAdd={canEditShoppingList}
+              suggestions={shoppingPlan.forgottenSuggestions}
+              targetWeek={shoppingPlan.orderDate}
+            />
           </Panel>
         </div>
       </div>
