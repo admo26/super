@@ -320,3 +320,21 @@ ingredients_to_map:
 - guacamole (optional)
 - coriander (optional)
 - lime
+
+## Simple Beef Tacos
+source: family standard meal
+cook_frequency: rotating
+serving_pattern: same_week_meal
+rotation_notes: Simple family taco night. Treat as a rotating meal until cadence is clearer.
+
+ingredients_to_map:
+- beef mince
+- onion
+- taco seasoning
+- cherry tomatoes
+- lettuce
+- taco shells
+- salsa
+- cheese
+- sour cream or Greek yoghurt (optional)
+- avocado or guacamole (optional)

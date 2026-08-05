@@ -336,5 +336,24 @@
       "coriander (optional)",
       "lime"
     ]
+  },
+  {
+    "name": "Simple Beef Tacos",
+    "source": "family standard meal",
+    "cookFrequency": "rotating",
+    "servingPattern": "same_week_meal",
+    "rotationNotes": "Simple family taco night. Treat as a rotating meal until cadence is clearer.",
+    "ingredientsToMap": [
+      "beef mince",
+      "onion",
+      "taco seasoning",
+      "cherry tomatoes",
+      "lettuce",
+      "taco shells",
+      "salsa",
+      "cheese",
+      "sour cream or Greek yoghurt (optional)",
+      "avocado or guacamole (optional)"
+    ]
   }
 ]
