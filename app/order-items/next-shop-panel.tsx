@@ -13,14 +13,15 @@ type NextShopPanelProps = {
   returnTo?: string;
 };
 
-const reasonOrder = [
-  "planned meal",
-  "ad hoc",
-  "weekly staple",
-  "fortnightly staple",
-  "monthly staple",
-  "freezer batch",
-  "pantry check"
+const typeOrder = [
+  "Vegetables",
+  "Fruit",
+  "Protein",
+  "Dairy",
+  "Bread & wraps",
+  "Pantry",
+  "Frozen",
+  "Other"
 ];
 
 function formatReason(value: string) {
@@ -30,16 +31,16 @@ function formatReason(value: string) {
     .join(" ");
 }
 
-function groupItemsByReason(items: ShoppingItem[]) {
+function groupItemsByType(items: ShoppingItem[]) {
   const grouped = items.reduce<Record<string, ShoppingItem[]>>((acc, item) => {
-    const key = item.reason || "other";
+    const key = item.group || "Other";
     acc[key] = [...(acc[key] ?? []), item];
     return acc;
   }, {});
 
   return Object.entries(grouped).sort(([left], [right]) => {
-    const leftIndex = reasonOrder.indexOf(left);
-    const rightIndex = reasonOrder.indexOf(right);
+    const leftIndex = typeOrder.indexOf(left);
+    const rightIndex = typeOrder.indexOf(right);
     return (leftIndex === -1 ? 99 : leftIndex) - (rightIndex === -1 ? 99 : rightIndex) || left.localeCompare(right);
   });
 }
@@ -76,7 +77,7 @@ export function NextShopPanel({
   returnTo = "/cadence"
 }: NextShopPanelProps) {
   const canEditShoppingList = Boolean(plan.id);
-  const groupedItems = groupItemsByReason(plan.items);
+  const groupedItems = groupItemsByType(plan.items);
 
   return (
     <Panel tone="tinted">
@@ -95,10 +96,10 @@ export function NextShopPanel({
       <PendingAdHocList items={pendingAdHocItems} targetWeek={plan.orderDate} />
 
       <div className="shopping-list">
-        {groupedItems.map(([reason, items]) => (
-          <section className="shopping-group" key={reason}>
+        {groupedItems.map(([type, items]) => (
+          <section className="shopping-group" key={type}>
             <div className="shopping-group__header">
-              <span>{formatReason(reason)}</span>
+              <span>{type}</span>
               <span>{items.length}</span>
             </div>
             {items.map((item) => (
@@ -110,7 +111,7 @@ export function NextShopPanel({
                   </div>
                 </div>
                 <div className="shopping-item__actions">
-                  <Tag category={item.group}>{item.group}</Tag>
+                  <Tag category={item.reason}>{formatReason(item.reason)}</Tag>
                   {item.id ? (
                     <form action={deleteShoppingListItem}>
                       <input type="hidden" name="itemId" value={item.id} />
