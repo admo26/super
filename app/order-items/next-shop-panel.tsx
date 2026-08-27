@@ -18,6 +18,7 @@ const typeOrder = [
   "Fruit",
   "Protein",
   "Dairy",
+  "Drinks",
   "Bread & wraps",
   "Snacks",
   "Pantry",
@@ -33,8 +34,16 @@ function formatReason(value: string) {
 }
 
 function resolveItemType(item: ShoppingItem) {
-  if (/\bfruit sticks?\b/i.test(item.name)) {
+  if (/\b(?:fruit sticks?|corn thins?|rice crackers?)\b/i.test(item.name)) {
     return "Snacks";
+  }
+
+  if (/\b(?:oat|soy|almond|rice) milk\b/i.test(item.name)) {
+    return "Drinks";
+  }
+
+  if (/\bpeanut butter\b/i.test(item.name)) {
+    return "Pantry";
   }
 
   if (/\bgravy(?: mix)?\b/i.test(item.name)) {
