@@ -141,6 +141,10 @@ function inferGroup(name: string) {
     return "Dairy";
   }
 
+  if (/\bfruit sticks?\b/i.test(name)) {
+    return "Snacks";
+  }
+
   if (/(bread|wrap|tortilla|pita|pasta|rice|noodle|panko|breadcrumb|flour|sauce|passata|tomato paste|canned tomatoes|salsa|spice|seasoning|powder|curry|salt|pepper|oil|vinegar|jar|tube|sachet)/i.test(name)) {
     return "Pantry";
   }

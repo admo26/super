@@ -19,6 +19,7 @@ const typeOrder = [
   "Protein",
   "Dairy",
   "Bread & wraps",
+  "Snacks",
   "Pantry",
   "Frozen",
   "Other"
@@ -32,6 +33,10 @@ function formatReason(value: string) {
 }
 
 function resolveItemType(item: ShoppingItem) {
+  if (/\bfruit sticks?\b/i.test(item.name)) {
+    return "Snacks";
+  }
+
   if (/\b(?:onion|garlic) powder\b/i.test(item.name)) {
     return "Pantry";
   }
