@@ -29,6 +29,33 @@ ingredients_to_map:
 - Maggi Roast Chicken Flavoured Gravy Mix (1 sachet/pack)
 - onion (1)
 
+## Slow Cooker Beef Brisket with BBQ Sauce (RecipeTin Eats)
+source: https://www.recipetineats.com/slow-cooker-beef-brisket-with-bbq-sauce/#recipe
+cook_frequency: rotating
+serving_pattern: same_week_meal
+swap_for: Roast Chicken Dinner
+rotation_notes: Optional swap for Roast Chicken Dinner. Roast chicken remains the weekly default; when brisket is chosen, keep the usual roast vegetables and use the brisket BBQ sauce instead of chicken gravy.
+
+ingredients_to_map:
+- beef brisket (1.5-2 kg)
+- olive oil (pantry likely)
+- brown sugar (pantry likely)
+- paprika powder (pantry likely)
+- onion powder (pantry likely)
+- garlic powder (pantry likely)
+- ground cumin (pantry likely)
+- mustard powder (pantry likely)
+- salt and black pepper (pantry likely)
+- garlic cloves (2)
+- apple cider vinegar (125 ml)
+- ketchup (375 ml)
+- cayenne pepper (pantry likely)
+- Worcestershire sauce (pantry likely)
+- Pams Brushed Agria Potatoes (1 bag)
+- carrots (2)
+- red kumara (2)
+- onion (1)
+
 ## Butter Chicken (RecipeTin Eats)
 source: https://www.recipetineats.com/butter-chicken/#recipe
 cook_frequency: rotating

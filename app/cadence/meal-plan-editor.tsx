@@ -38,7 +38,9 @@ function mealTypeFromFrequency(frequency: RecipeFrequency, batchCook: boolean) {
 function recipeToMeal(recipe: Recipe): EditableMeal {
   return {
     name: recipe.name,
-    type: mealTypeFromFrequency(recipe.cookFrequency, isBatchCook(recipe)),
+    type: recipe.swapFor
+      ? "Weekly swap"
+      : mealTypeFromFrequency(recipe.cookFrequency, isBatchCook(recipe)),
     note: recipe.rotationNotes,
     url: recipe.source.startsWith("http") ? recipe.source : undefined
   };

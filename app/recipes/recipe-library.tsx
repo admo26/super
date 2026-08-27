@@ -26,6 +26,7 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
           recipe.cookFrequency,
           recipe.servingPattern,
           recipe.rotationNotes,
+          recipe.swapFor ?? "",
           recipe.ingredientsToMap.join(" ")
         ]
           .join(" ")
@@ -64,8 +65,8 @@ export function RecipeLibrary({ recipes }: RecipeLibraryProps) {
                     )}
                   </h3>
                   <p className="recipe-meta">
-                    <Tag category={recipeFrequencyLabel(recipe.cookFrequency)}>
-                      {recipeFrequencyLabel(recipe.cookFrequency)}
+                    <Tag category={recipeFrequencyLabel(recipe.cookFrequency, recipe.swapFor)}>
+                      {recipeFrequencyLabel(recipe.cookFrequency, recipe.swapFor)}
                     </Tag>
                     <span>{recipe.servingPattern}</span>
                   </p>

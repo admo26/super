@@ -133,7 +133,7 @@ function parseIngredientSpec(spec: string): IngredientEntry | null {
 }
 
 function inferGroup(name: string) {
-  if (/(beef|chicken|pork|sausage|sausages|meatball|meatballs|egg|eggs|fish|mince)/i.test(name)) {
+  if (/(beef|brisket|chicken|pork|sausage|sausages|meatball|meatballs|egg|eggs|fish|mince)/i.test(name)) {
     return "Protein";
   }
 
@@ -402,7 +402,9 @@ function buildMealPlan(
 ) {
   const batchRecipes = recipes.filter((recipe) => isBatchCook(recipe));
   const weeklyRecipes = recipes.filter((recipe) => recipe.cookFrequency === "weekly" && !isBatchCook(recipe));
-  const rotationRecipes = recipes.filter((recipe) => recipe.cookFrequency === "rotating" && !isBatchCook(recipe));
+  const rotationRecipes = recipes.filter(
+    (recipe) => recipe.cookFrequency === "rotating" && !isBatchCook(recipe) && !recipe.swapFor
+  );
   const recipeUsageByName = buildRecipeUsageByName(recipeHistory);
 
   const scoredRotation = rotationRecipes

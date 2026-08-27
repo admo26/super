@@ -9,13 +9,15 @@ export type Recipe = {
   servingPattern: string;
   rotationNotes: string;
   ingredientsToMap: string[];
+  swapFor?: string;
 };
 
 export function isBatchCook(recipe: Recipe) {
   return recipe.servingPattern === "used_weekly_with_pasta";
 }
 
-export function recipeFrequencyLabel(frequency: RecipeFrequency) {
+export function recipeFrequencyLabel(frequency: RecipeFrequency, swapFor?: string) {
+  if (swapFor) return "Weekly swap";
   if (frequency === "monthly_batch") return "Batch cook";
   return frequency === "weekly" ? "Weekly" : "Rotating";
 }
