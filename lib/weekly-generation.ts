@@ -141,7 +141,7 @@ function inferGroup(name: string) {
     return "Dairy";
   }
 
-  if (/(bread|wrap|tortilla|pita|pasta|rice|noodle|panko|breadcrumb|flour|sauce|passata|tomato paste|canned tomatoes|salsa|spice|curry|oil|vinegar|jar|tube|sachet)/i.test(name)) {
+  if (/(bread|wrap|tortilla|pita|pasta|rice|noodle|panko|breadcrumb|flour|sauce|passata|tomato paste|canned tomatoes|salsa|spice|seasoning|powder|curry|salt|pepper|oil|vinegar|jar|tube|sachet)/i.test(name)) {
     return "Pantry";
   }
 

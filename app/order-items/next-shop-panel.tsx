@@ -31,9 +31,17 @@ function formatReason(value: string) {
     .join(" ");
 }
 
+function resolveItemType(item: ShoppingItem) {
+  if (/\b(?:onion|garlic) powder\b/i.test(item.name)) {
+    return "Pantry";
+  }
+
+  return item.group || "Other";
+}
+
 function groupItemsByType(items: ShoppingItem[]) {
   const grouped = items.reduce<Record<string, ShoppingItem[]>>((acc, item) => {
-    const key = item.group || "Other";
+    const key = resolveItemType(item);
     acc[key] = [...(acc[key] ?? []), item];
     return acc;
   }, {});
