@@ -209,6 +209,7 @@ export async function POST(request: Request) {
     }
 
     revalidatePath("/");
+    revalidatePath("/cadence");
     return NextResponse.json({
       ok: true,
       status: "added-to-plan",
@@ -232,6 +233,7 @@ export async function POST(request: Request) {
   }
 
   revalidatePath("/");
+  revalidatePath("/cadence");
   return NextResponse.json({
     ok: true,
     status: "pending",

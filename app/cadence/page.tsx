@@ -3,12 +3,13 @@ import { Beef, CheckCircle2, ClipboardList, CookingPot, PackageCheck, Sparkles, 
 
 import { CadenceEditor } from "@/app/cadence/cadence-editor";
 import { MealPlanEditor } from "@/app/cadence/meal-plan-editor";
+import { NextShopPanel } from "@/app/order-items/next-shop-panel";
 import { generateNextWeeklyPlan } from "@/app/plan/actions";
 import { RecipeLibrary } from "@/app/recipes/recipe-library";
 import { Button, Notice, PageHeader, Panel, Tabs } from "@/app/ui";
 import { formatHumanDate } from "@/lib/date-format";
 import { getRecipes } from "@/lib/recipes";
-import { getEditableWeeklyPlan, getRecurringCadence, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
+import { getEditableWeeklyPlan, getPendingAdHocItems, getRecurringCadence, getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
 
 type CadencePageProps = {
   searchParams?: Promise<{
@@ -47,7 +48,12 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
       : resolvedSearchParams.tab === "recipes"
         ? "recipes"
         : "next-week";
-  const mealPlan = selectedTab === "next-week" && nextWeek ? await getEditableWeeklyPlan(nextWeek) : null;
+  const [mealPlan, shoppingPlan] = selectedTab === "next-week" && nextWeek
+    ? await Promise.all([getEditableWeeklyPlan(nextWeek), getWeeklyPlan(nextWeek)])
+    : [null, null];
+  const pendingAdHocItems = shoppingPlan
+    ? await getPendingAdHocItems(shoppingPlan.orderDate)
+    : [];
 
   return (
     <main className="page-shell">
@@ -99,14 +105,21 @@ export default async function CadencePage({ searchParams }: CadencePageProps) {
             }
             initialCadence={recurringCadence.cadence}
           />
-        ) : mealPlan ? (
-          <MealPlanEditor
-            weeklyPlanId={mealPlan.id}
-            orderDate={mealPlan.orderDate}
-            analysisWindow={mealPlan.analysisWindow}
-            initialMeals={mealPlan.meals}
-            recipes={recipes}
-          />
+        ) : mealPlan && shoppingPlan ? (
+          <>
+            <MealPlanEditor
+              weeklyPlanId={mealPlan.id}
+              orderDate={mealPlan.orderDate}
+              analysisWindow={mealPlan.analysisWindow}
+              initialMeals={mealPlan.meals}
+              recipes={recipes}
+            />
+            <NextShopPanel
+              plan={shoppingPlan}
+              pendingAdHocItems={pendingAdHocItems}
+              returnTo="/cadence"
+            />
+          </>
         ) : selectedTab === "recipes" ? (
           <Panel>
             <div className="section-header">

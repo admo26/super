@@ -1,110 +1,20 @@
 import Link from "next/link";
-import { CheckCircle2, ChefHat, ShoppingBasket, Trash2, Wand2, XCircle } from "lucide-react";
+import { ChefHat, Wand2 } from "lucide-react";
 
-import { AdHocItemForm } from "@/app/order-items/ad-hoc-item-form";
-import { ForgottenSuggestionsList } from "@/app/order-items/forgotten-suggestions-list";
-import { deleteShoppingListItem } from "@/app/plan/actions";
-import { LinkButton, Notice, PageHeader, Panel, Tag } from "@/app/ui";
-import { formatHumanDate } from "@/lib/date-format";
-import { getPendingAdHocItems, getWeeklyPlan, getWeeklyPlanSummaries } from "@/lib/weekly-plan";
-import type { PendingAdHocItem, ShoppingItem } from "@/lib/types";
+import { LinkButton, PageHeader, Panel, Tag } from "@/app/ui";
+import { getWeeklyPlan } from "@/lib/weekly-plan";
 
-type HomePageProps = {
-  searchParams?: Promise<{
-    generated?: string;
-    error?: string;
-  }>;
-};
+export const dynamic = "force-dynamic";
 
-const reasonOrder = ["planned meal", "ad hoc", "weekly staple", "fortnightly staple", "monthly staple", "freezer batch", "pantry check"];
-
-function formatDate(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function addDays(dateString: string, days: number) {
-  const date = new Date(`${dateString}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return formatDate(date);
-}
-
-function formatReason(value: string) {
-  return value
-    .split(" ")
-    .map((word) => word[0]?.toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function groupItemsByReason(items: ShoppingItem[]) {
-  const grouped = items.reduce<Record<string, ShoppingItem[]>>((acc, item) => {
-    const key = item.reason || "other";
-    acc[key] = [...(acc[key] ?? []), item];
-    return acc;
-  }, {});
-
-  return Object.entries(grouped).sort(([left], [right]) => {
-    const leftIndex = reasonOrder.indexOf(left);
-    const rightIndex = reasonOrder.indexOf(right);
-    return (leftIndex === -1 ? 99 : leftIndex) - (rightIndex === -1 ? 99 : rightIndex) || left.localeCompare(right);
-  });
-}
-
-function PendingAdHocList({ items, targetWeek }: { items: PendingAdHocItem[]; targetWeek: string }) {
-  if (!items.length) return null;
-
-  return (
-    <section className="pending-ad-hoc" aria-label="Pending ad hoc items">
-      <div className="shopping-group__header">
-        <span>Saved for the next shop</span>
-        <span>{items.length}</span>
-      </div>
-      <div className="pending-ad-hoc__list">
-        {items.map((item) => (
-          <article className="shopping-item" key={item.id}>
-            <div>
-              <div className="shopping-name">{item.name}</div>
-              <div className="shopping-meta">
-                Qty: {item.qty} · saved for {formatHumanDate(targetWeek)}
-              </div>
-            </div>
-            <Tag tone="info">Pending</Tag>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const resolvedSearchParams = (await searchParams) ?? {};
-  const generated = resolvedSearchParams.generated === "1";
-  const error = resolvedSearchParams.error ?? null;
-  const [plan, planSummaries] = await Promise.all([
-    getWeeklyPlan(),
-    getWeeklyPlanSummaries()
-  ]);
-  const nextWeekSummary = planSummaries.find((summary) => summary.orderDate > plan.orderDate) ?? null;
-  const shoppingPlan = nextWeekSummary ? await getWeeklyPlan(nextWeekSummary.orderDate) : plan;
-  const adHocTargetWeek = shoppingPlan.orderDate ?? addDays(plan.orderDate, 7);
-  const pendingAdHocItems = !nextWeekSummary
-    ? await getPendingAdHocItems(adHocTargetWeek)
-    : [];
-  const canEditShoppingList = Boolean(shoppingPlan.id);
-  const groupedItems = groupItemsByReason(shoppingPlan.items);
-  const isPreparingNextOrder = Boolean(nextWeekSummary);
+export default async function HomePage() {
+  const plan = await getWeeklyPlan();
 
   return (
     <main className="page-shell">
-      {generated ? (
-        <Notice icon={<CheckCircle2 aria-hidden="true" />}>
-          Next week is ready to go.
-        </Notice>
-      ) : null}
-      {error ? <Notice tone="danger" icon={<XCircle aria-hidden="true" />}>{error}</Notice> : null}
       <PageHeader
         eyebrow="This Week"
         title="Dinners for the week"
-        summary={<>A quick view of what&apos;s on for dinner now, plus the list for the next shop.</>}
+        summary={<>A quick view of what&apos;s on for dinner now.</>}
         actions={
           <LinkButton as={Link} href="/cadence" icon={<Wand2 aria-hidden="true" />} variant="secondary">
             Plan next week
@@ -143,62 +53,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </div>
           </Panel>
 
-          <Panel tone="tinted">
-            <div className="section-header">
-              <div>
-                <h2><ShoppingBasket aria-hidden="true" size={19} /> {isPreparingNextOrder ? "Next shop" : "Shopping list"}</h2>
-                <p>
-                  {canEditShoppingList
-                    ? isPreparingNextOrder
-                      ? `Everything you need for the ${formatHumanDate(shoppingPlan.orderDate)} order.`
-                      : "Your list, grouped so it&apos;s easier to sense-check before you shop."
-                    : "List editing is available once this plan has been saved."}
-                </p>
-              </div>
-              <AdHocItemForm targetWeek={adHocTargetWeek} />
-            </div>
-
-            <PendingAdHocList items={pendingAdHocItems} targetWeek={adHocTargetWeek} />
-
-            <div className="shopping-list">
-              {groupedItems.map(([reason, items]) => (
-                <section className="shopping-group" key={reason}>
-                  <div className="shopping-group__header">
-                    <span>{formatReason(reason)}</span>
-                    <span>{items.length}</span>
-                  </div>
-                  {items.map((item) => (
-                    <article className="shopping-item" key={item.id ?? `${item.name}-${item.qty}`}>
-                      <div>
-                        <div className="shopping-name">{item.name}</div>
-                        <div className="shopping-meta">
-                          Qty: {item.qty} · {item.meal}
-                        </div>
-                      </div>
-                      <div className="shopping-item__actions">
-                        <Tag category={item.group}>{item.group}</Tag>
-                        {item.id ? (
-                          <form action={deleteShoppingListItem}>
-                            <input type="hidden" name="itemId" value={item.id} />
-                            <button className="ghost-button ghost-button--small" type="submit">
-                              <Trash2 aria-hidden="true" />
-                              Remove
-                            </button>
-                          </form>
-                        ) : null}
-                      </div>
-                    </article>
-                  ))}
-                </section>
-              ))}
-            </div>
-
-            <ForgottenSuggestionsList
-              canAdd={canEditShoppingList}
-              suggestions={shoppingPlan.forgottenSuggestions}
-              targetWeek={shoppingPlan.orderDate}
-            />
-          </Panel>
         </div>
       </div>
     </main>

@@ -62,14 +62,20 @@ export async function generateNextWeeklyPlan(formData?: FormData) {
 }
 
 export async function deleteShoppingListItem(formData: FormData) {
+  const returnToValue = formData.get("returnTo");
+  const returnTo =
+    typeof returnToValue === "string" && returnToValue.startsWith("/") && !returnToValue.startsWith("//")
+      ? returnToValue
+      : "/cadence";
+
   if (!hasSupabaseConfig()) {
-    redirectWithError("Supabase is not configured.");
+    redirectWithError("Supabase is not configured.", returnTo);
   }
 
   const itemId = formData.get("itemId");
 
   if (typeof itemId !== "string" || itemId.length === 0) {
-    redirectWithError("Missing shopping list item id.");
+    redirectWithError("Missing shopping list item id.", returnTo);
   }
 
   const supabase = await createClient();
@@ -78,7 +84,7 @@ export async function deleteShoppingListItem(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?error=${encodeError("Please sign in first.")}&next=${encodeURIComponent("/")}`);
+    redirect(`/login?error=${encodeError("Please sign in first.")}&next=${encodeURIComponent(returnTo)}`);
   }
 
   if (!isAllowedAuthEmail(user.email)) {
@@ -88,9 +94,10 @@ export async function deleteShoppingListItem(formData: FormData) {
   const deleteResult = await supabase.from("weekly_plan_items").delete().eq("id", itemId);
 
   if (deleteResult.error) {
-    redirectWithError(deleteResult.error.message);
+    redirectWithError(deleteResult.error.message, returnTo);
   }
 
   revalidatePath("/");
-  redirect("/");
+  revalidatePath("/cadence");
+  redirect(returnTo);
 }
