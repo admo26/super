@@ -133,6 +133,10 @@ function parseIngredientSpec(spec: string): IngredientEntry | null {
 }
 
 function inferGroup(name: string) {
+  if (/\bgravy(?: mix)?\b/i.test(name)) {
+    return "Pantry";
+  }
+
   if (/(beef|brisket|chicken|pork|sausage|sausages|meatball|meatballs|egg|eggs|fish|mince)/i.test(name)) {
     return "Protein";
   }

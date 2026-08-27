@@ -37,6 +37,10 @@ function resolveItemType(item: ShoppingItem) {
     return "Snacks";
   }
 
+  if (/\bgravy(?: mix)?\b/i.test(item.name)) {
+    return "Pantry";
+  }
+
   if (/\b(?:onion|garlic) powder\b/i.test(item.name)) {
     return "Pantry";
   }
