@@ -133,6 +133,10 @@ function parseIngredientSpec(spec: string): IngredientEntry | null {
 }
 
 function inferGroup(name: string) {
+  if (/\b(?:stock powder|bouillon)\b/i.test(name)) {
+    return "Pantry";
+  }
+
   if (/\b(?:fruit sticks?|corn thins?|rice crackers?)\b/i.test(name)) {
     return "Snacks";
   }
@@ -153,7 +157,7 @@ function inferGroup(name: string) {
     return "Protein";
   }
 
-  if (/(milk|cheese|yoghurt|yogurt|cream|butter|coconut milk|kewpie|mayo)/i.test(name)) {
+  if (/(milk|cheese|parmesan|yoghurt|yogurt|cream|butter|coconut milk|kewpie|mayo)/i.test(name)) {
     return "Dairy";
   }
 
@@ -169,7 +173,7 @@ function inferGroup(name: string) {
     return "Frozen";
   }
 
-  if (/(potato|potatoes|kumara|carrot|broccoli|cucumber|capsicum|lettuce|spinach|tomato|onion|garlic|ginger|slaw)/i.test(name)) {
+  if (/(potato|potatoes|kumara|carrot|broccoli|cucumber|capsicum|lettuce|spinach|tomato|onion|garlic|ginger|parsley|slaw)/i.test(name)) {
     return "Vegetables";
   }
 

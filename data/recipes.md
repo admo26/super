@@ -365,3 +365,26 @@ ingredients_to_map:
 - cheese
 - sour cream or Greek yoghurt (optional)
 - avocado or guacamole (optional)
+
+## Baked Chicken Rissoles (Simple Home Edit)
+source: https://simplehomeedit.com/recipe/baked-chicken-rissoles/
+cook_frequency: rotating
+serving_pattern: same_week_meal
+rotation_notes: Rotating family dinner option. Quick oven-baked chicken rissoles with a crisp panko and parmesan coating; freezer-friendly and suitable for easy weeknights.
+
+ingredients_to_map:
+- olive oil spray (pantry likely)
+- chicken mince (500 g)
+- onion (1 small)
+- garlic (1 tsp)
+- fresh flat-leaf parsley (1 bunch)
+- panko breadcrumbs (60 g)
+- egg (1)
+- chicken stock powder (1 tsp)
+- black pepper (pantry likely)
+- sweet paprika (1 tsp)
+- parmesan (35 g)
+- sea salt (pantry likely)
+- lemon wedges (optional side)
+- mashed potatoes (optional side)
+- creamy garlic cucumber salad (optional side)
