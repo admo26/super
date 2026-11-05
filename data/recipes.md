@@ -105,7 +105,7 @@ ingredients_to_map:
 - lettuce or spinach
 - cheese
 - cherry tomatoes
-- chicken thighs
+- chicken thighs (2 pack)
 
 ## Sticky BBQ Meatballs (Simple Home Edit)
 source: https://simplehomeedit.com/recipe/sticky-bbq-meatballs/
