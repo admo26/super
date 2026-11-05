@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Save, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button, Panel, Tag } from "@/app/ui";
 import { formatHumanDate } from "@/lib/date-format";
@@ -68,6 +69,7 @@ export function MealPlanEditor({
   initialMeals,
   recipes
 }: MealPlanEditorProps) {
+  const router = useRouter();
   const [draftMeals, setDraftMeals] = useState(() => cloneMeals(initialMeals));
   const [saveMessage, setSaveMessage] = useState("Changes save automatically.");
   const [error, setError] = useState<string | null>(null);
@@ -144,6 +146,7 @@ export function MealPlanEditor({
         }
 
         setSaveMessage(`Saved ${payload.saved} meals and refreshed ${payload.itemsSaved} shopping list items.`);
+        router.refresh();
       } catch {
         if (requestId !== saveRequestId.current) return;
         setSaveMessage("Auto-save paused.");
@@ -152,7 +155,7 @@ export function MealPlanEditor({
     }, 800);
 
     return () => window.clearTimeout(timeoutId);
-  }, [draftMeals, weeklyPlanId]);
+  }, [draftMeals, weeklyPlanId, router]);
 
   return (
     <Panel className="cadence-editor">
