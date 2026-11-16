@@ -56,6 +56,10 @@ function mapItem(row: OrderHistoryRow): OrderHistoryItem {
   };
 }
 
+// Supabase/PostgREST caps a single response at 1000 rows by default, so the
+// history must be paged or older orders silently stop rendering.
+const HISTORY_PAGE_SIZE = 1000;
+
 export async function getOrderHistoryRows(limit?: number): Promise<OrderHistoryRow[]> {
   if (!hasSupabaseConfig()) {
     return [];
@@ -63,23 +67,39 @@ export async function getOrderHistoryRows(limit?: number): Promise<OrderHistoryR
 
   try {
     const supabase = await createClient();
-    let query = supabase
-      .from("order_history_items")
-      .select("order_date, item_name, quantity, unit, category, notes, source_type, source_name")
-      .order("order_date", { ascending: false })
-      .order("item_name", { ascending: true });
+    const rows: OrderHistoryRow[] = [];
+    let from = 0;
 
-    if (limit) {
-      query = query.limit(limit);
+    while (true) {
+      const remaining = typeof limit === "number" ? limit - rows.length : HISTORY_PAGE_SIZE;
+      if (remaining <= 0) {
+        break;
+      }
+      const pageSize = Math.min(HISTORY_PAGE_SIZE, remaining);
+
+      const result = await supabase
+        .from("order_history_items")
+        .select("order_date, item_name, quantity, unit, category, notes, source_type, source_name")
+        .order("order_date", { ascending: false })
+        .order("item_name", { ascending: true })
+        // id tiebreaker keeps the sort stable across pages.
+        .order("id", { ascending: true })
+        .range(from, from + pageSize - 1);
+
+      if (result.error) {
+        return [];
+      }
+
+      const page = (result.data ?? []) as OrderHistoryRow[];
+      rows.push(...page);
+
+      if (page.length < pageSize) {
+        break;
+      }
+      from += pageSize;
     }
 
-    const result = await query;
-
-    if (result.error) {
-      return [];
-    }
-
-    return (result.data ?? []) as OrderHistoryRow[];
+    return rows;
   } catch {
     return [];
   }

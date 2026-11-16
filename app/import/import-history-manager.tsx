@@ -27,6 +27,7 @@ export function ImportHistoryManager() {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isParsing, startParsing] = useTransition();
   const [isSaving, startSaving] = useTransition();
+  const [formResetKey, setFormResetKey] = useState(0);
 
   function handleParse() {
     if (!file) {
@@ -100,7 +101,13 @@ export function ImportHistoryManager() {
         return;
       }
 
-      setSaveMessage(`Saved ${payload.saved} order history rows to Supabase.`);
+      const skippedNote = payload.skipped ? ` (${payload.skipped} already saved)` : "";
+      setSaveMessage(`Saved ${payload.saved} order history rows to Supabase.${skippedNote}`);
+      // Clear the draft so a second click on Save cannot insert the same rows again.
+      setParsed(null);
+      setDraftItems([]);
+      setFile(null);
+      setFormResetKey((key) => key + 1);
       router.refresh();
     });
   }
@@ -138,6 +145,7 @@ export function ImportHistoryManager() {
 
         <div className="import-controls">
           <input
+            key={formResetKey}
             type="file"
             accept=".pdf,image/png,image/jpeg"
             onChange={(event) => setFile(event.target.files?.[0] ?? null)}

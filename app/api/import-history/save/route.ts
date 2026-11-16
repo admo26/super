@@ -31,18 +31,57 @@ export async function POST(request: Request) {
     auth: { persistSession: false }
   });
 
-  const result = await supabase.from("order_history_items").insert(
-    body.items.map((item) => ({
-      order_date: item.order_date,
-      item_name: item.item_name,
-      quantity: item.quantity,
-      unit: item.unit,
-      category: item.category,
-      notes: item.notes,
-      source_type: "file_import",
-      source_name: body.source_name
-    }))
-  );
+  const items = body.items.map((item) => ({
+    order_date: item.order_date,
+    item_name: item.item_name,
+    quantity: item.quantity,
+    unit: item.unit,
+    category: item.category,
+    notes: item.notes,
+    source_type: "file_import",
+    source_name: body.source_name
+  }));
+
+  // Dedupe: a re-saved draft (double click, retry, raced save) must not
+  // insert the same rows twice. Match on the full row content for this
+  // source file and skip anything already stored.
+  type DedupeRow = {
+    order_date: string | null;
+    item_name: string;
+    quantity: string | null;
+    unit: string | null;
+    category: string | null;
+    notes: string | null;
+  };
+  const itemKey = (item: DedupeRow) =>
+    [
+      item.order_date ?? "",
+      item.item_name,
+      item.quantity ?? "",
+      item.unit ?? "",
+      item.category ?? "",
+      item.notes ?? ""
+    ].join("\u0000");
+
+  const { data: existingRows, error: lookupError } = await supabase
+    .from("order_history_items")
+    .select("order_date, item_name, quantity, unit, category, notes")
+    .eq("source_type", "file_import")
+    .eq("source_name", body.source_name);
+
+  if (lookupError) {
+    return NextResponse.json({ error: lookupError.message }, { status: 500 });
+  }
+
+  const existingKeys = new Set((existingRows ?? []).map(itemKey));
+  const newItems = items.filter((item) => !existingKeys.has(itemKey(item)));
+  const skipped = items.length - newItems.length;
+
+  if (!newItems.length) {
+    return NextResponse.json({ ok: true, saved: 0, skipped });
+  }
+
+  const result = await supabase.from("order_history_items").insert(newItems);
 
   if (result.error) {
     if (result.error.message.includes("Could not find the table 'public.order_history_items'")) {
@@ -58,5 +97,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, saved: body.items.length });
+  return NextResponse.json({ ok: true, saved: newItems.length, skipped });
 }
